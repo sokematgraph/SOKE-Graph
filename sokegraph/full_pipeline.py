@@ -16,9 +16,25 @@ from itertools import combinations
 import re
 
 
+counter_index_API = 0
+
 def full_pipeline_main(args):
     
-    pass
+    updated_ontology_file_path = ranking_papers(args.API_keys,
+    args.ontology_file,
+    int(args.number_papers),
+    args.paper_query_file,
+    args.keyword_query_file,
+    args.output_dir)
+
+    with open(args.credentials_for_knowledge_graph, "r") as file:
+        credentials = json.load(file)
+
+    build_knowledge_graph_from_ontology_json(updated_ontology_file_path,
+    credentials["neo4j_uri"],
+    credentials["neo4j_user"],
+    credentials["neo4j_pass"])
+
 
 def safe_title(title: str, max_len: int = 100) -> str:
     """
@@ -40,7 +56,7 @@ def safe_title(title: str, max_len: int = 100) -> str:
     return cleaned_title[:max_len].strip()
 
 
-def get_unique_papers_from_sch(max_total: int, queries_file_path) -> List[Dict]:
+def get_unique_papers_from_sch(max_total: int, paper_query_file_path) -> List[Dict]:
     """
     Search Semantic Scholar for research papers matching a list of queries,
     and return a deduplicated list of paper metadata.
@@ -53,7 +69,7 @@ def get_unique_papers_from_sch(max_total: int, queries_file_path) -> List[Dict]:
         List[Dict]: A list of unique papers, where each paper is represented as a dictionary
                     containing keys: paper_id, title, abstract, authors, year, venue, url, and doi.
     """
-    search_queries_list = load_queries_list(queries_file_path)
+    search_queries_list = load_queries_list(paper_query_file_path)
 
 
     # Initialize the Semantic Scholar API
@@ -120,8 +136,8 @@ def get_unique_papers_from_sch(max_total: int, queries_file_path) -> List[Dict]:
     return semantic_scholar_papers
 
 
-def load_queries_list(queries_file_path):
-    with open(queries_file_path, 'r') as f:
+def load_queries_list(paper_query_file_path):
+    with open(paper_query_file_path, 'r') as f:
         return [line.strip() for line in f if line.strip()]
 
 
@@ -140,8 +156,10 @@ def load_api_keys(API_file_path: str) -> List[str]:
         return [line.strip() for line in f if line.strip()]
 
 ####check is it true
-def get_next_api_key(api_keys, current_api_index):
-    key = api_keys[(current_api_index + 1) % len(api_keys)]
+def get_next_api_key(api_keys):
+    global counter_index_API
+    counter_index_API = counter_index_API + 1
+    key = api_keys[(counter_index_API + 1) % len(api_keys)]
     return key
 
 
@@ -256,7 +274,7 @@ def call_openai_model(layer_name: str, abstract_text: str, ontology_layer: Dict,
 
 
 
-def enrich_ontology_with_papers(ontology_path: str, api_keys_path: str, max_papers: int) -> None:
+def enrich_ontology_with_papers(ontology_path: str, api_keys_path: str, max_papers: int, paper_query_file_path, output_dir) -> None:
     """
     Enrich the ontology by extracting relevant keywords from paper abstracts using the OpenAI API,
     and save the enriched ontology structure to a JSON file.
@@ -278,7 +296,7 @@ def enrich_ontology_with_papers(ontology_path: str, api_keys_path: str, max_pape
     print("Total API keys loaded:", len(api_keys))
 
     # Step 3: Retrieve research papers (titles and abstracts), up to `max_papers`
-    text_data, title_map, abstract_map = load_paper_data(max_papers)
+    text_data, title_map, abstract_map = load_paper_data(max_papers, paper_query_file_path)
     print(f"✅ Organized {len(text_data)} papers with title-based IDs.")
 
     # Step 4: Extract relevant keywords from each paper abstract for each ontology layer
@@ -288,9 +306,12 @@ def enrich_ontology_with_papers(ontology_path: str, api_keys_path: str, max_pape
     parse_all_metadata(ontology_extractions)
 
     # Step 6: Save the updated ontology structure to a JSON file
-    with open("updated_ontology.json", "w") as f:
+    updated_ontology_file_path = f"{output_dir}/updated_ontology.json"
+    with open(updated_ontology_file_path, "w") as f:
         json.dump(ontology_extractions, f, indent=2)
-    print("✅ Saved updated ontology to 'updated_ontology.json'")
+    print(f"✅ Saved updated ontology to {updated_ontology_file_path}")
+
+    return ontology_extractions, title_map, abstract_map, updated_ontology_file_path
 
 
 def load_or_initialize_ontology(path: str) -> dict:
@@ -305,13 +326,12 @@ def load_or_initialize_ontology(path: str) -> dict:
         dict: The ontology data as a dictionary, either loaded from file or the fallback version.
     """
     if not os.path.exists(path):
-        print("\u26A0\uFE0F 'ontology.json' not found. Using built-in fallback.")
-    try:
-        return json.load(open(path))
-    except:
-        return fallback_ontology()
-    
+        print("\u26A0\uFE0F 'ontology.json' not found.")
+        return
+    return json.load(open(path))
 
+
+#### to be deleted
 def fallback_ontology() -> dict:
     """
     Provide a predefined fallback ontology as a nested dictionary.
@@ -387,7 +407,7 @@ def fallback_ontology() -> dict:
     }
 
 
-def load_paper_data(max_paper: int) -> tuple[dict, dict, dict]:
+def load_paper_data(max_paper: int, paper_query_file_path) -> tuple[dict, dict, dict]:
     """
     Retrieve and organize research paper data up to a specified maximum number.
 
@@ -406,7 +426,7 @@ def load_paper_data(max_paper: int) -> tuple[dict, dict, dict]:
         by these safe IDs. If a paper's title or abstract is missing, an empty string is used instead.
     """
     text_data, title_map, abstract_map = {}, {}, {}
-    papers = get_unique_papers_from_sch(max_paper)
+    papers = get_unique_papers_from_sch(max_paper, paper_query_file_path)
     for paper in papers:
         safe_id = safe_title(paper['title'] or paper['paper_id'])
         text_data[safe_id] = paper['abstract'] or ""
@@ -445,7 +465,7 @@ def extract_keywords(ontology: dict, text_data: dict, api_keys: list) -> dict:
         It skips any categories returned by the model that are not defined in the ontology.
         Progress and warnings are printed to the console during processing.
     """
-    from collections import defaultdict
+    
     results_dict = defaultdict(lambda: defaultdict(list))
     for paper_id, abstract in text_data.items():
         print(f"\U0001F50D Processing paper: {paper_id}")
@@ -596,7 +616,7 @@ def build_knowledge_graph_from_ontology_json(
     None
     """
 
-    # Load extracted ontology from JSON file
+    # Load extracted ontology from JSON file (updated Json file)
     with open(ontology_path, "r") as f:
         ontology_extractions = json.load(f)
 
@@ -1093,7 +1113,7 @@ def is_dominated_by_opposites(
     # Default fallback: Keep the paper
     return False
 
-
+#### user_query = keywords_query_list (str)
 def find_common_papers(
     user_query: str,
     ontology_extractions: dict,
@@ -1103,6 +1123,7 @@ def find_common_papers(
     client,
     kw_lookup: dict,
     abstract_map: dict,
+    output_dir,
     threshold: float = 1.5
 ) -> tuple:
     """
@@ -1126,6 +1147,8 @@ def find_common_papers(
             - ranked (list): List of tuples (paper_id, score) for ranked papers.
             - low_sorted (list): List of filtered low relevance papers sorted by threshold exceed count.
     """
+    #@Sana : the code didnt use threshold. what is that?
+
 
     print(f"🔍 User query: {user_query}")
 
@@ -1194,7 +1217,7 @@ def find_common_papers(
         except ImportError:
             pass
 
-        summary_df.to_csv("filtered_paper_breakdown.csv", index=False)
+        summary_df.to_csv(f"{output_dir}/filtered_paper_breakdown.csv", index=False)
 
         print(f"\n🚫 Filtered out {len(filtered_out)} papers due to dominance of opposite keywords.")
 
@@ -1243,7 +1266,10 @@ def find_common_papers(
         }
         for pid, pair_set in ranked_by_pair_overlap
     ])
-    df_pairs.to_csv("shared_pair_ranked_papers.csv", index=False)
+
+    df_pairs_file_path = f"{output_dir}/shared_pair_ranked_papers.csv"
+
+    df_pairs.to_csv(df_pairs_file_path, index=False)
     print("✅ Exported shared papers to 'shared_pair_ranked_papers.csv'")
 
     # Step 10: Show category overlap statistics
@@ -1261,78 +1287,13 @@ def find_common_papers(
 
         print(f"  • '{c1}' ↔ '{c2}': {len(filtered_shared)} shared papers, {total_mentions} keyword mentions in common")
 
-    return ranked, low_sorted
-    
-
-
-def ranking_papers(
-    title_map: dict,
-    abstract_map: dict,
-    pair_file: str
-) -> None:
-    """
-    Load ontology data, build mappings from ontology categories to papers and keywords,
-    classify and rank papers relevant to a query, then rank shared papers by category pairs.
-
-    Args:
-        title_map (dict): Mapping of paper IDs to their titles.
-        abstract_map (dict): Mapping of paper IDs to their abstracts.
-        pair_file (str): Path to file containing category pair data for ranking overlaps.
-
-    Returns:
-        None: Prints output and saves ranked paper info, no explicit return.
-    """
-
-    # Step 1: Load ontology extraction data from JSON file
-    with open("updated_ontology.json", "r") as f:
-        ontology_extractions = json.load(f)
-
-    # Step 2: Initialize dictionaries to store mappings and counts
-    category_to_papers = defaultdict(lambda: defaultdict(int))   # {(layer, category): {paper_id: count}}
-    paper_keyword_map = defaultdict(lambda: defaultdict(set))    # {(layer, category): {paper_id: set(keywords)}}
-    kw_lookup = {}  # Keyword to (layer, category) lookup for quick reference
-
-    # Step 3: Populate mappings from ontology extraction data
-    for layer, categories in ontology_extractions.items():
-        for category, items in categories.items():
-            for item in items:
-                paper_id = item["paper_id"]
-                for kw in item["keywords"]:
-                    kw_lower = kw.lower()
-                    kw_lookup[kw_lower] = (layer, category)
-                    paper_keyword_map[(layer, category)][paper_id].add(kw_lower)
-                    category_to_papers[(layer, category)][paper_id] += 1
-
-    # Step 4: Initialize OpenAI client (make sure get_next_api_key() is implemented)
-    client = OpenAI(api_key=get_next_api_key())
-
-    # Step 5: Run the main query processing and ranking pipeline
-    # Here, "acidic HER water splitting" is the example search query
-    ranked, low_sorted = find_common_papers(
-        user_query="acidic HER water splitting",
-        ontology_extractions=ontology_extractions,
-        category_to_papers=category_to_papers,
-        paper_keyword_map=paper_keyword_map,
-        title_map=title_map,
-        client=client,
-        kw_lookup=kw_lookup,
-        abstract_map=abstract_map,
-        threshold=1.5
-    )
-
-    # Step 6: Further rank shared papers based on pairs and mentions in the pair_file
-    final_ranked_shared = rank_shared_papers_by_pairs_and_mentions(ranked, low_sorted, pair_file)
-
-    # You can print or save final_ranked_shared as needed, for example:
-    print("\n🎯 Final shared paper ranking:")
-    for idx, (paper_id, score) in enumerate(final_ranked_shared, 1):
-        print(f"{idx}. {paper_id}: {score}")
+    return ranked, low_sorted, df_pairs_file_path
 
 
 def rank_shared_papers_by_pairs_and_mentions(
     ranked: list,
     low_sorted: list,
-    pair_file: str = "shared_pair_ranked_papers.csv"
+    pair_file: str 
 ) -> pd.DataFrame:
     """
     Ranks shared papers by pair count and keyword relevance.
@@ -1386,3 +1347,80 @@ def rank_shared_papers_by_pairs_and_mentions(
             print(f"✅ Saved: {filename}")
 
     return df_pairs
+
+def ranking_papers(
+    API_file_path,
+    ontology_path,
+    max_papers,
+    paper_query_file_path,
+    keyword_query_file_path,
+    output_dir
+) -> None:
+    """
+    Load ontology data, build mappings from ontology categories to papers and keywords,
+    classify and rank papers relevant to a query, then rank shared papers by category pairs.
+
+    Args:
+        title_map (dict): Mapping of paper IDs to their titles.
+        abstract_map (dict): Mapping of paper IDs to their abstracts.
+        pair_file (str): Path to file containing category pair data for ranking overlaps.
+
+    Returns:
+        None: Prints output and saves ranked paper info, no explicit return.
+    """
+
+    # Step 1: Load ontology extraction data from JSON file (old code)
+    # with open("updated_ontology.json", "r") as f:
+    #     ontology_extractions = json.load(f)
+
+    # new code 
+    # Step 1: Load ontology extraction data
+    ontology_extractions, title_map, abstract_map, updated_ontology_file_path = enrich_ontology_with_papers(ontology_path, API_file_path, max_papers, paper_query_file_path, output_dir)
+
+    # Step 2: Initialize dictionaries to store mappings and counts
+    category_to_papers = defaultdict(lambda: defaultdict(int))   # {(layer, category): {paper_id: count}}
+    paper_keyword_map = defaultdict(lambda: defaultdict(set))    # {(layer, category): {paper_id: set(keywords)}}
+    kw_lookup = {}  # Keyword to (layer, category) lookup for quick reference
+
+    # Step 3: Populate mappings from ontology extraction data
+    for layer, categories in ontology_extractions.items():
+        for category, items in categories.items():
+            for item in items:
+                paper_id = item["paper_id"]
+                for kw in item["keywords"]:
+                    kw_lower = kw.lower()
+                    kw_lookup[kw_lower] = (layer, category)
+                    paper_keyword_map[(layer, category)][paper_id].add(kw_lower)
+                    category_to_papers[(layer, category)][paper_id] += 1
+
+    # Step 4: Initialize OpenAI client (make sure get_next_api_key() is implemented)
+    API_keys = load_api_keys(API_file_path)
+    client = OpenAI(api_key=get_next_api_key(API_keys))
+
+    # Step 5: Run the main query processing and ranking pipeline
+    # Here, "acidic HER water splitting" is the example search query , user_query="acidic HER water splitting"
+    with open(keyword_query_file_path, "r") as file:
+        user_query = file.read()
+    ranked, low_sorted, pair_file_path = find_common_papers(
+        user_query=user_query,
+        ontology_extractions=ontology_extractions,
+        category_to_papers=category_to_papers,
+        paper_keyword_map=paper_keyword_map,
+        title_map=title_map,
+        client=client,
+        kw_lookup=kw_lookup,
+        abstract_map=abstract_map,
+        output_dir = output_dir,
+        threshold=1.5
+
+    )
+
+    # Step 6: Further rank shared papers based on pairs and mentions in the pair_file
+    final_ranked_shared = rank_shared_papers_by_pairs_and_mentions(ranked, low_sorted, pair_file_path)
+
+    # You can print or save final_ranked_shared as needed, for example:
+    print("\n🎯 Final shared paper ranking:")
+    for idx, (paper_id, score) in enumerate(final_ranked_shared, 1):
+        print(f"{idx}. {paper_id}: {score}")
+    
+    return updated_ontology_file_path

@@ -18,11 +18,13 @@ def main():
     parser.add_argument(
         "-v", "--version", action="version", version=f"%(prog)s {__version__}"
     )
+    parser.add_argument("-n", "--number_papers", help="the number of papers", default="200",)
     parser.add_argument("-pq", "--paper_query_file", help="path for a file contains query for paper finiding", type=check_file)
     parser.add_argument("-ky", "--keyword_query_file", help="path for a file contains keywords for paper ranking", type=check_file)
+    parser.add_argument("-ont", "--ontology_file", help="path for a file contains keywords for paper ranking", type=check_file)
     parser.add_argument("-API", "--API_keys", help="path for a file contains API keys", type=check_file)
     parser.add_argument("-ckg", "--credentials_for_knowledge_graph", help="path for a file contains crendetials for Neo4j database", type=check_file)
-    parser.add_argument("-AI", "--AI", help="Which AI", default="openAI",)
+    #parser.add_argument("-AI", "--AI", help="Which AI", default="openAI",)
     parser.add_argument("-o", "--output_dir", help="output directory", default=Path(f"sarand_results_{run_time}"),)
 
     # Parse arguments
