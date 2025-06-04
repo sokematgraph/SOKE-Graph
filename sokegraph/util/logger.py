@@ -9,7 +9,7 @@ from sokegraph import __version__, __program_name__
 
 def get_logger() -> logging.Logger:
     """Returns the default logger for sarand."""
-    return logging.getLogger("ssfdds")
+    return logging.getLogger("sokegraph")
 
 
 def create_logger(output: Optional[str] = None, verbose: bool = False):
@@ -49,6 +49,6 @@ def create_logger(output: Optional[str] = None, verbose: bool = False):
 
     return logger
 
-
+create_logger(verbose=True)
 # Default class to export the logger for easy use
 LOG = get_logger()
