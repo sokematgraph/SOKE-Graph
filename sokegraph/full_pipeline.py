@@ -1,45 +1,73 @@
-import json
+from sokegraph.base_paper_source import BasePaperSource
+from sokegraph.semantic_scholar_source import SemanticScholarPaperSource
+from sokegraph.pdf_paper_source import PDFPaperSource
+from sokegraph.paper_ranker import PaperRanker
+from sokegraph.knowledge_graph import KnowledgeGraph
 from sokegraph.util.logger import LOG
-from sokegraph.paper_ranking_openAI import ranking_papers
-from sokegraph.input_handling import *
-from sokegraph.update_ontology_openAI import enrich_ontology_with_papers_openAI, load_ontology
-from sokegraph.build_neo4j_knowledge_graph import build_neo4j_knowledge_graph_from_ontology_json
+from sokegraph.ai_agent import AIAgent
+from sokegraph.openai_agent import OpenAIAgent
+from sokegraph.gemini_agent import GeminiAgent
+from sokegraph.ontology_updater import OntologyUpdater
+from sokegraph.neo4j_knowledge_graph import Neo4jKnowledgeGraph
 
-import re
-
-
-counter_index_API = 0
+import json
 
 def full_pipeline_main(params):
-    LOG.info("Starirng Ranking ...")
-    
-    papers = get_papers(params=params)
-    
-    text_data, title_map, abstract_map = load_paper_data(papers=papers)
-    
-    API_keys = load_api_keys(params.API_keys)
-    
-    if params.AI=="openAI":
-        updated_ontology_file_path =  enrich_ontology_with_papers_openAI(params.ontology_file, API_keys, text_data, params.output_dir)
-    
-        ontology_extractions = load_ontology(updated_ontology_file_path)
+    LOG.info("🚀 Starting Full Pipeline")
 
-        with open(params.keyword_query_file, "r") as file:
-            keyword_query = file.read()
+    # 0. Setup AI agent
+    ai_tool: AIAgent
+    if params.AI == "openAI":
+        ai_tool = OpenAIAgent(params.API_keys)
+    elif params.AI == "gemini":
+        ai_tool = GeminiAgent(params.API_keys)
+    else:
+        raise ValueError(f"Unsupported AI provider: {params.AI}")
 
-        ranking_papers(API_keys,
-            ontology_extractions,
-            title_map,
-            abstract_map,
-            keyword_query,
-            params.output_dir)
+    # 1. Select paper source
+    paper_source: BasePaperSource
+    if params.number_papers and not params.pdfs_file:
+        if not params.paper_query_file:
+            LOG.error("❌ paper_query_file is required when using number_papers.")
+            return
+        paper_source = SemanticScholarPaperSource(
+            num_papers=int(params.number_papers),
+            query_file=params.paper_query_file,
+            output_dir=params.output_dir
+        )
+    elif params.pdfs_file and not params.number_papers:
+        paper_source = PDFPaperSource(
+            zip_path=params.pdfs_file,
+            output_dir=params.output_dir
+        )
+    else:
+        LOG.error("❌ Please specify either number_papers or pdfs_file, but not both.")
+        return
 
+    papers = paper_source.fetch_papers()
+
+    # 2. Update ontology
+    ontology_updater = OntologyUpdater(params.ontology_file, papers, ai_tool, params.output_dir)  # or however you instantiate it
+    ontology_extractions = ontology_updater.enrich_with_papers()
+
+
+    #LOG.info("ranking papers ....")
+    # 3. Rank papers
+    ranker = PaperRanker(ai_tool, papers, f"{params.output_dir}/updated_ontology.json", params.keyword_query_file, params.output_dir)
+    updated_ontology_path = ranker.rank_papers()
+
+    # 4. Build knowledge graph
+    LOG.info(" Building knowledge graph ....")
+    with open(params.credentials_for_knowledge_graph, "r") as f:
+        credentials = json.load(f)
+
+    graph_builder: KnowledgeGraph
+    if(params.model_knowledge_graph == "neo4j"):
+        graph_builder = Neo4jKnowledgeGraph(f"{params.output_dir}/updated_ontology.json", 
+                                            credentials["neo4j_uri"],
+                                            credentials["neo4j_user"],
+                                            credentials["neo4j_pass"])
     
-    with open(params.credentials_for_knowledge_graph, "r") as file:
-        credentials = json.load(file)
+    graph_builder.build_graph()
 
-    if params.model_knowledge_graph=="neo4j":
-        build_neo4j_knowledge_graph_from_ontology_json(updated_ontology_file_path,
-        credentials["neo4j_uri"],
-        credentials["neo4j_user"],
-        credentials["neo4j_pass"])
+    LOG.info("🎉 Pipeline Completed Successfully")

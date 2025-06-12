@@ -18,8 +18,6 @@ def check_file(path: str) -> Path:
             f"{path} can't be found, please double check the path"
         )
 
-
-
 def validate_range(value_type, minimum, maximum):
     """Determine whether arg value is within minimum and maximum range"""
 
