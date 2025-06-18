@@ -9,6 +9,7 @@ from sokegraph.openai_agent import OpenAIAgent
 from sokegraph.gemini_agent import GeminiAgent
 from sokegraph.ontology_updater import OntologyUpdater
 from sokegraph.neo4j_knowledge_graph import Neo4jKnowledgeGraph
+from sokegraph.llama_agent import LlamaAgent
 
 import json
 
@@ -21,6 +22,8 @@ def full_pipeline_main(params):
         ai_tool = OpenAIAgent(params.API_keys)
     elif params.AI == "gemini":
         ai_tool = GeminiAgent(params.API_keys)
+    elif params.AI == "llama":
+        ai_tool = LlamaAgent(params.API_keys)
     else:
         raise ValueError(f"Unsupported AI provider: {params.AI}")
 
@@ -47,8 +50,8 @@ def full_pipeline_main(params):
     papers = paper_source.fetch_papers()
 
     # 2. Update ontology
-    ontology_updater = OntologyUpdater(params.ontology_file, papers, ai_tool, params.output_dir)  # or however you instantiate it
-    ontology_extractions = ontology_updater.enrich_with_papers()
+    #ontology_updater = OntologyUpdater(params.ontology_file, papers, ai_tool, params.output_dir)  # or however you instantiate it
+    #ontology_extractions = ontology_updater.enrich_with_papers()
 
 
     #LOG.info("ranking papers ....")
@@ -57,17 +60,17 @@ def full_pipeline_main(params):
     updated_ontology_path = ranker.rank_papers()
 
     # 4. Build knowledge graph
-    LOG.info(" Building knowledge graph ....")
-    with open(params.credentials_for_knowledge_graph, "r") as f:
-        credentials = json.load(f)
+    #LOG.info(" Building knowledge graph ....")
+    #with open(params.credentials_for_knowledge_graph, "r") as f:
+    #    credentials = json.load(f)
 
-    graph_builder: KnowledgeGraph
-    if(params.model_knowledge_graph == "neo4j"):
-        graph_builder = Neo4jKnowledgeGraph(f"{params.output_dir}/updated_ontology.json", 
-                                            credentials["neo4j_uri"],
-                                            credentials["neo4j_user"],
-                                            credentials["neo4j_pass"])
+    #graph_builder: KnowledgeGraph
+    #if(params.model_knowledge_graph == "neo4j"):
+    #    graph_builder = Neo4jKnowledgeGraph(f"{params.output_dir}/updated_ontology.json", 
+    #                                        credentials["neo4j_uri"],
+    #                                        credentials["neo4j_user"],
+    #                                        credentials["neo4j_pass"])
     
-    graph_builder.build_graph()
+    #graph_builder.build_graph()
 
     LOG.info("🎉 Pipeline Completed Successfully")
