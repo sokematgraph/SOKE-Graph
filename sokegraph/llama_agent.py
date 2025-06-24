@@ -19,7 +19,8 @@ class LlamaAgent(AIAgent):
 
                 response = client.chat.completions.create(
                     #model="meta-llama/Llama-3-70b-instruct",  # ← Confirm model name here
-                    model = "meta-llama/Llama-2-70b-chat-hf",
+                    #model = "meta-llama/Llama-2-70b-chat-hf",
+                    model="meta-llama/Llama-3.3-70B-Instruct-Turbo-Free",
                     messages=[{"role": "user", "content": prompt}],
                     temperature=0,
                     max_tokens=50

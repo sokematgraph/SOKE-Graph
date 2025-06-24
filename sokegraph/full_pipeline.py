@@ -10,6 +10,7 @@ from sokegraph.gemini_agent import GeminiAgent
 from sokegraph.ontology_updater import OntologyUpdater
 from sokegraph.neo4j_knowledge_graph import Neo4jKnowledgeGraph
 from sokegraph.llama_agent import LlamaAgent
+from sokegraph.ollama_agent import OllamaAgent
 
 import json
 
@@ -24,6 +25,8 @@ def full_pipeline_main(params):
         ai_tool = GeminiAgent(params.API_keys)
     elif params.AI == "llama":
         ai_tool = LlamaAgent(params.API_keys)
+    elif params.AI == "ollama":
+        ai_tool = OllamaAgent()
     else:
         raise ValueError(f"Unsupported AI provider: {params.AI}")
 

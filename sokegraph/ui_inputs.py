@@ -31,7 +31,7 @@ class SOKEGraphUI:
         )
 
         self.ai_selector = widgets.Dropdown(
-            options=['openAI', 'gemini', 'llama'],
+            options=['openAI', 'gemini', 'llama', 'ollama'],
             description='AI Agent:'
         )
 
