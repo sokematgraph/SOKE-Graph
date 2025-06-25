@@ -118,19 +118,10 @@ This notebook provides an **interactive UI-based form**, perfect for beginners w
 
 ---
 
-### 3️⃣ Run from Command Line  
-Run the pipeline via terminal or script after installing the project.  
-👉 You pass parameters through command-line flags.
 
 ### 3️⃣ Run from Command Line 
 
 This option is great for developers or users who prefer terminal-based execution and want to run the entire pipeline using a single command with a config dictionary.
-
----
-
-#### 🛠️ Step 1: Install the Project
-
-After setting up your environment, you can run the entire pipeline using a single terminal command.
 
 ---
 
@@ -192,6 +183,29 @@ sokegraph \
 ---
 
 💡 **Tip:** Ensure your file paths exist and any external services like Neo4j or Ollama are running before execution.
+
+### 🦙 Using Ollama Locally
+#### ✅ Step 1: Install Ollama
+Install Ollama from the official site or using the command line:
+
+Website (all OS): https://ollama.com/download
+
+macOS (via Homebrew):
+```bash
+brew install ollama
+```
+
+Linux (via script):
+```bash
+curl -fsSL https://ollama.com/install.sh | sh
+```
+
+
+#### 🚀 Step 2: Pull and Run the Model
+Once installed, pull the model you want and run the Ollama server locally:
+```bash
+ollama run llama3
+```
 
 ### Pipeline Steps:
 1. **Initialize AI agent** (OpenAI or Gemini)
