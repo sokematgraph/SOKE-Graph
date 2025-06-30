@@ -53,27 +53,27 @@ def full_pipeline_main(params):
     papers = paper_source.fetch_papers()
 
     # 2. Update ontology
-    #ontology_updater = OntologyUpdater(params.ontology_file, papers, ai_tool, params.output_dir)  # or however you instantiate it
-    #ontology_extractions = ontology_updater.enrich_with_papers()
+    ontology_updater = OntologyUpdater(params.ontology_file, papers, ai_tool, params.output_dir)  # or however you instantiate it
+    ontology_extractions = ontology_updater.enrich_with_papers()
 
 
-    #LOG.info("ranking papers ....")
+    LOG.info("ranking papers ....")
     # 3. Rank papers
     ranker = PaperRanker(ai_tool, papers, f"{params.output_dir}/updated_ontology.json", params.keyword_query_file, params.output_dir)
     updated_ontology_path = ranker.rank_papers()
 
     # 4. Build knowledge graph
-    #LOG.info(" Building knowledge graph ....")
-    #with open(params.credentials_for_knowledge_graph, "r") as f:
-    #    credentials = json.load(f)
+    LOG.info(" Building knowledge graph ....")
+    with open(params.credentials_for_knowledge_graph, "r") as f:
+        credentials = json.load(f)
 
-    #graph_builder: KnowledgeGraph
-    #if(params.model_knowledge_graph == "neo4j"):
-    #    graph_builder = Neo4jKnowledgeGraph(f"{params.output_dir}/updated_ontology.json", 
-    #                                        credentials["neo4j_uri"],
-    #                                        credentials["neo4j_user"],
-    #                                        credentials["neo4j_pass"])
+    graph_builder: KnowledgeGraph
+    if(params.model_knowledge_graph == "neo4j"):
+        graph_builder = Neo4jKnowledgeGraph(f"{params.output_dir}/updated_ontology.json", 
+                                            credentials["neo4j_uri"],
+                                            credentials["neo4j_user"],
+                                            credentials["neo4j_pass"])
     
-    #graph_builder.build_graph()
+    graph_builder.build_graph()
 
     LOG.info("🎉 Pipeline Completed Successfully")
