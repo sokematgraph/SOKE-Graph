@@ -89,44 +89,68 @@ OR
 
 depending on whether you're searching for papers or uploading PDFs.
 
-💡 Make sure the paths are correct and required services (Neo4j, Ollama, etc.) are running.
+💡 Make sure that all file paths in your `params` are valid and that services like **Neo4j**, **Ollama**, or your Journal API access are available before starting the pipeline.
 
 
 ### 2️⃣ Run from Jupyter Notebook (Interactive Step-by-Step) – `full_pipeline_stepBYstep.ipynb`
 
-This notebook provides an **interactive UI-based form**, perfect for beginners who prefer not to write code manually.
+This notebook offers an **interactive, beginner-friendly form-based UI**, ideal for users who want to run the pipeline without writing code.
 
 #### 🧩 What it does:
-- You choose how to input your papers:
-  - Upload a ZIP file of PDFs **or**
-  - Search papers from **Semantic Scholar** using a text file of queries.
-  - Search papers from **Journal API** using a text file of queries and api key.
-  
-- You'll use dropdowns and file pickers to provide required files.
-- You run the pipeline step by step to see exactly what happens at each stage.
+- Allows you to select how you want to retrieve papers:
+  - 📁 Upload a ZIP file of PDFs (PDF source)
+  - 🔎 Search and fetch papers from **Semantic Scholar** using a query file
+  - 🌐 Fetch papers via the **Journal API** using a query file and an API key
 
-#### 📋 Steps involved:
-1. **Paper Retrieval**
-   - If using Semantic Scholar, it downloads papers based on your query file.
-   - If using a ZIP file, it extracts and analyzes the PDFs.
+- Provides dropdowns and file pickers to easily select files like:
+  - Ontology
+  - Keyword queries
+  - API keys
+  - Output folder
 
-2. **Ontology Enrichment**
-   - The AI agent (OpenAI, Gemini, LLaMA, or Ollama) enriches the ontology file with keywords and paper metadata.
+- Runs each pipeline step independently, so you can see exactly what happens at every stage.
 
-3. **Paper Ranking**
-   - Papers are scored based on keyword relevance, synonyms, and opposites to help identify the most relevant literature.
+#### 📋 Steps Involved:
 
-4. **Knowledge Graph Construction**
-   - The enriched data is converted into a structured **Neo4j graph**, including categories, entities, and links between papers.
+1. **📄 Paper Retrieval**
+   - Based on your selected `paper_source`:
+     - `Semantic Scholar`: Downloads papers using your `paper_query_file`
+     - `PDF Zip`: Loads and processes PDFs from the uploaded ZIP file
+     - `Journal API`: Retrieves paper metadata from the Web of Science API using query + API key
 
-5. **Output**
-   - All results (ontology, ranked papers, logs) are saved to your selected output directory.
+2. **🧠 Ontology Enrichment**
+   - The chosen AI agent (`openAI`, `gemini`, `llama`, `ollama`, or `claude`) analyzes the papers and expands your base ontology
+   - Adds new keywords, concepts, synonyms, and relationships
 
-> ✅ **No need to modify code manually**—just fill the form and click Submit.
+3. **📊 Paper Ranking**
+   - Ranks the papers using:
+     - Exact keyword matches
+     - Synonyms and expanded terms
+     - Opposite-term filtering to down-rank irrelevant papers
 
-> 💡 Make sure Neo4j or Ollama are running in the background if you're using them.
+4. **🕸 Knowledge Graph Construction**
+   - Converts enriched data into a structured graph using:
+     - `Neo4j` (with login credentials)
+     - Or `NetworkX` (in-memory option)
+   - Graph includes:
+     - Ontology categories
+     - Paper-concept links
+     - Metadata associations
+
+5. **💾 Output**
+   - Saves everything in your selected `output_dir`, including:
+     - Enriched ontology file
+     - Ranked papers (CSV/JSON)
+     - Execution logs
+     - Knowledge graph artifacts (if exported)
 
 ---
+
+> ✅ **No need to modify code manually** – just fill out the form and click **Run** for each step.
+
+> 💡 Make sure required services like **Neo4j**, **Ollama**, or your **Journal API** credentials are ready before starting the pipeline.
+
+
 
 
 ### 3️⃣ Run from Command Line 
