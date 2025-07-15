@@ -696,15 +696,17 @@ class PaperRanker:
         for _, row in df_pairs.iterrows():
             LOG.info(f"{row['Paper ID']} | Pairs: {row['Pair Count']} | Mentions: {row['Relevant Keyword Score']} | Relevance: {row['Relevance Level']}")
 
+        output_path_files = {}
         # Step 6: Save separate CSVs for each relevance level
         for level in ["high", "low", "unknown"]:
             subset = df_pairs[df_pairs["Relevance Level"] == level]
             if not subset.empty:
                 filename = f"{output_dir}/shared_ranked_by_pairs_then_mentions_{level}.csv"
+                output_path_files[level] = filename
                 subset.to_csv(filename, index=False)
                 LOG.info(f"✅ Saved: {filename}")
 
-        return df_pairs
+        return output_path_files
 
     
 

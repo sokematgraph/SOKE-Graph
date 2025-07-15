@@ -54,3 +54,25 @@ class KnowledgeGraph(ABC):
         entire graph‑creation workflow here.
         """
         pass
+
+    @abstractmethod
+    def show_graph(self):
+        pass
+
+
+    @abstractmethod
+    def get_attr_keys(self):
+        """Return all attribute names that appear on any node
+        (e.g. ['layer', 'keyword', 'domain', ...])."""
+
+    @abstractmethod
+    def get_attr_values(self, key: str):
+        """Return distinct values for *key* (e.g. all layer names)."""
+
+    @abstractmethod
+    def subgraph_for_attr(self, key: str, value: str):
+        """Return sub‑graph containing only nodes with attr[key]==value."""
+
+    @abstractmethod
+    def neighbour_subgraph(self, node_id: str) :
+        """Return node + first‑degree neighbours (for drill‑down)."""

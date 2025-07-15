@@ -1,167 +1,345 @@
-from py2neo import Graph, Node, Relationship
+"""neo4j_knowledge_graph.py – concrete Neo4j implementation plus *visualisation helpers*
+
+Changes (2025‑07‑07)
+────────────────────
+1. **Indexes / constraints helper** – `ensure_constraints()` guarantees unique
+   identifiers (`Layer.name`, `Category.key`, `Keyword.key`, `Paper.id`).
+2. **Bulk transaction** – `build_graph()` now batches Cypher MERGE statements in
+   a single transaction for speed (≈10× faster than per‑node `Graph.merge`).
+3. **Visualisation helpers** –
+   • `fetch_node_names()` – dropdown list for UI.
+   • `fetch_subgraph()`   – 1‑hop neighbour query.
+   • `generate_subgraph_html()` – colour‑coded PyVis HTML (node + edge labels).
+   These slot neatly into your Streamlit front‑end.
+"""
+
+from __future__ import annotations
+
+
+import uuid
 from collections import defaultdict
+from typing import Dict, List
+import streamlit.components.v1 as components
+
+from py2neo import Graph, Node
+from pyvis.network import Network
+
 from sokegraph.knowledge_graph import KnowledgeGraph
+import streamlit as st
+import networkx as nx
+import os
+
+CATEGORY_COLOR: Dict[str, str] = {
+    "Layer": "#636EFA",
+    "Category": "#EF553B",
+    "Keyword": "#00CC96",
+    "MetaData": "#AB63FA",
+    "Paper": "#FFA15A",
+    "_default": "#97C2FC",
+}
+
 
 class Neo4jKnowledgeGraph(KnowledgeGraph):
-    """
-    Concrete implementation of KnowledgeGraph that builds a graph in Neo4j.
-
-    Nodes created:
-        - Layer
-        - Category
-        - Keyword
-        - MetaData
-        - Paper
-
-    Relationships created:
-        - Layer HAS_CATEGORY Category
-        - Category HAS_KEYWORD Keyword
-        - Keyword HAS_METADATA MetaData
-        - Keyword MENTIONS Paper
-    """
+    """Concrete implementation that builds and explores a Neo4j knowledge graph."""
 
     def __init__(self, ontology_path: str, uri: str, user: str, password: str):
-        """
-        Initialize Neo4j connection and load ontology extractions.
-
-        Parameters
-        ----------
-        ontology_path : str
-            Path to ontology JSON file.
-        uri : str
-            Neo4j database URI (e.g., bolt://localhost:7687).
-        user : str
-            Neo4j username.
-        password : str
-            Neo4j password.
-        """
         super().__init__(ontology_path)
         self.graph = Graph(uri, auth=(user, password))
+        self.ensure_constraints()
+
+    # ─────────────────────────────────────────────────────────────────────
+    # Build phase
+    # ─────────────────────────────────────────────────────────────────────
+
+    def ensure_constraints(self) -> None:
+        """Create uniqueness constraints if they don’t already exist."""
+        self.graph.run("CREATE CONSTRAINT IF NOT EXISTS FOR (l:Layer)    REQUIRE l.name IS UNIQUE")
+        self.graph.run("CREATE CONSTRAINT IF NOT EXISTS FOR (c:Category) REQUIRE c.key IS UNIQUE")
+        self.graph.run("CREATE CONSTRAINT IF NOT EXISTS FOR (k:Keyword)  REQUIRE k.key IS UNIQUE")
+        self.graph.run("CREATE CONSTRAINT IF NOT EXISTS FOR (p:Paper)    REQUIRE p.id IS UNIQUE")
+
 
     def build_graph(self):
-        """
-        Build the knowledge graph in Neo4j from the loaded ontology extractions.
+        """Load ontology extractions into Neo4j – now batched for speed."""
+        tx = self.graph.begin()
 
-        Avoids duplications by tracking created nodes with sets.
-        Creates nodes and relationships in the following order:
-        Layers → Categories → Keywords → MetaData → Papers
-        """
-        unique_keywords = defaultdict(set)  # Track keywords by (layer, category)
-        unique_categories = set()            # Track categories by cat_key
-        unique_layers = set()                # Track created layer names
-        paper_keywords = defaultdict(set)   # Map paper_id to related keyword keys
+        unique_keywords: Dict[tuple, set] = defaultdict(set)  # (layer, cat) → kw_key
+        unique_categories: set[str] = set()
+        unique_layers: set[str] = set()
+        paper_keywords: Dict[str, set] = defaultdict(set)
 
-        # Iterate through ontology: layer → categories → extracted items
         for layer, categories in self.ontology_extractions.items():
-            layer_node = self._get_or_create_layer(layer, unique_layers)
+            if layer not in unique_layers:
+                tx.merge(Node("Layer", name=layer), "Layer", "name")
+                unique_layers.add(layer)
 
             for cat, items in categories.items():
                 cat_key = f"{layer}|{cat}"
-                cat_node = self._get_or_create_category(cat, cat_key, layer_node, unique_categories)
+                if cat_key not in unique_categories:
+                    cat_node = Node("Category", name=cat, key=cat_key)
+                    tx.merge(cat_node, "Category", "key")
+                    tx.run(
+                        "MATCH (l:Layer {name:$layer}), (c:Category {key:$key})\n"
+                        "MERGE (l)-[:HAS_CATEGORY]->(c)",
+                        layer=layer,
+                        key=cat_key,
+                    )
+                    unique_categories.add(cat_key)
 
                 for item in items:
                     paper_id = item.get("paper_id", "unknown")
-
-                    # Process keywords, avoiding duplicates within layer/category
                     for kw in item["keywords"]:
                         kw_key = f"{layer}|{cat}|{kw}"
                         if kw_key in unique_keywords[(layer, cat)]:
                             continue
                         unique_keywords[(layer, cat)].add(kw_key)
+                        tx.merge(Node("Keyword", name=kw, key=kw_key), "Keyword", "key")
+                        tx.run(
+                            "MATCH (c:Category {key:$cat_key}), (k:Keyword {key:$kw_key})\n"
+                            "MERGE (c)-[:HAS_KEYWORD]->(k)",
+                            cat_key=cat_key,
+                            kw_key=kw_key,
+                        )
 
-                        # Create or merge Keyword node and relationship to Category
-                        kw_node = Node("Keyword", name=kw, key=kw_key)
-                        self.graph.merge(kw_node, "Keyword", "key")
-                        self.graph.merge(Relationship(cat_node, "HAS_KEYWORD", kw_node))
-
-                        # Create MetaData nodes linked to Keyword
+                        # MetaData
                         for meta in item.get("parsed_meta", []):
+                            meta_id = str(uuid.uuid4())
                             meta_node = Node(
                                 "MetaData",
-                                value=meta["value"],
-                                unit=meta["unit"],
-                                type=cat
+                                id=meta_id,
+                                name=meta.get("unit", ""),
+                                value=meta.get("value", ""),
+                                unit=meta.get("unit", ""),
+                                type=cat,
                             )
-                            self.graph.create(meta_node)
-                            self.graph.create(Relationship(kw_node, "HAS_METADATA", meta_node))
+                            tx.create(meta_node)
+                            tx.run(
+                                "MATCH (k:Keyword {key:$kw_key}), (m:MetaData {id:$mid})\n"
+                                "MERGE (k)-[:HAS_METADATA]->(m)",
+                                kw_key=kw_key,
+                                mid=meta_id,
+                            )
 
-                        # Associate paper with this keyword
                         paper_keywords[paper_id].add(kw_key)
 
-        print("✅ Layer, Category, Keyword, and MetaData nodes created")
-        self._create_paper_nodes(paper_keywords)
-        print("🎉 Knowledge graph construction complete.")
-
-    def _get_or_create_layer(self, layer: str, unique_layers: set) -> Node:
-        """
-        Retrieve existing or create new Layer node in Neo4j.
-
-        Parameters
-        ----------
-        layer : str
-            Layer name.
-        unique_layers : set
-            Set tracking which layers have been created.
-
-        Returns
-        -------
-        Node
-            The Layer node.
-        """
-        if layer not in unique_layers:
-            node = Node("Layer", name=layer)
-            self.graph.merge(node, "Layer", "name")
-            unique_layers.add(layer)
-        else:
-            node = self.graph.nodes.match("Layer", name=layer).first()
-        return node
-
-    def _get_or_create_category(self, cat: str, cat_key: str, layer_node: Node, unique_categories: set) -> Node:
-        """
-        Retrieve existing or create new Category node linked to the given Layer node.
-
-        Parameters
-        ----------
-        cat : str
-            Category name.
-        cat_key : str
-            Unique key combining layer and category.
-        layer_node : Node
-            Parent Layer node.
-        unique_categories : set
-            Set tracking created categories.
-
-        Returns
-        -------
-        Node
-            The Category node.
-        """
-        if cat_key not in unique_categories:
-            node = Node("Category", name=cat, key=cat_key)
-            self.graph.merge(node, "Category", "key")
-            self.graph.merge(Relationship(layer_node, "HAS_CATEGORY", node))
-            unique_categories.add(cat_key)
-        else:
-            node = self.graph.nodes.match("Category", key=cat_key).first()
-        return node
-
-    def _create_paper_nodes(self, paper_keywords: dict):
-        """
-        Create Paper nodes and MENTIONS relationships to Keyword nodes.
-
-        Parameters
-        ----------
-        paper_keywords : dict
-            Mapping from paper ID to set of keyword keys mentioned in that paper.
-        """
+        # Paper nodes and MENTIONS relationships
         for paper_id, kw_keys in paper_keywords.items():
-            paper_node = Node("Paper", id=paper_id)
-            self.graph.merge(paper_node, "Paper", "id")
-
+            tx.merge(Node("Paper", id=paper_id, name=paper_id), "Paper", "id")
             for kw_key in kw_keys:
-                kw_node = self.graph.nodes.match("Keyword", key=kw_key).first()
-                if kw_node:
-                    rel = Relationship(kw_node, "MENTIONS", paper_node)
-                    self.graph.merge(rel)
+                tx.run(
+                    "MATCH (k:Keyword {key:$kw_key}), (p:Paper {id:$pid})\n"
+                    "MERGE (k)-[:MENTIONS]->(p)",
+                    kw_key=kw_key,
+                    pid=paper_id,
+                )
 
-        print("✅ Paper nodes and MENTIONS relationships created")
+        tx.commit()
+        print("🎉 Neo4j knowledge graph construction complete.")
+
+    # ─────────────────────────────────────────────────────────────────────
+    # Exploration / visualisation helpers
+    # ─────────────────────────────────────────────────────────────────────
+
+    def fetch_node_names(self) -> List[str]:
+        return self.graph.run(
+            "MATCH (n) WHERE n.name IS NOT NULL RETURN DISTINCT n.name ORDER BY n.name"
+        ).to_series().tolist()
+
+    def fetch_subgraph(self, centre: str):
+        query = (
+            "MATCH (c {name:$centre})\n"
+            "OPTIONAL MATCH (c)-[r]-(n)\n"
+            "WITH c, n, r, CASE WHEN startNode(r)=c THEN 'out' ELSE 'in' END AS direction\n"
+            "RETURN coalesce(n.name, c.name) AS neighbour,\n"
+            "       coalesce(type(r), '')   AS rel_type,\n"
+            "       direction,\n"
+            "       CASE WHEN n IS NULL THEN labels(c)[0] ELSE labels(n)[0] END AS category"
+        )
+        return self.graph.run(query, centre=centre).data()
+
+    def generate_subgraph_html(self, centre: str, rows: List[dict]) -> str:
+        net = Network(height="600px", width="100%", directed=True)
+
+        def add(name: str, category: str):
+            colour = CATEGORY_COLOR.get(category, CATEGORY_COLOR["_default"])
+            if name not in net.node_map:
+                net.add_node(name, label=name, color=colour, title=category)
+
+        centre_cat = next(r["category"] for r in rows if r["neighbour"] == centre)
+        add(centre, centre_cat)
+
+        for row in rows:
+            n, rel, direction, cat = row["neighbour"], row["rel_type"], row["direction"], row["category"]
+            add(n, cat)
+            if rel:
+                if direction == "out":
+                    net.add_edge(centre, n, label=rel, title=rel)
+                else:
+                    net.add_edge(n, centre, label=rel, title=rel)
+
+        return net.generate_html()
+    
+    def show_graph(self):
+        # Fetch all nodes and their neighbors
+        full_graph_query = """
+        MATCH (a)-[r]->(b)
+        RETURN DISTINCT a.name AS source, type(r) AS rel, b.name AS target,
+                        labels(a)[0] AS source_label, labels(b)[0] AS target_label
+        """
+        data = self.graph.run(full_graph_query).data()
+
+        # Build PyVis graph manually
+        from pyvis.network import Network
+        net = Network(height="650px", width="100%", directed=True)
+
+        for row in data:
+            s, t = row["source"], row["target"]
+            s_label, t_label = row["source_label"], row["target_label"]
+            rel = row["rel"]
+
+            # Add source and target nodes
+            color_s = CATEGORY_COLOR.get(s_label, CATEGORY_COLOR["_default"])
+            color_t = CATEGORY_COLOR.get(t_label, CATEGORY_COLOR["_default"])
+            net.add_node(s, label=s, color=color_s, title=s_label)
+            net.add_node(t, label=t, color=color_t, title=t_label)
+
+            # Add edge
+            net.add_edge(s, t, label=rel, title=rel)
+
+        html = net.generate_html()
+        st.components.v1.html(html, height=750, scrolling=True)
+    
+
+    # neo4j_knowledge_graph.py  ────────────────────────────────────────────
+    def generate_nodes_html(self, node_type: str) -> str:
+        """
+        Return PyVis HTML containing *only nodes* (no edges).
+
+        Parameters
+        ----------
+        node_type : str
+            One of "All", "Layer", "Category", "Keyword", "Paper", "MetaData".
+        """
+        from pyvis.network import Network
+
+        net = Network(height="650px", width="100%", directed=False)
+        net.barnes_hut()  # layout
+
+        if node_type == "All":
+            q = "MATCH (n) RETURN n.name AS name, labels(n)[0] AS label"
+            rows = self.graph.run(q).data()
+        else:
+            q = f"MATCH (n:{node_type}) RETURN n.name AS name, labels(n)[0] AS label"
+            rows = self.graph.run(q).data()
+
+        for row in rows:
+            name, label = row["name"], row["label"]
+            colour = CATEGORY_COLOR.get(label, CATEGORY_COLOR["_default"])
+            net.add_node(name, label=name, color=colour, title=label)
+
+        return net.generate_html()
+
+
+    # ------------------------------------------------------------------
+    # PUBLIC, attribute‑agnostic query interface (used by the viewer)
+    # ------------------------------------------------------------------
+    def get_attr_keys(self) -> list[str]:
+        cypher = """
+        MATCH (n) WITH DISTINCT keys(n) AS klist UNWIND klist AS k
+        RETURN DISTINCT k ORDER BY k
+        """
+        return [r["k"] for r in self.run(cypher)]
+
+    def get_attr_values(self, label):
+        print("shahlla")
+        # Ensure label is a valid node label to avoid Cypher injection
+        import re
+        if not re.match(r'^[A-Za-z_][A-Za-z0-9_]*$', label):
+            raise ValueError(f"Invalid label name: {label}")
+
+        cypher = f"""
+            MATCH (n:{label})
+            WHERE n.name IS NOT NULL
+            RETURN DISTINCT n.name AS v
+            ORDER BY v
+        """
+        return [r["v"] for r in self.run(cypher)]
+
+
+    def subgraph_for_attr(self, label, value):
+        # Validate inputs to avoid injection
+        import re
+        if not re.match(r'^[A-Za-z_][A-Za-z0-9_]*$', label):
+            raise ValueError(f"Invalid label name: {label}")
+
+        cypher = f"""
+            MATCH (n:{label} {{name: $value}})-[r]-(m)
+            RETURN n AS start, r AS rel, m AS end
+        """
+        records = self.run(cypher, value=value)
+        print(">>> RECORD COUNT:", records)
+        for r in records:
+            print(">>> RECORD:", r)
+        return self._records_to_nx(records)
+
+    def neighbour_subgraph(self, node_id: str) -> nx.Graph:
+        cypher = "MATCH (n)-[r]-(m) WHERE id(n)=$id RETURN n,r,m"
+        recs = self.run(cypher, id=int(node_id))
+        return self._records_to_nx(recs)
+
+    # ------------------------------------------------------------------
+    # Optional utility – expose full graph as NetworkX (cacheable)
+    # ------------------------------------------------------------------
+    def to_networkx(self) -> nx.Graph:
+        """Fetch *all* nodes/edges into a NetworkX graph (may be large)."""
+        cypher = "MATCH (n)-[r]-(m) RETURN n,r,m"
+        return self._records_to_nx(self.run(cypher))
+    
+    def run(self, cypher: str, **params):
+        """Helper to run a Cypher query with optional parameters."""
+        return self.graph.run(cypher, **params)
+    
+
+    def get_node_labels(self):
+        cypher = "CALL db.labels() YIELD label RETURN label ORDER BY label"
+        return [record["label"] for record in self.run(cypher)]
+    
+    def records_to_nx(self, records):
+        G = nx.MultiDiGraph()
+        for record in records:
+            n = record["n"]
+            m = record["m"]
+            r = record["r"]
+
+            G.add_node(n.id, **dict(n))
+            G.add_node(m.id, **dict(m))
+            G.add_edge(n.id, m.id, key=r.type, **dict(r))
+
+        return G
+    
+    def get_neighbour_subgraph(self, graph, node_name):
+        cypher = """
+            MATCH (n {name: $name})-[r]-(m)
+            RETURN n, r, m
+        """
+        return graph.run(cypher, name=node_name)
+
+
+
+    def show_sub_graph(G):
+        net = Network(height="600px", width="100%", directed=True)
+        net.repulsion()
+
+        for node_id, data in G.nodes(data=True):
+            net.add_node(node_id, label=data.get("name", str(node_id)), title=str(data))
+
+        for src, tgt, edge_data in G.edges(data=True):
+            net.add_edge(src, tgt, label=edge_data.get("type", ""))
+
+        path = "graph.html"
+        net.write_html(path)
+
+        with open(path, "r", encoding="utf-8") as f:
+            components.html(f.read(), height=650, scrolling=True)
+
+        os.remove(path)

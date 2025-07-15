@@ -18,8 +18,6 @@ This tool can be tailored for accelerating literature analysis in any domain of 
 
 ### 1. Clone the repository
 
-## 🔧 How to Set Up the Project
-
 ### ✅ 1. Get the Code
 
 Open a terminal (or use Google Colab) and run:
@@ -42,32 +40,33 @@ pip install -r requirements.txt
 
 ## 🚀 How to Run SOKEGraph
 
-You can run the full pipeline in **three different ways** depending on your preference and setup:
+You can run the full pipeline in **four different ways** depending on your preference and setup:
 
 ---
 
 ### 1️⃣ Run from Jupyter Notebook – `full_pipeline.ipynb`  
 This notebook is designed for users who are comfortable modifying code directly.
 
-- 🔧 You define all parameters manually in a Python dictionary called `params`.
+- 🔧 You should define all parameters manually in a Python dictionary called `params`.
 - ✅ Once configured, you run the pipeline **with a single function call**.
 - 📂 Best for quick experiments or automation in notebook environments.
 
 #### Example Usage:
 
 ```python
-params = {
-    "AI": "openAI",  # Choose the AI model: "openAI", "gemini", "llama", or "ollama"
-    "API_keys": "openai_keys.json",  # Path to your API keys file (required for OpenAI/Gemini/llama)
-    "number_papers": 10,  # How many papers to fetch from Semantic Scholar (if not using PDF input)
-    "paper_query_file": "topics.txt",  # A text file containing search queries (one per line)
-    "pdfs_file": None,  # If using PDF input, provide a path to a ZIP file of PDF papers
-    "ontology_file": "base_ontology.json",  # Path to your ontology file in JSON format
-    "output_dir": "output/",  # Directory where results and files will be saved
-    "keyword_query_file": "keywords.txt",  # A text file listing keywords to extract from papers
-    "credentials_for_knowledge_graph": "neo4j_credentials.json",  # File containing credentials for knowledge graph model for example Neo4j URI, username, and password.
-    "model_knowledge_graph": "neo4j"  # Currently supports only "neo4j" as the graph database.
-}
+params = SimpleNamespace(
+    number_papers=10,  # Number of papers to fetch from Semantic Scholar (if not using PDFs)
+    paper_query_file="topics.txt",  # Text file with one search query per line
+    pdfs_file=None,  # Optional: ZIP file with PDFs, if using PDF input instead of Semantic Scholar
+    api_key_journal_api = "api_journal_api.txt",
+    ontology_file="base_ontology.json",  # Base ontology file in JSON or OWL format
+    AI="openAI",  # Choose the AI model: "openAI", "gemini", "llama", "ollama", or "claude"
+    API_keys="openai_keys.json",  # Path to your API keys file (required for OpenAI/Gemini/LLaMA)
+    keyword_query_file="keywords.txt",  # Text file listing keywords to extract and rank by
+    model_knowledge_graph="neo4j"  # Graph backend: "neo4j" or "networkx"
+    credentials_for_knowledge_graph="neo4j_credentials.json",  # JSON file with graph DB credentials (e.g., URI, user, password)
+    output_dir="output/",  # Directory where results and metadata will be saved
+)
 
 from sokegraph.full_pipeline import full_pipeline_main
 full_pipeline_main(params)
@@ -77,7 +76,8 @@ full_pipeline_main(params)
 
 "number_papers" + "paper_query_file"
 OR
-
+"number_papers" + "paper_query_file" + "api_key_journal_api"
+OR
 "pdfs_file"
 depending on whether you're searching for papers or uploading PDFs.
 
@@ -92,6 +92,8 @@ This notebook provides an **interactive UI-based form**, perfect for beginners w
 - You choose how to input your papers:
   - Upload a ZIP file of PDFs **or**
   - Search papers from **Semantic Scholar** using a text file of queries.
+  - Search papers from **Journal API** using a text file of queries and api key.
+  
 - You'll use dropdowns and file pickers to provide required files.
 - You run the pipeline step by step to see exactly what happens at each stage.
 

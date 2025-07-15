@@ -143,6 +143,7 @@ class AIAgent(ABC):
                     ontology_layer: dict) -> List[dict]:
         """Utility that builds the prompt, queries the model and parses."""
         prompt = self._build_prompt(layer, abstract_text, ontology_layer)
+        print("xxxx")
         model_output = self.ask(prompt)
         return [] if not model_output else self._parse_model_output(model_output)
 

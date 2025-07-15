@@ -52,8 +52,6 @@ from sokegraph.neo4j_knowledge_graph import Neo4jKnowledgeGraph
 from sokegraph.llama_agent import LlamaAgent
 from sokegraph.ollama_agent import OllamaAgent
 from sokegraph.claude_agent import ClaudeAgent
-from sokegraph.journal_api_source import JournalApiPaperSource
-
 from sokegraph.networkx_knowledge_graph import NetworkXKnowledgeGraph
 import uuid
 
@@ -88,35 +86,6 @@ def retrieve_papers_semantic_scholar(paper_query_file: str, number_papers: int, 
     papers = paper_source.fetch_papers()
 
     return papers
-
-def retrieve_papers_journal_API(paper_query_file: str, number_papers: int, output_dir: str, api_key_file: str) -> pd.DataFrame:
-    """Retrieve papers from the Web of Science Journal API.
-
-    Parameters
-    ----------
-    paper_query_file : str
-        Path to a plain‑text file containing the search query/keywords.
-    number_papers : int
-        Number of papers (journals) to fetch.
-    output_dir : str
-        Directory to save the output Excel file.
-
-    Returns
-    -------
-    pd.DataFrame
-        DataFrame containing the fetched journal metadata.
-    """
-    
-    paper_source = JournalApiPaperSource(
-        num_papers=int(number_papers),
-        query_file=paper_query_file,
-        output_dir=output_dir,
-        api_key_file=api_key_file
-    )
-    
-    papers = paper_source.fetch_papers()
-    return papers
-
 
 
 def retrieve_papers_from_zip(zip_path: str, output_dir: str) -> pd.DataFrame:
@@ -276,7 +245,7 @@ def fetch_node_names(driver) -> List[str]:
         return sess.run(query).value()
 
 
-def fetch_related(graph, node_name: str):
+def fetch_related(driver, node_name: str):
     query = """
     MATCH (n {name: $name})-[r]-(m)
     RETURN DISTINCT m.name AS neighbour,
@@ -284,8 +253,8 @@ def fetch_related(graph, node_name: str):
                     CASE WHEN startNode(r)=n THEN 'out' ELSE 'in' END AS direction
     ORDER BY rel_type, neighbour
     """
-    result = graph.run(query, parameters={"name": node_name})
-    return [dict(record) for record in result]
+    with driver.session() as sess:
+        return [dict(record) for record in sess.run(query, name=node_name)]
 
 
 def _get_driver(creds_path: Path):
@@ -295,7 +264,7 @@ def _get_driver(creds_path: Path):
 # ---------------------------------------------------------------------------
 
 def _needs_api_key(agent: str) -> bool:
-    return agent.lower() in {"openai", "gemini", "llama", "claude", "deepseek",  "Journal API"}
+    return agent.lower() in {"openai", "gemini", "llama", "claude"}
 
 
 def _needs_kg_cred(kg_type: str) -> bool:
@@ -323,7 +292,7 @@ def main():
     # ---------------- LEFT COLUMN: paper source ---------------------------
     with left:
         st.subheader("Paper Source")
-        paper_mode = st.radio("", ["Semantic Scholar", "Journal API", "PDF ZIP"], key="src")
+        paper_mode = st.radio("", ["Semantic Scholar", "PDF ZIP"], key="src")
 
     # ---------------- RIGHT COLUMN: configuration -------------------------
     with right:
@@ -332,20 +301,13 @@ def main():
         if paper_mode == "Semantic Scholar":
             num_papers = st.number_input("Number of papers", 1, 200, 10) #should change upper bound
             query_file = st.file_uploader("Upload query file (.txt)", type=["txt"])
-            api_key_for_journal_api_file = None
-            pdf_zip = None
-        elif paper_mode == "Journal API":
-            num_papers = st.number_input("Number of papers", 1, 200, 10) #should change upper bound
-            query_file = st.file_uploader("Upload query file (.txt)", type=["txt"])
-            api_key_for_journal_api_file = st.file_uploader("Upload API key for journal API (.txt)", type=["txt"]) 
             pdf_zip = None
         else:
             pdf_zip = st.file_uploader("Upload PDF ZIP", type=["zip"])
-            api_key_for_journal_api_file = None
             query_file = None
             num_papers = None
 
-        ontology_file = st.file_uploader("Upload base ontology file (.jsonl)", type=["json"])
+        ontology_file = st.file_uploader("Upload base ontology file (.json / .owl)", type=["json", "owl"])
         agent = st.selectbox("AI Agent", ["openAI", "gemini", "llama", "ollama", "claude"])
         api_key_file = st.file_uploader("Upload API key (.txt)", type=["txt"]) if _needs_api_key(agent) else None
         keywords_file = st.file_uploader("Upload keywords file (.txt)", type=["txt"])
@@ -387,17 +349,11 @@ def main():
         with st.status("Running pipeline…", expanded=True) as status:
             # 1️⃣ Retrieve papers
             status.write("1/4 • Retrieving papers…")
-            if paper_mode == "Semantic Scholar":
-                papers = retrieve_papers_semantic_scholar(str(query_path), int(num_papers), output_dir)
-
-            elif paper_mode == "PDF Zip":
-                papers = retrieve_papers_from_zip(str(pdf_path), output_dir)
-
-            elif paper_mode == "Journal API":
-                papers = retrieve_papers_journal_API(str(query_path), int(num_papers), output_dir, api_key_for_journal_api_file)
-
-            else:
-                raise ValueError(f"Unsupported paper source mode: {paper_mode}")
+            papers = (
+                retrieve_papers_semantic_scholar(str(query_path), int(num_papers), output_dir)
+                if paper_mode == "Semantic Scholar"
+                else retrieve_papers_from_zip(str(pdf_path), output_dir)
+            )
             papers_df = pd.DataFrame(papers)
             status.update(label="✅ Papers retrieved")
 
@@ -409,7 +365,6 @@ def main():
             # 3️⃣ Rank papers
             status.update(label="3/4 • Ranking papers…")
             ranked_path_files = rank_papers(papers, str(updated_ontology_path), str(keywords_path), ai_tool, output_dir)
-            print(f"print ranked path : {papers}")
             ranked_df_parts = [pd.read_csv(p) for p in ranked_path_files.values()]
             status.update(label="✅ Papers ranked")
 
@@ -457,23 +412,22 @@ def main():
 
         # ---- Node‑only explorer ----
         display_node_only_graph(st.session_state["kg_result"])
-        
-        #from sokegraph.interactive_graph_view import InteractiveGraphView
-        #InteractiveGraphView(st.session_state["kg_result"]).render()
-        st.subheader("Interactive Knowledge‑Graph")
 
-        # ── Select node type (label)
-        node_labels = st.session_state["kg_result"].get_node_labels()
-        selected_label = st.selectbox("Select node type", node_labels)
 
-        # ── Select value (e.g., name of a Layer/Keyword/etc.)
-        values = st.session_state["kg_result"].get_attr_values(selected_label)
-        choice = st.selectbox("Value", values, key="attr_value")
-        
-        #driver = st.session_state.neo4j_driver
+
+    # ─────────────────────────────────────────────────────────────────────
+    # Neo4j Graph Query panel
+    # ─────────────────────────────────────────────────────────────────────
+    if "neo4j_driver" in st.session_state and st.session_state.neo4j_driver:
+        st.markdown("---")
+        st.title("SOKEGraph – explore neighbours")
+        driver = st.session_state.neo4j_driver
+
+        names = fetch_node_names(driver)
+        choice = st.selectbox("Select a node", names, index=None, placeholder="Choose…")
 
         if choice:
-            data = fetch_related(st.session_state["kg_result"], choice)
+            data = fetch_related(driver, choice)
             st.subheader(f"Neighbours of **{choice}**")
             st.dataframe(data, use_container_width=True)
 
@@ -494,45 +448,8 @@ def main():
                 net.repulsion(node_distance=180, central_gravity=0.2, spring_length=200, spring_strength=0.05, damping=0.09)
                 html = net.generate_html()
                 st.components.v1.html(html, height=800, scrolling=True)
-        
 
-
-
-    # ─────────────────────────────────────────────────────────────────────
-    # Neo4j Graph Query panel
-    # ─────────────────────────────────────────────────────────────────────
-    # if "neo4j_driver" in st.session_state and st.session_state.neo4j_driver:
-    #     st.markdown("---")
-    #     st.title("SOKEGraph – explore neighbours")
-    #     driver = st.session_state.neo4j_driver
-
-    #     names = fetch_node_names(driver)
-    #     choice = st.selectbox("Select a node", names, index=None, placeholder="Choose…")
-
-    #     if choice:
-    #         data = fetch_related(driver, choice)
-    #         st.subheader(f"Neighbours of **{choice}**")
-    #         st.dataframe(data, use_container_width=True)
-
-    #         if st.checkbox("Visualise neighbours (PyVis)"):
-    #             net = Network(height="500px", width="100%", directed=True)
-    #             style = dict(shape="circle", font={"color": "#ffffff", "size": 14}, color={"background": "#FF5733", "border": "#FF5733"}, borderWidth=2)
-    #             net.add_node(choice, label=wrap_label(choice), **style)
-
-    #             for row in data:
-    #                 n = row["neighbour"]
-    #                 rel = row["rel_type"]
-    #                 if n not in net.node_map:
-    #                     net.add_node(n, label=wrap_label(n), **style)
-    #                 if row["direction"] == "out":
-    #                     net.add_edge(choice, n, label=rel)
-    #                 else:
-    #                     net.add_edge(n, choice, label=rel)
-    #             net.repulsion(node_distance=180, central_gravity=0.2, spring_length=200, spring_strength=0.05, damping=0.09)
-    #             html = net.generate_html()
-    #             st.components.v1.html(html, height=800, scrolling=True)
-
-    #     driver.close()
+        driver.close()
 
 
 def display_node_only_graph(kg_result):

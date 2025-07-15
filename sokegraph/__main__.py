@@ -20,6 +20,7 @@ def main():
     )
     parser.add_argument("-n", "--number_papers", help="the number of papers", default="")
     parser.add_argument("-pdfs", "--pdfs_file", help="path for a zip file contains papers for ranking", default="", type=str)
+    parser.add_argument("-api_journal", "--api_key_journal_api", help="path for a file contains API key of Journal API", default="", type=check_file)
     parser.add_argument("-pq", "--paper_query_file", help="path for a file contains query for paper finiding", default="", type=check_file)
     parser.add_argument("-ky", "--keyword_query_file", help="path for a file contains keywords for paper ranking", type=check_file)
     parser.add_argument("-ont", "--ontology_file", help="path for a file contains keywords for paper ranking", default="", type=check_file)
