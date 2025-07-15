@@ -54,31 +54,39 @@ This notebook is designed for users who are comfortable modifying code directly.
 #### Example Usage:
 
 ```python
+from types import SimpleNamespace
+from sokegraph.full_pipeline import full_pipeline_main
+
 params = SimpleNamespace(
-    number_papers=10,  # Number of papers to fetch from Semantic Scholar (if not using PDFs)
-    paper_query_file="topics.txt",  # Text file with one search query per line
-    pdfs_file=None,  # Optional: ZIP file with PDFs, if using PDF input instead of Semantic Scholar
-    api_key_journal_api = "api_journal_api.txt",
-    ontology_file="base_ontology.json",  # Base ontology file in JSON or OWL format
-    AI="openAI",  # Choose the AI model: "openAI", "gemini", "llama", "ollama", or "claude"
-    API_keys="openai_keys.json",  # Path to your API keys file (required for OpenAI/Gemini/LLaMA)
-    keyword_query_file="keywords.txt",  # Text file listing keywords to extract and rank by
-    model_knowledge_graph="neo4j"  # Graph backend: "neo4j" or "networkx"
-    credentials_for_knowledge_graph="neo4j_credentials.json",  # JSON file with graph DB credentials (e.g., URI, user, password)
-    output_dir="output/",  # Directory where results and metadata will be saved
+    paper_source="Semantic Scholar",  # Options: "Semantic Scholar", "PDF Zip", "Journal API"
+    number_papers=10,                # Number of papers to fetch from Semantic Scholar
+    paper_query_file="topics.txt",   # Text file with one search query per line
+    pdfs_file=None,                  # Optional: ZIP file with PDFs (for PDF source)
+    api_key_file="api_journal_api.txt",  # API key file for Journal API source
+    ontology_file="base_ontology.json",  # Base ontology file (JSON or OWL)
+    AI="openAI",                          # Options: "openAI", "gemini", "llama", "ollama", "claude"
+    API_keys="openai_keys.json",         # API key file for AI tools
+    keyword_query_file="keywords.txt",   # Text file listing keywords
+    model_knowledge_graph="neo4j",       # Options: "neo4j", "networkx"
+    credentials_for_knowledge_graph="neo4j_credentials.json",  # Graph DB credentials
+    output_dir="output/"                 # Output directory
 )
 
-from sokegraph.full_pipeline import full_pipeline_main
 full_pipeline_main(params)
 ```
 
 ⚠️ Important: You should use either:
 
 "number_papers" + "paper_query_file"
+
 OR
+
 "number_papers" + "paper_query_file" + "api_key_journal_api"
+
 OR
+
 "pdfs_file"
+
 depending on whether you're searching for papers or uploading PDFs.
 
 💡 Make sure the paths are correct and required services (Neo4j, Ollama, etc.) are running.
