@@ -141,16 +141,12 @@ This notebook offers an **interactive, beginner-friendly form-based UI**, ideal 
    - Saves everything in your selected `output_dir`, including:
      - Enriched ontology file
      - Ranked papers (CSV/JSON)
-     - Execution logs
-     - Knowledge graph artifacts (if exported)
 
 ---
 
 > ✅ **No need to modify code manually** – just fill out the form and click **Run** for each step.
 
 > 💡 Make sure required services like **Neo4j**, **Ollama**, or your **Journal API** credentials are ready before starting the pipeline.
-
-
 
 
 ### 3️⃣ Run from Command Line 
@@ -183,16 +179,17 @@ pip install -r requirements.txt
 
 ```bash
 sokegraph \
-  -n 200 \                                    # --number_papers : how many papers to fetch
-  -pdfs "" \                                  # --pdfs_file : ZIP of PDFs (leave empty if using -n)
-  -pq external/input/paper_query.txt \        # --paper_query_file : search-query file
-  -ky external/input/keyword_query.txt \      # --keyword_query_file : keywords for ranking
-  -ont external/input/Ontology.json \         # --ontology_file : base ontology JSON
-  -API external/input/API_keys.txt \          # --API_keys : file with your API tokens
-  -ckg external/input/neo4j.json \            # --credentials_for_knowledge_graph : Neo4j creds
-  -mkg neo4j \                                # --model_knowledge_graph : graph backend
-  -AI openAI \                                # --AI : choose AI engine (openAI, gemini, llama…)
-  -o external/output                          # --output_dir : where all results will be saved
+  -n 200 \                                      # --number_papers: number of papers to fetch from Semantic Scholar
+  -pdfs "" \                                    # --pdfs_file: ZIP file with PDFs (leave empty if using -n)
+  -api_journal external/input/journal_api_key.txt \  # --api_key_journal_api: API key file for Journal API (if used)
+  -pq external/input/paper_query.txt \          # --paper_query_file: text file with search queries (one per line)
+  -ky external/input/keyword_query.txt \        # --keyword_query_file: keywords for ranking and filtering
+  -ont external/input/ontology.json \           # --ontology_file: base ontology file (JSON or OWL)
+  -API external/input/API_keys.txt \            # --API_keys: file with your AI provider's API credentials
+  -ckg external/input/neo4j.json \              # --credentials_for_knowledge_graph: Neo4j credentials (JSON)
+  -mkg neo4j \                                   # --model_knowledge_graph: choose 'neo4j' or 'networkx'
+  -AI openAI \                                   # --AI: choose your AI engine (openAI, gemini, llama, etc.)
+  -o external/output/                            # --output_dir: directory to store all outputs
 
 ```
 
@@ -200,18 +197,22 @@ sokegraph \
 
 #### 🧾 CLI Argument Explanation
 
-| Flag    | Long Option                         | Example Value       | Purpose                                                                                    |
-| ------- | ----------------------------------- | ------------------- | ------------------------------------------------------------------------------------------ |
-| `-n`    | `--number_papers`                   | `200`               | Number of papers to fetch from Semantic Scholar. Use `0` or leave blank if supplying PDFs. |
-| `-pdfs` | `--pdfs_file`                       | `papers.zip`        | ZIP file containing PDF papers for offline analysis. Leave empty when using `-n`.          |
-| `-pq`   | `--paper_query_file`                | `paper_query.txt`   | Text file with search queries (one per line).                                              |
-| `-ky`   | `--keyword_query_file`              | `keyword_query.txt` | Text file listing keywords used for ranking.                                               |
-| `-ont`  | `--ontology_file`                   | `Ontology.json`     | JSON file containing the base ontology.                                                    |
-| `-API`  | `--API_keys`                        | `API_keys.txt`      | File that stores your API keys (OpenAI, Gemini, etc.).                                     |
-| `-ckg`  | `--credentials_for_knowledge_graph` | `neo4j.json`        | JSON with Neo4j URI + username + password.                                                 |
-| `-mkg`  | `--model_knowledge_graph`           | `neo4j`             | Knowledge-graph backend (currently only `neo4j`).                                          |
-| `-AI`   | `--AI`                              | `openAI`            | AI agent to use: `openAI`, `gemini`, `llama`, etc.                                         |
-| `-o`    | `--output_dir`                      | `external/output`   | Folder where all pipeline outputs will be written.                                         |
+| Flag         | Long Option                          | Example Value                  | Purpose                                                                                             |
+|--------------|--------------------------------------|--------------------------------|-----------------------------------------------------------------------------------------------------|
+| `-n`         | `--number_papers`                    | `200`                          | Number of papers to fetch from Semantic Scholar or Journal API. Leave blank if using PDFs.          |
+| `-pdfs`      | `--pdfs_file`                        | `papers.zip`                   | ZIP file containing PDF papers. Leave blank when using `-n`.                                        |
+| `-api_journal` | `--api_key_journal_api`            | `journal_api_key.txt`          | File containing Journal API key (used when paper source is Journal API).                           |
+| `-pq`        | `--paper_query_file`                 | `paper_query.txt`              | File with one search query per line (used by Semantic Scholar or Journal API).                     |
+| `-ky`        | `--keyword_query_file`               | `keyword_query.txt`            | Keywords used for paper ranking and ontology enrichment.                                            |
+| `-ont`       | `--ontology_file`                    | `ontology.json`                | Base ontology file (in JSON or OWL format).                                                         |
+| `-API`       | `--API_keys`                         | `API_keys.txt`                 | File containing your AI provider API credentials (OpenAI, Gemini, etc.).                           |
+| `-ckg`       | `--credentials_for_knowledge_graph`  | `neo4j.json`                   | Required only for Neo4j: JSON file with URI, username, and password.                               |
+| `-mkg`       | `--model_knowledge_graph`            | `neo4j` or `networkx`          | Backend for the knowledge graph: use `neo4j` for DB or `networkx` for local graph construction.     |
+| `-AI`        | `--AI`                               | `openAI`                       | AI engine to use: `openAI`, `gemini`, `llama`, `ollama`, or `claude`.                              |
+| `-o`         | `--output_dir`                       | `external/output/`             | Directory where all outputs (ontology, rankings, logs) will be saved.                              |
+| `--verbose`  | `--verbose`                          | *(flag only)*                  | Enables debug logging and keeps intermediate files.                                                 |
+| `-f`         | `--force`                            | *(flag only)*                  | Overwrites existing outputs and ignores previous runs.                                              |
+
 
 
 ---
