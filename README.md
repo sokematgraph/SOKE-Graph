@@ -220,7 +220,6 @@ sokegraph \
 
 
 ### 4️⃣ Run with Streamlit App – `streamlit-app.py`
-## 🚀 Streamlit App: Interactive UI for SOKEGraph
 
 The Streamlit app provides a **user-friendly graphical interface** to run the full SOKEGraph pipeline — no coding required.
 
@@ -261,7 +260,7 @@ pip install -r requirements.txt
 
 # 2. Launch the Streamlit UI
 streamlit run streamlit-app.py
-
+```
 ---
 
 ### 🦙 Using Ollama Locally
