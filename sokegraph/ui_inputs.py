@@ -13,7 +13,7 @@ class SOKEGraphUI:
     
     @staticmethod
     def _needs_cred(kg: str) -> bool:
-        return kg.lower() in {"neo4j",}
+        return kg.lower() in {"neo4j"}
 
     def __init__(self):
         self.params = SimpleNamespace(
@@ -75,6 +75,7 @@ class SOKEGraphUI:
         # ──────────────────────── Event Bindings ───────────────────────
         self.paper_source_selector.observe(self._update_inputs, names="value")
         self.ai_selector.observe(self._update_inputs, names="value")
+        self.kg_selector.observe(self._update_inputs, names="value")
         self.submit_button.on_click(self._on_submit_clicked)
 
     def _update_inputs(self, change=None):
@@ -103,13 +104,16 @@ class SOKEGraphUI:
         ])
 
         if self._needs_api_key(self.ai_selector.value):
+            print("yesyes")
             children.append(self.api_keys_chooser)
 
         children.extend([self.kg_selector])
         
         if self._needs_cred(self.kg_selector.value):
+            print("yes")
             children.append(self.credentials_chooser)
-
+        else:
+            print("no")
         children.extend([
             self.output_dir_chooser,
             self.submit_button
@@ -180,10 +184,11 @@ class SOKEGraphUI:
             else:
                 self.params.api_keys_file = self.api_keys_chooser.selected
 
-        if not self.credentials_chooser.selected:
-            errors.append("❌ KG credentials file not selected.")
-        else:
-            self.params.kg_credentials_file = self.credentials_chooser.selected
+        if self._needs_cred(self.params.kg_type):
+            if not self.credentials_chooser.selected:
+                errors.append("❌ KG credentials file not selected.")
+            else:
+                self.params.kg_credentials_file = self.credentials_chooser.selected
 
         if not self.output_dir_chooser.selected_path:
             errors.append("❌ Output directory not selected.")
