@@ -304,6 +304,34 @@ The pipeline will generate:
 
 ---
 
+## 🧠 Base Ontology: What It Is & How It Works
+
+The base ontology is a user-defined `.json` file that provides a structured vocabulary for your domain. It acts as the conceptual backbone of the SOKEGraph pipeline, enabling semantic understanding, paper ranking, and knowledge graph construction.
+
+### 📚 What Is an Ontology?
+
+An ontology is a hierarchical organization of concepts relevant to a scientific or technical field. It typically includes:
+
+- High-level categories (e.g., Environment, Process, Material, Application)
+- Sub-concepts under each category
+- Keyword patterns or synonyms that help detect these concepts in paper texts
+
+This structure allows the system to semantically tag and classify papers—even when different terminology is used.
+
+### 📁 File Format & Example Structure
+
+The ontology must be defined as a `.json` file using this structure:
+
+```json
+{
+  "CategoryName": {
+    "Subconcept1": ["keyword1", "synonym1", "variant1"],
+    "Subconcept2": ["keyword2", "synonym2"]
+  }
+}
+
+---
+
 ## 🔐 API Keys & Credentials
 
 - Place your **OpenAI** or **Gemini** API keys in a JSON file: `ai_keys.json`
