@@ -213,8 +213,6 @@ sokegraph \
 | `--verbose`  | `--verbose`                          | *(flag only)*                  | Enables debug logging and keeps intermediate files.                                                 |
 | `-f`         | `--force`                            | *(flag only)*                  | Overwrites existing outputs and ignores previous runs.                                              |
 
-
-
 ---
 
 💡 **Tip:** Ensure your file paths exist and any external services like Neo4j or Ollama are running before execution.
