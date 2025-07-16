@@ -329,7 +329,7 @@ The ontology must be defined as a `.json` file using this structure:
     "Subconcept2": ["keyword2", "synonym2"]
   }
 }
-
+```
 ---
 
 ## 🔐 API Keys & Credentials
