@@ -195,6 +195,7 @@ sokegraph \
 
 ---
 
+
 #### 🧾 CLI Argument Explanation
 
 | Flag         | Long Option                          | Example Value                  | Purpose                                                                                             |
@@ -216,6 +217,52 @@ sokegraph \
 ---
 
 💡 **Tip:** Ensure your file paths exist and any external services like Neo4j or Ollama are running before execution.
+
+
+### 4️⃣ Run with Streamlit App – `streamlit-app.py`
+## 🚀 Streamlit App: Interactive UI for SOKEGraph
+
+The Streamlit app provides a **user-friendly graphical interface** to run the full SOKEGraph pipeline — no coding required.
+
+---
+
+### 🧭 What You Can Do with It
+
+- Choose your **paper source**:  
+  `Semantic Scholar`, `PDF ZIP`, or `Journal API`.
+
+- Upload or select required files:
+  - Paper queries
+  - Ontology file
+  - Keywords list
+  - API keys (AI + Journal API)
+  - Neo4j credentials (optional)
+
+- Select an AI agent:
+  - `openAI`, `gemini`, `llama`, `ollama`, or `claude`
+
+- Choose your knowledge graph backend:
+  - `neo4j` or `networkx`
+
+- Run the full pipeline:
+  - **Fetch → Enrich → Rank → Build Graph**
+
+- View logs, ranked papers, and results directly in the UI.
+
+---
+
+### ▶️ How to Run the App
+
+Make sure your environment is set up correctly, then run:
+
+```bash
+# 1. Install dependencies (if needed)
+pip install -r requirements.txt
+
+# 2. Launch the Streamlit UI
+streamlit run streamlit-app.py
+
+---
 
 ### 🦙 Using Ollama Locally
 #### ✅ Step 1: Install Ollama
