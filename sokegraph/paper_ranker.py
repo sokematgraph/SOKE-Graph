@@ -291,29 +291,37 @@ class PaperRanker:
         tokens = [t for t in re.findall(r"\w+", user_query.lower()) if len(t) > 1]
 
         # Step 2: Create a summary of the ontology layers and their categories (used in the prompt)
+        ontology_summary = {}
+        for layer, cats in self.ontology.items():
+            ontology_summary[layer] = {}
+            for cat, items in cats.items():
+                all_keywords = set()
+                for item in items:
+                    all_keywords.update(item["keywords"])
+                # Use top 3 keywords for brevity
+                top_keywords = sorted(all_keywords)[:3]
+                ontology_summary[layer][cat] = top_keywords
         ontology_summary = {layer: list(cats.keys()) for layer, cats in self.ontology.items()}
 
         # Step 3: Build the AI prompt for structured classification
         prompt = f'''
-            You are a structured classification AI for materials science.
-            Ontology:
-            {json.dumps(ontology_summary, indent=2)}
-
-            Given the user query: "{user_query}"
-
-            Extract each meaningful keyword (ignore stopwords like 'and', 'for', etc).
-            Assign each keyword to the most relevant category and layer from the ontology.
-            Return only the results in valid JSON format:
-
-            [
-                {{
-                    "keyword": "cheap",
-                    "category": "Earth-Abundant Elements",
-                    "layer": "Elemental Composition"
-                }},
-            ...
-            ]
-        '''
+                    You are a structured classification AI for materials science.
+                    Ontology:
+                    {json.dumps(ontology_summary, indent=2)}
+                    Given the user query: "{user_query}"
+                    Extract each meaningful keyword (ignore stopwords like 'and', 'for', etc).
+                    Assign each keyword to the most relevant category and layer from the ontology.
+                    Use both the category name and its associated keywords to guide your assignment.
+                    Return only the results in valid JSON format:
+                    [
+                    {{
+                        "keyword": "cheap",
+                        "category": "Earth-Abundant Elements",
+                        "layer": "Elemental Composition"
+                    }},
+                    ...
+                    ]
+                '''
 
         # Step 4: Send prompt to the AI agent and clean the response
         response = self.ai_tool.ask(prompt)
