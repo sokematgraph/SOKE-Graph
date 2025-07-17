@@ -276,17 +276,6 @@ def fetch_node_names(driver) -> List[str]:
         return sess.run(query).value()
 
 
-def fetch_related(graph, node_name: str):
-    query = """
-    MATCH (n {name: $name})-[r]-(m)
-    RETURN DISTINCT m.name AS neighbour,
-                    type(r) AS rel_type,
-                    CASE WHEN startNode(r)=n THEN 'out' ELSE 'in' END AS direction
-    ORDER BY rel_type, neighbour
-    """
-    result = graph.run(query, parameters={"name": node_name})
-    return [dict(record) for record in result]
-
 
 def _get_driver(creds_path: Path):
     creds = json.loads(Path(creds_path).read_text())
@@ -467,13 +456,15 @@ def main():
         selected_label = st.selectbox("Select node type", node_labels)
 
         # ── Select value (e.g., name of a Layer/Keyword/etc.)
+        print(type(selected_label))
         values = st.session_state["kg_result"].get_attr_values(selected_label)
+        print(values)
         choice = st.selectbox("Value", values, key="attr_value")
         
         #driver = st.session_state.neo4j_driver
 
         if choice:
-            data = fetch_related(st.session_state["kg_result"], choice)
+            data = st.session_state["kg_result"].fetch_related(choice)
             st.subheader(f"Neighbours of **{choice}**")
             st.dataframe(data, use_container_width=True)
 
@@ -540,10 +531,12 @@ def display_node_only_graph(kg_result):
     Add a section to show only nodes based on selected type,
     without clearing or hiding other Streamlit content.
     """
+    node_labels = st.session_state["kg_result"].get_node_labels()
     with st.expander("🔍 Explore Nodes by Type", expanded=True):
         view_mode = st.radio(
             "Nodes to display:",
-            ["All", "Layer", "Category", "Keyword", "Paper", "MetaData"],
+            #["All", "Layer", "Category", "Keyword", "Paper", "MetaData"],
+            node_labels,
             horizontal=True,
             key="node_display_mode"
         )

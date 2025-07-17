@@ -24,7 +24,7 @@ Open a terminal (or use Google Colab) and run:
 
 ```bash
 git clone https://github.com/sanakashgouli/SOKEGraph.git
-cd sokegraph
+cd SOKEGraph
 ```
 
 > 🔒 If the repo is private and you're using Google Colab, use a [GitHub token](https://github.com/settings/tokens) to authenticate.

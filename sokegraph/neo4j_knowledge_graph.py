@@ -343,3 +343,14 @@ class Neo4jKnowledgeGraph(KnowledgeGraph):
             components.html(f.read(), height=650, scrolling=True)
 
         os.remove(path)
+    
+    def fetch_related(self, node_name: str):
+        query = """
+        MATCH (n {name: $name})-[r]-(m)
+        RETURN DISTINCT m.name AS neighbour,
+                        type(r) AS rel_type,
+                        CASE WHEN startNode(r)=n THEN 'out' ELSE 'in' END AS direction
+        ORDER BY rel_type, neighbour
+        """
+        result = self.graph.run(query, parameters={"name": node_name})
+        return [dict(record) for record in result]
