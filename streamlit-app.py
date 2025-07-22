@@ -38,23 +38,22 @@ import streamlit as st
 from neo4j import GraphDatabase
 from pyvis.network import Network
 
-from sokegraph.base_paper_source import BasePaperSource
-from sokegraph.semantic_scholar_source import SemanticScholarPaperSource
-from sokegraph.pdf_paper_source import PDFPaperSource
-from sokegraph.paper_ranker import PaperRanker
-from sokegraph.knowledge_graph import KnowledgeGraph
-from sokegraph.util.logger import LOG
-from sokegraph.ai_agent import AIAgent
-from sokegraph.openai_agent import OpenAIAgent
-from sokegraph.gemini_agent import GeminiAgent
-from sokegraph.ontology_updater import OntologyUpdater
-from sokegraph.neo4j_knowledge_graph import Neo4jKnowledgeGraph
-from sokegraph.llama_agent import LlamaAgent
-from sokegraph.ollama_agent import OllamaAgent
-from sokegraph.claude_agent import ClaudeAgent
-from sokegraph.journal_api_source import JournalApiPaperSource
+from sokegraph.sources.base_paper_source import BasePaperSource
+from sokegraph.sources.semantic_scholar_source import SemanticScholarPaperSource
+from sokegraph.sources.pdf_paper_source import PDFPaperSource
+from sokegraph.ranking.paper_ranker import PaperRanker
+from sokegraph.graph.knowledge_graph import KnowledgeGraph
+from sokegraph.agents.ai_agent import AIAgent
+from sokegraph.agents.openai_agent import OpenAIAgent
+from sokegraph.agents.gemini_agent import GeminiAgent
+from sokegraph.ontology.ontology_updater import OntologyUpdater
+from sokegraph.graph.neo4j_knowledge_graph import Neo4jKnowledgeGraph
+from sokegraph.agents.llama_agent import LlamaAgent
+from sokegraph.agents.ollama_agent import OllamaAgent
+from sokegraph.agents.claude_agent import ClaudeAgent
+from sokegraph.sources.journal_api_source import JournalApiPaperSource
 
-from sokegraph.networkx_knowledge_graph import NetworkXKnowledgeGraph
+from sokegraph.graph.networkx_knowledge_graph import NetworkXKnowledgeGraph
 import uuid
 
 import networkx as nx
@@ -158,10 +157,10 @@ def rank_papers(
 def build_knowledge_graph(
     ontology_path: str,
     kg_type: str,
-    creds_path: str | None,
+    creds_path: str,
 ):
     """Stub – return either a NetworkX graph or write to Neo4j and return the driver."""
-    
+    print(creds_path)
     graph_builder: KnowledgeGraph
     if(kg_type == "neo4j"):
         with open(creds_path, "r") as f:

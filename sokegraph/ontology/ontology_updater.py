@@ -12,8 +12,8 @@ import json
 import os
 from typing import List, Dict
 
-from sokegraph.ai_agent import AIAgent
-from sokegraph.functions import safe_title, parse_all_metadata
+from sokegraph.agents.ai_agent import AIAgent
+from sokegraph.utils.functions import safe_title, parse_all_metadata
 
 
 class OntologyUpdater:

@@ -1,7 +1,7 @@
 import requests
 from time import sleep
 from typing import List, Dict
-from sokegraph.base_paper_source import BasePaperSource
+from sokegraph.sources.base_paper_source import BasePaperSource
 from sokegraph.util.logger import LOG
 
 

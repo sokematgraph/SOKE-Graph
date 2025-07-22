@@ -1,5 +1,5 @@
 import re
-from sokegraph import config
+from sokegraph.ontology import config
 
 
 def get_next_api_key(api_keys):

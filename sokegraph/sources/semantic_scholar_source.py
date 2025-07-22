@@ -4,7 +4,7 @@ from semanticscholar import SemanticScholar
 from time import sleep
 from sokegraph.util.logger import LOG
 from typing import List, Dict
-from sokegraph.base_paper_source import BasePaperSource
+from sokegraph.sources.base_paper_source import BasePaperSource
 
 class SemanticScholarPaperSource(BasePaperSource):
     """

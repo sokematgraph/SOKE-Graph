@@ -14,8 +14,8 @@ import logging
 from typing import List, Dict, Any
 
 from openai import OpenAI
-from sokegraph.ai_agent import AIAgent
-from sokegraph.functions import get_next_api_key
+from sokegraph.agents.ai_agent import AIAgent
+from sokegraph.utils.functions import get_next_api_key
 
 LOG = logging.getLogger(__name__)
 

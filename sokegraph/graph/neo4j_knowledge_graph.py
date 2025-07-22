@@ -24,7 +24,7 @@ import streamlit.components.v1 as components
 from py2neo import Graph, Node
 from pyvis.network import Network
 
-from sokegraph.knowledge_graph import KnowledgeGraph
+from sokegraph.graph.knowledge_graph import KnowledgeGraph
 import streamlit as st
 import networkx as nx
 import os

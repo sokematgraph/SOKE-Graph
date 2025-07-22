@@ -1,7 +1,7 @@
 # ai_tool/gemini_tool.py
 
 # Import base AI agent interface
-from sokegraph.ai_agent import AIAgent
+from sokegraph.agents.ai_agent import AIAgent
 
 # Used for cycling through API keys (currently not in use)
 from itertools import cycle
@@ -10,7 +10,7 @@ from itertools import cycle
 from together import Together
 
 # Helper function to rotate or retrieve the next API key from a list
-from sokegraph.functions import get_next_api_key
+from sokegraph.utils.functions import get_next_api_key
 
 
 class LlamaAgent(AIAgent):

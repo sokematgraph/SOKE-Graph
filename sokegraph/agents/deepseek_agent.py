@@ -7,8 +7,8 @@ from __future__ import annotations
 import logging
 from typing import List
 from openai import OpenAI  # This SDK wraps the OpenAI-compatible DeepSeek endpoint
-from sokegraph.ai_agent import AIAgent
-from sokegraph.functions import get_next_api_key
+from sokegraph.agents.ai_agent import AIAgent
+from sokegraph.utils.functions import get_next_api_key
 LOG = logging.getLogger(__name__)
 class DeepSeekAgent(AIAgent):
     """

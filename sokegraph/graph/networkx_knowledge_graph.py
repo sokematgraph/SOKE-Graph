@@ -2,7 +2,7 @@ import json
 from collections import defaultdict
 from pathlib import Path
 import networkx as nx
-from sokegraph.knowledge_graph import KnowledgeGraph
+from sokegraph.graph.knowledge_graph import KnowledgeGraph
 from pyvis.network import Network
 import streamlit as st
 import tempfile

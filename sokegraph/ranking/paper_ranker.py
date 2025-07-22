@@ -21,10 +21,10 @@ from itertools import combinations
 from typing import List, Dict, Any, Tuple, Set
 
 from sokegraph.util.logger import LOG
-from sokegraph.functions import load_keyword, safe_title
+from sokegraph.utils.functions import load_keyword, safe_title
 
 
-from sokegraph.ai_agent import AIAgent
+from sokegraph.agents.ai_agent import AIAgent
 
 class PaperRanker:
     def __init__(self, ai_tool: AIAgent, papers, ontology_path, keyword_path, output_dir: str):
@@ -679,6 +679,9 @@ class PaperRanker:
         except FileNotFoundError:
             LOG.error(f"❌ File not found: {pair_file}")
             return pd.DataFrame()
+        except pd.errors.EmptyDataError:
+            print(f"⚠️ Empty CSV file: {pair_file}")
+            return pd.DataFrame()  
 
         # Step 2: Build a lookup mapping from paper ID to (relevance level, keyword score)
         relevance_scores = {paper_id: ("high", score) for paper_id, score in ranked}

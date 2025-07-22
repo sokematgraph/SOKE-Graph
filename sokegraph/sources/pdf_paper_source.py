@@ -3,9 +3,9 @@
 import zipfile, os, requests
 from PyPDF2 import PdfReader
 from sokegraph.util.logger import LOG
-from sokegraph.utils import check_file
+from sokegraph.utils.utils import check_file
 from typing import List, Dict
-from sokegraph.base_paper_source import BasePaperSource
+from sokegraph.sources.base_paper_source import BasePaperSource
 
 class PDFPaperSource(BasePaperSource):
     """

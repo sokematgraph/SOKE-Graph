@@ -4,7 +4,7 @@
 import requests
 
 # Import the base class AIAgent that this class will extend
-from sokegraph.ai_agent import AIAgent
+from sokegraph.agents.ai_agent import AIAgent
 
 class OllamaAgent(AIAgent):
     """

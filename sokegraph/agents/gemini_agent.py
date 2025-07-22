@@ -1,10 +1,8 @@
 # ai_tool/gemini_tool.py
 
-from sokegraph.ai_agent import AIAgent
-import json
-import re
+from sokegraph.agents.ai_agent import AIAgent
 import google.generativeai as genai
-from sokegraph.functions import get_next_api_key
+from sokegraph.utils.functions import get_next_api_key
 
 class GeminiAgent(AIAgent):
     """
