@@ -352,6 +352,38 @@ def main():
     # EXECUTION
     # ---------------------------------------------------------------------
     if run_btn:
+        # 🔍 Validate required inputs
+        missing_inputs = []
+
+        if paper_mode in {"Semantic Scholar", "Journal API"}:
+            if not query_file:
+                missing_inputs.append("Query file (.txt)")
+            if not num_papers:
+                missing_inputs.append("Number of papers")
+            elif num_papers <= 0:
+                missing_inputs.append("Number of papers must be greater than 0")
+
+        if paper_mode == "Journal API" and not api_key_for_journal_api_file:
+            missing_inputs.append("Journal API key file (.txt)")
+
+        if paper_mode == "PDF ZIP" and not pdf_zip:
+            missing_inputs.append("PDF ZIP file")
+
+        if not ontology_file:
+            missing_inputs.append("Base ontology file (.jsonl)")
+
+        if _needs_api_key(agent) and not api_key_file:
+            missing_inputs.append(f"{agent} API key (.txt)")
+
+        if not keywords_file:
+            missing_inputs.append("Keywords file (.txt)")
+
+        if _needs_kg_cred(kg_type) and not kg_credentials:
+            missing_inputs.append("KG credentials (.json)")
+
+        if missing_inputs:
+            st.error("❌ Please upload or select the following before running:\n\n" + "\n".join(f"• {item}" for item in missing_inputs))
+            st.stop()
         # (validation code unchanged) …
 
         # Save uploads
