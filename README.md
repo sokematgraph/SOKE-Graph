@@ -312,9 +312,9 @@ The base ontology is a user-defined `.json` file that provides a structured voca
 
 An ontology is a hierarchical organization of concepts relevant to a scientific or technical field. It typically includes:
 
-- High-level categories (e.g., Environment, Process, Material, Application)
-- Sub-concepts under each category
-- Keyword patterns or synonyms that help detect these concepts in paper texts
+- High-level layers (e.g., Environment, Process, Material, Application)
+- Categories under each layer
+- Keyword patterns or synonyms that help detect these categories in paper texts
 
 This structure allows the system to semantically tag and classify papers—even when different terminology is used.
 
