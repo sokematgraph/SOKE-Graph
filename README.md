@@ -350,6 +350,7 @@ Example:
 
 ## 🙋‍♀️ Contributions
 
+Originally created by @sanakashgouli and mirrored to this organization.
 Feel free to open issues or pull requests. Let’s improve this together!
 
 ---
