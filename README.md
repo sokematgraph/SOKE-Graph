@@ -91,6 +91,25 @@ If you get an error saying `git` is not found:
   ```bash
   cd SOKEGraph
   ```
+
+## Step 3.1: Open the Project in VS Code
+
+We recommend working with **Visual Studio Code (VS Code)** for this project.  
+You can open the project in two ways:
+
+### Option 1: Open from VS Code
+- Open **VS Code**  
+- Go to **File > Open Folder...** and select the `SOKEGraph` folder  
+
+### Option 2: Open from Terminal
+If VS Code is installed and added to your PATH, you can run:
+```bash
+cd SOKEGraph
+code .
+```
+
+After opening, use the integrated terminal (View > Terminal) to activate your virtual environment (see Step 5) and start running the project.
+
 ---
 
 ## Step 4: Create a Virtual Environment (Isolate Dependencies)
