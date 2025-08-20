@@ -340,4 +340,16 @@ When done working, you can leave the environment by running:
 ```bash
 deactivate
 ```
+---
+## Reusing the Tool
+If you have cloned the repository and want to use it again:
 
+### Windows Users
+
+In Command Prompt or PowerShell, run:
+
+```bash
+cd SOKEGraph
+venv\Scripts\activate
+streamlit run streamlit-app.py
+```
