@@ -398,13 +398,11 @@ Graph neural networks for chemical reaction prediction
 ```
 
 ## 3) 🔑 Keyword File (`keyword_query.txt`)
-Keywords used to **rank papers** (exact hits, synonyms if ontology is provided). One term per line.
+The `keyword_query.txt` file contains keywords or short phrases (e.g., *acidic HER water splitting*) that the system uses to **rank papers** during search.
 
 **Example**
 ```txt
-acidic
-HER
-water splitting
+acidic HER water splitting
 ```
 
 **Recommended Layout**
@@ -441,57 +439,3 @@ cd SOKEGraph
 venv\Scripts\activate
 streamlit run streamlit-app.py
 ```
-
-# 🧭 Ontology File
-
-This project uses an **ontology file** (`Ontology.json`) to guide the search.  
-The ontology defines **categories**, **subcategories**, and a list of **keywords/synonyms** for each.
-
-## How to Prepare Your Own Ontology
-1. Create a JSON file called `Ontology.json`.  
-2. Use the format:
-   ```json
-   {
-     "Category": {
-       "Subcategory": ["keyword1", "keyword2", "keyword3"]
-     }
-   }
-   ```
-3. Add categories (e.g., *Environment*, *Process*), subcategories (e.g., *Acidic*, *Fuel Cells*), and synonyms.  
-4. Validate the JSON with a tool like [jsonlint.com](https://jsonlint.com).  
-5. Save it in the project folder (e.g., `config/Ontology.json`).  
-
-## Example
-```json
-{
-  "Environment": {
-    "Acidic": ["pH < 7", "acidic"],
-    "Alkaline": ["pH > 7", "alkaline", "basic"]
-  },
-  "Process": {
-    "Water Electrolysis": ["electrolysis of water", "splitting H2O"],
-    "Fuel Cells": ["fuel cell", "PEM", "proton exchange membrane"]
-  }
-}
-```
-
-# 📄 Query File for Paper Finding
-
-This project allows searching papers from **Semantic Scholar** or other engines using a query file.  
-The query file is a simple **text file** where each line represents one search query.
-
-## How to Create a Query File
-1. Create a plain text file named `paper_query.txt`.  
-2. Write one query per line.  
-   - Each line can be a keyword, a phrase, or a research question.  
-   - Queries will be sent to the paper search engine.  
-
-### Example
-```txt
-Acidic earth abundant catalysts for water splitting
-Nickel-based electrocatalysts for OER
-Graph neural networks for chemical reaction prediction
-```
-# 🔑 Keyword File
-
-The `keyword_query.txt` file contains keywords or short phrases (e.g., *acidic HER water splitting*) that the system uses to **rank papers** during search.
