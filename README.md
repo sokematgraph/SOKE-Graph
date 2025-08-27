@@ -407,3 +407,35 @@ Graph neural networks for chemical reaction prediction
 # 🔑 Keyword File
 
 The `keyword_query.txt` file contains keywords or short phrases (e.g., *acidic HER water splitting*) that the system uses to **rank papers** during search.
+
+
+---
+
+## 🐍 Run with Conda Environment (Alternative to venv)
+
+If you prefer using **Anaconda / Miniconda**, you can create and manage environments with `conda`.
+
+### Step 1: Create a Conda Environment
+```bash
+conda create -n sokegraph python=3.9
+```
+*(replace `3.9` with your preferred version if needed)*
+
+### Step 2: Activate the Environment
+```bash
+conda activate sokegraph
+```
+
+### Step 3: Install Dependencies
+```bash
+pip install --upgrade pip
+pip install -r requirements.txt
+```
+
+### Step 4: Run the Project
+You can now use the same instructions as before (Streamlit, Jupyter notebooks, or CLI) inside this conda environment.
+
+### Step 5: Deactivate Environment (Optional)
+```bash
+conda deactivate
+```
