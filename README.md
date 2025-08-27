@@ -67,7 +67,7 @@ You'll be able to enter commands here.
 In the command line window you opened, type:
 
 ```bash
-git clone https://github.com/sanakashgouli/SOKEGraph.git
+git clone https://github.com/sokematgraph/SOKE-Graph.git
 ```
 
 If you get an error saying `git` is not found:
