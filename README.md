@@ -353,3 +353,37 @@ cd SOKEGraph
 venv\Scripts\activate
 streamlit run streamlit-app.py
 ```
+
+# 🧭 Ontology File
+
+This project uses an **ontology file** (`Ontology.json`) to guide the search.  
+The ontology defines **categories**, **subcategories**, and a list of **keywords/synonyms** for each.
+
+## How to Prepare Your Own Ontology
+1. Create a JSON file called `Ontology.json`.  
+2. Use the format:
+   ```json
+   {
+     "Category": {
+       "Subcategory": ["keyword1", "keyword2", "keyword3"]
+     }
+   }
+   ```
+3. Add categories (e.g., *Environment*, *Process*), subcategories (e.g., *Acidic*, *Fuel Cells*), and synonyms.  
+4. Validate the JSON with a tool like [jsonlint.com](https://jsonlint.com).  
+5. Save it in the project folder (e.g., `config/Ontology.json`).  
+
+## Example
+```json
+{
+  "Environment": {
+    "Acidic": ["pH < 7", "acidic"],
+    "Alkaline": ["pH > 7", "alkaline", "basic"]
+  },
+  "Process": {
+    "Water Electrolysis": ["electrolysis of water", "splitting H2O"],
+    "Fuel Cells": ["fuel cell", "PEM", "proton exchange membrane"]
+  }
+}
+```
+
