@@ -387,3 +387,23 @@ The ontology defines **categories**, **subcategories**, and a list of **keywords
 }
 ```
 
+# 📄 Query File for Paper Finding
+
+This project allows searching papers from **Semantic Scholar** or other engines using a query file.  
+The query file is a simple **text file** where each line represents one search query.
+
+## How to Create a Query File
+1. Create a plain text file named `paper_query.txt`.  
+2. Write one query per line.  
+   - Each line can be a keyword, a phrase, or a research question.  
+   - Queries will be sent to the paper search engine.  
+
+### Example
+```txt
+Acidic earth abundant catalysts for water splitting
+Nickel-based electrocatalysts for OER
+Graph neural networks for chemical reaction prediction
+```
+# 🔑 Keyword File
+
+The `keyword_query.txt` file contains keywords or short phrases (e.g., *acidic HER water splitting*) that the system uses to **rank papers** during search.
