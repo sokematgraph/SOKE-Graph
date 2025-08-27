@@ -114,6 +114,13 @@ After opening, use the integrated terminal (View > Terminal) to activate your vi
 
 ## Step 4: Create a Virtual Environment (Isolate Dependencies)
 
+### Alternative: Create with Conda
+If you prefer **Anaconda / Miniconda**:
+```bash
+conda create -n sokegraph python=3.9
+```
+
+
 This keeps the project’s Python packages separate from your system.
 
 ### Windows Users
@@ -138,6 +145,13 @@ python3 -m venv venv
 ---
 
 ## Step 5: Activate the Virtual Environment
+
+### Conda: Activate
+If you created a Conda env:
+```bash
+conda activate sokegraph
+```
+
 
 You'll need to activate this environment every time before you run the project.
 
@@ -335,11 +349,85 @@ It’s helpful if you want a guided, cell-by-cell execution **without writing co
   
 ---
 
+
+
+---
+
+# 📂 Preparing Input Files for SOKEGraph
+
+SOKEGraph uses three input files. Place them in your project (e.g., `./inputs/`) and point the app/notebook to their paths.
+
+## 1) 🧭 Ontology File (`Ontology.json`)
+Defines **categories → subcategories → keywords/synonyms** that guide concept detection and search.
+
+**Format**
+```json
+{
+  "Category": {
+    "Subcategory": ["keyword1", "keyword2", "keyword3"]
+  }
+}
+```
+
+**Example**
+```json
+{
+  "Environment": {
+    "Acidic": ["pH < 7", "acidic"],
+    "Alkaline": ["pH > 7", "alkaline", "basic"]
+  },
+  "Process": {
+    "Water Electrolysis": ["electrolysis of water", "splitting H2O"],
+    "Fuel Cells": ["fuel cell", "PEM", "proton exchange membrane"]
+  }
+}
+```
+
+**Tips**
+- Include common variants (symbols, abbreviations, spacing: `pH<7` vs `pH < 7`).
+- Validate JSON (e.g., jsonlint). Save as `Ontology.json`.
+
+## 2) 📄 Query File (`paper_query.txt`)
+Each **line** is one search query sent to Semantic Scholar / other engines.
+
+**Example**
+```txt
+Acidic earth abundant catalysts for water splitting
+Nickel-based electrocatalysts for OER
+Graph neural networks for chemical reaction prediction
+```
+
+## 3) 🔑 Keyword File (`keyword_query.txt`)
+Keywords used to **rank papers** (exact hits, synonyms if ontology is provided). One term per line.
+
+**Example**
+```txt
+acidic
+HER
+water splitting
+```
+
+**Recommended Layout**
+```
+inputs/
+  Ontology.json
+  paper_query.txt
+  keyword_query.txt
+```
+Point the Streamlit app / notebooks to these files when prompted.
+
+
 ## Step 9: Deactivate Virtual Environment (Optional)
 When done working, you can leave the environment by running:
 ```bash
 deactivate
 ```
+
+Or for Conda:
+```bash
+conda deactivate
+```
+
 ---
 ## Reusing the Tool
 If you have cloned the repository and want to use it again:
@@ -407,35 +495,3 @@ Graph neural networks for chemical reaction prediction
 # 🔑 Keyword File
 
 The `keyword_query.txt` file contains keywords or short phrases (e.g., *acidic HER water splitting*) that the system uses to **rank papers** during search.
-
-
----
-
-## 🐍 Run with Conda Environment (Alternative to venv)
-
-If you prefer using **Anaconda / Miniconda**, you can create and manage environments with `conda`.
-
-### Step 1: Create a Conda Environment
-```bash
-conda create -n sokegraph python=3.9
-```
-*(replace `3.9` with your preferred version if needed)*
-
-### Step 2: Activate the Environment
-```bash
-conda activate sokegraph
-```
-
-### Step 3: Install Dependencies
-```bash
-pip install --upgrade pip
-pip install -r requirements.txt
-```
-
-### Step 4: Run the Project
-You can now use the same instructions as before (Streamlit, Jupyter notebooks, or CLI) inside this conda environment.
-
-### Step 5: Deactivate Environment (Optional)
-```bash
-conda deactivate
-```
