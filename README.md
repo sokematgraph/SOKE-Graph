@@ -9,15 +9,14 @@ This tool can be tailored for accelerating literature analysis in any domain of 
 - [🧠 SOKE Graph: A Semantic-linked Ontological Framework](#-soke-graph-a-semantic-linked-ontological-framework-for-domain-specific-knowledge-discovery-in-scientific-literature)
 - [🚀 Features](#-features)
 - [🚀 How to Run This Python Project on Windows, macOS, and Linux](#-how-to-run-this-python-project-on-windows-macos-and-linux)
-  - [Step 1: Install Python](#step-1-install-python)
-  - [Step 2: Open the Command Line / Terminal](#step-2-open-the-command-line--terminal)
-  - [Step 3: Clone the Project (Download the Code)](#step-3-clone-the-project-download-the-code)
+    - [Step 1: Open the Command Line / Terminal](#step-2-open-the-command-line--terminal)
+  - [Step 2: Clone the Project (Download the Code)](#step-3-clone-the-project-download-the-code)
   - [Step 3.1: Open the Project in VS Code](#step-31-open-the-project-in-vs-code)
-  - [Step 4: Create a Virtual Environment](#step-4-create-a-virtual-environment-isolate-dependencies)
-  - [Step 5: Activate the Virtual Environment](#step-5-activate-the-virtual-environment)
-  - [Step 6: Install Project Dependencies](#step-6-install-project-dependencies)
-  - [Step 7: Recommended Editor – VS Code](#step-7-recommended-editor--visual-studio-code-vs-code)
-  - [Step 8: Run the Project](#step-8-run-the-project)
+  - [Step 3: Create a Virtual Environment](#step-4-create-a-virtual-environment-isolate-dependencies)
+  - [Step 4: Activate the Virtual Environment](#step-5-activate-the-virtual-environment)
+  - [Step 5: Install Project Dependencies](#step-6-install-project-dependencies)
+  - [Step 6: Recommended Editor – VS Code](#step-7-recommended-editor--visual-studio-code-vs-code)
+  - [Step 7: Run the Project](#step-8-run-the-project)
     - [1️⃣ Run with Streamlit App](#1️⃣-run-with-streamlit-app--streamlit-apppy)
     - [2️⃣ Run from Jupyter Notebook – full_pipeline.ipynb](#2️⃣-run-from-jupyter-notebook--full_pipelineipynb)
     - [3️⃣ Run from Jupyter Notebook – Step-by-Step](#3️⃣-run-from-jupyter-notebook-interactive-step-by-step--full_pipeline_stepbystepipynb)
@@ -25,7 +24,7 @@ This tool can be tailored for accelerating literature analysis in any domain of 
   - [1) Ontology File](#1-ontology-file-ontologyjson)
   - [2) Query File](#2-query-file-paper_querytxt)
   - [3) Keyword File](#3-keyword-file-keyword_querytxt)
-- [Step 9: Deactivate Virtual Environment](#step-9-deactivate-virtual-environment-optional)
+- [Step 8: Deactivate Virtual Environment](#step-9-deactivate-virtual-environment-optional)
 - [Reusing the Tool](#reusing-the-tool)
 
 
@@ -43,37 +42,7 @@ This guide will walk you through running this project on your computer, regardle
 
 ---
 
-## Step 1: Install Python
-
-Python is the programming language this project uses.
-
-- **Download Python 3.x here:** https://www.python.org/downloads/  
-- Make sure you download **Python 3** (not Python 2).
-
-### Windows Users
-- When installing Python, **make sure to check the box "Add Python to PATH"** on the installer screen!  
-- If you forget this step, your computer won’t recognize Python commands.
-
-### macOS Users
-- Python 3 is often pre-installed, but it may be an older version.  
-- Recommended: install the latest Python 3 via [Homebrew](https://brew.sh/):
-  ```bash
-  /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-  brew install python
-  ```
-### Linux Users
-
-- Most Linux distributions come with Python installed.
-
-- To install or upgrade, use your package manager.
-
-- For Ubuntu/Debian:
-
-  ```bash
-  sudo apt update
-  sudo apt install python3 python3-venv python3-pip
-  ```
-## Step 2: Open the Command Line / Terminal
+## Step 1: Open the Command Line / Terminal
 
 You'll be able to enter commands here.
 
@@ -86,7 +55,7 @@ You'll be able to enter commands here.
 
 ---
 
-## Step 3: Clone the Project (Download the Code)
+## Step 2: Clone the Project (Download the Code)
 
 In the command line window you opened, type:
 
@@ -136,7 +105,7 @@ After opening, use the integrated terminal (View > Terminal) to activate your vi
 
 ---
 
-## Step 4: Create a Virtual Environment (Conda Recommended)
+## Step 3: Create a Virtual Environment (Conda Recommended)
 
 We recommend using **Conda** (or Miniconda/Mamba) to manage dependencies for this project.  
 Conda makes it easy to install and manage scientific packages across platforms.
@@ -147,7 +116,7 @@ conda create -n sokegraph python=3.9
 
 ---
 
-## Step 5: Activate the Environment
+## Step 4: Activate the Environment
 
 ```bash
 conda activate sokegraph
@@ -156,7 +125,7 @@ conda activate sokegraph
 You’ll need to activate this environment every time before running the project.
 
 ---
-## Step 6: Install Project Dependencies
+## Step 5: Install Project Dependencies
 
 With the environment active, install required packages:
 
@@ -172,7 +141,7 @@ pip install -r requirements.txt
 
 ---
 
-## Step 7: Recommended Editor – Visual Studio Code (VS Code)
+## Step 6: Recommended Editor – Visual Studio Code (VS Code)
 
 We recommend using **VS Code** for working with this project, whether you want to edit code, run the Streamlit app, or work in Jupyter Notebooks.
 
@@ -187,7 +156,7 @@ We recommend using **VS Code** for working with this project, whether you want t
 
 ---
 
-## Step 8: Run the Project
+## Step 7: Run the Project
 You can choose the method that best fits your skills and setup. For most users, **Streamlit app is the easiest way** to get started.
 
 ---
@@ -397,7 +366,7 @@ inputs/
 Point the Streamlit app / notebooks to these files when prompted.
 
 
-## Step 9: Deactivate Virtual Environment (Optional)
+## Step 8: Deactivate Virtual Environment (Optional)
 When done working, you can leave the environment by running:
 ```bash
 deactivate
