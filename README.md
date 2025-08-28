@@ -136,81 +136,39 @@ After opening, use the integrated terminal (View > Terminal) to activate your vi
 
 ---
 
-## Step 4: Create a Virtual Environment (Isolate Dependencies)
+## Step 4: Create a Virtual Environment (Conda Recommended)
 
-### Alternative: Create with Conda
-If you prefer **Anaconda / Miniconda**:
+We recommend using **Conda** (or Miniconda/Mamba) to manage dependencies for this project.  
+Conda makes it easy to install and manage scientific packages across platforms.
+
 ```bash
 conda create -n sokegraph python=3.9
 ```
 
-
-This keeps the project’s Python packages separate from your system.
-
-### Windows Users
-
-In Command Prompt or PowerShell, run:
-
-```powershell
-python -m venv venv
-```
-If python is not recognized, try:
-
-```powershell
-py -3 -m venv venv
-```
-### macOS / Linux Users
-Run:
-
-```bash
-python3 -m venv venv
-```
-
 ---
 
-## Step 5: Activate the Virtual Environment
+## Step 5: Activate the Environment
 
-### Conda: Activate
-If you created a Conda env:
 ```bash
 conda activate sokegraph
 ```
 
-
-You'll need to activate this environment every time before you run the project.
-
-### Windows Users
-
-- In Command Prompt, run:
-  
-```cmd
-venv\Scripts\activate
-```
-- In PowerShell:
-  
-```powershell
-venv\Scripts\Activate.ps1
-```
-> If you see an error about script execution policies in PowerShell:
-Run this command once to allow scripts:
-```powershell
-Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
-```
-Then activate again.
-### macOS / Linux Users
-Run:
-```bash
-source venv/bin/activate
-```
+You’ll need to activate this environment every time before running the project.
 
 ---
-
 ## Step 6: Install Project Dependencies
-With the virtual environment active (you should see (venv) at the start of your prompt), install packages:
+
+With the environment active, install required packages:
+
 ```bash
 pip install --upgrade pip
 pip install -r requirements.txt
 ```
+
+---
+
+> ⚡ **Note for advanced users:**  
+> You may also use Python’s built-in `venv` if you prefer, but Conda is the recommended and tested way for this project.
 
 ---
 
