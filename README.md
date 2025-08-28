@@ -63,24 +63,9 @@ In the command line window you opened, type:
 git clone https://github.com/sokematgraph/SOKE-Graph.git
 ```
 
-If you get an error saying `git` is not found:
+👉 If Git is not installed on your system, please see [INSTALLATION.md](INSTALLATION.md) for details.
 
-- **Windows:** Download and install [Git for Windows](https://git-scm.com/download/win).
-
-- **macOS:** Install via Homebrew with:
-
-  ```bash
-  brew install git
-  ```
-
-- **Linux:** Install with:
-
-  ```bash
-  sudo apt install git
-  ```
-  (For Ubuntu/Debian, or use your distro’s package manager.)
-
-  After cloning, navigate into the project folder:
+After cloning, navigate into the project folder:
   ```bash
   cd SOKEGraph
   ```
