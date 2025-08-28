@@ -9,6 +9,7 @@ import tempfile
 import uuid
 from typing import Optional, Set
 from pyvis.network import Network
+from sokegraph.util.logger import LOG
 
 CATEGORY_COLOR = {
     "Layer": "#FFD700",
@@ -103,7 +104,7 @@ class NetworkXKnowledgeGraph(KnowledgeGraph):
             for kw_key in kw_keys:
                 self._add_edge_once(kw_key, paper_id, "MENTIONS")
 
-        print("🎉 NetworkX knowledge graph construction complete.")
+        LOG.info("🎉 NetworkX knowledge graph construction complete.")
         return self.graph
 
     def _add_node_once(self, key: str, kind: str, attrs: dict, registry: Optional[Set[str]] = None) -> None:

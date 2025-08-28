@@ -4,6 +4,30 @@ SOKE Graph is a powerful, end-to-end pipeline designed to extract structured kno
 
 This tool can be tailored for accelerating literature analysis in any domain of research; in our case, we have focused on material science fields like green hydrogen production and water electrolysis.
 
+## 📑 Table of Contents
+
+- [🧠 SOKE Graph: A Semantic-linked Ontological Framework](#-soke-graph-a-semantic-linked-ontological-framework-for-domain-specific-knowledge-discovery-in-scientific-literature)
+- [🚀 Features](#-features)
+- [🚀 How to Run This Python Project on Windows, macOS, and Linux](#-how-to-run-this-python-project-on-windows-macos-and-linux)
+  - [Step 1: Install Python](#step-1-install-python)
+  - [Step 2: Open the Command Line / Terminal](#step-2-open-the-command-line--terminal)
+  - [Step 3: Clone the Project (Download the Code)](#step-3-clone-the-project-download-the-code)
+  - [Step 3.1: Open the Project in VS Code](#step-31-open-the-project-in-vs-code)
+  - [Step 4: Create a Virtual Environment](#step-4-create-a-virtual-environment-isolate-dependencies)
+  - [Step 5: Activate the Virtual Environment](#step-5-activate-the-virtual-environment)
+  - [Step 6: Install Project Dependencies](#step-6-install-project-dependencies)
+  - [Step 7: Recommended Editor – VS Code](#step-7-recommended-editor--visual-studio-code-vs-code)
+  - [Step 8: Run the Project](#step-8-run-the-project)
+    - [1️⃣ Run with Streamlit App](#1️⃣-run-with-streamlit-app--streamlit-apppy)
+    - [2️⃣ Run from Jupyter Notebook – full_pipeline.ipynb](#2️⃣-run-from-jupyter-notebook--full_pipelineipynb)
+    - [3️⃣ Run from Jupyter Notebook – Step-by-Step](#3️⃣-run-from-jupyter-notebook-interactive-step-by-step--full_pipeline_stepbystepipynb)
+- [📂 Preparing Input Files for SOKEGraph](#-preparing-input-files-for-sokegraph)
+  - [1) Ontology File](#1-ontology-file-ontologyjson)
+  - [2) Query File](#2-query-file-paper_querytxt)
+  - [3) Keyword File](#3-keyword-file-keyword_querytxt)
+- [Step 9: Deactivate Virtual Environment](#step-9-deactivate-virtual-environment-optional)
+- [Reusing the Tool](#reusing-the-tool)
+
 
 ## 🚀 Features
 
