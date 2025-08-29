@@ -23,6 +23,7 @@ This tool can be tailored for accelerating literature analysis in any domain of 
   - [1) Ontology File](#1-ontology-file-ontologyjson)
   - [2) Query File](#2-query-file-paper_querytxt)
   - [3) Keyword File](#3-keyword-file-keyword_querytxt)
+  - [4) API Key File](#4-🔑-api-key-file-apikeys_xxxtxt)
 - [Step 8: Deactivate Virtual Environment](#step-8-deactivate-virtual-environment-optional)
 - [Reusing the Tool](#reusing-the-tool)
 
@@ -143,6 +144,7 @@ You can choose the method that best fits your skills and setup. For most users, 
 ---
 
 
+
 ### 1️⃣ Run with Streamlit App – `streamlit-app.py`
 
 The Streamlit app provides a **simple graphical interface** to run the entire pipeline without writing code.  
@@ -172,9 +174,11 @@ The app will open in your browser. You can configure the pipeline with the follo
 
 - **AI Agent**: Select which LLM to use for ontology enrichment and paper analysis (`openAI`, `gemini`, `llama`, `ollama`, or `claude`).  
 
-- **Upload API key file (`apikeys_xxx.txt`)**: Required for accessing AI models and/or Journal APIs.  
+- **Upload API key file (`apikeys_xxx.txt`)**: A text file containing the API keys required for accessing AI models and/or Journal APIs.  
 
 - **Upload keywords file (`keyword_query.txt`)**: A list of keywords used for ranking and filtering papers.  
+
+👉 **Note:** If you don’t know how to create these files (`Ontology.json`, `paper_query.txt`, `keyword_query.txt`, or `apikeys_xxx.txt`), see the section [📂 Preparing Input Files for SOKEGraph](#-preparing-input-files-for-sokegraph) below.  
 
 - **Knowledge Graph backend**: Choose the graph engine:  
   - `networkx` (in-memory, default)  
@@ -366,6 +370,26 @@ inputs/
   keyword_query.txt
 ```
 Point the Streamlit app / notebooks to these files when prompted.
+
+
+## 4) 🔑 API Key File (`apikeys_xxx.txt`)
+This file stores the API keys required to access AI models (e.g., OpenAI, Gemini, Claude) and/or external Journal APIs.  
+
+**Format**  
+Each line should contain one key, labeled by service. For example:  
+
+```txt
+OPENAI_KEY=sk-xxxxxxxxxxxxxxxx
+GEMINI_KEY=ya29.xxxxxxxxxxxxxxxx
+CLAUDE_KEY=claude-xxxxxxxxxxxxx
+JOURNAL_API_KEY=abcd1234efgh5678
+```
+
+**Tips**  
+- Keep this file private and **do not share it publicly**.  
+- If you only need one service (e.g., OpenAI), you can include just that line.  
+- Save the file as `apikeys_xxx.txt` and upload it in the Streamlit app when prompted.  
+
 
 
 ## Step 8: Deactivate Virtual Environment (Optional)
