@@ -372,24 +372,82 @@ inputs/
 Point the Streamlit app / notebooks to these files when prompted.
 
 
+
 ## 4) 🔑 API Key File (`apikeys_xxx.txt`)
-This file stores the API keys required to access AI models (e.g., OpenAI, Gemini, Claude) and/or external Journal APIs.  
 
-**Format**  
-Each line should contain one key, labeled by service. For example:  
+The application requires **API keys** to access AI agents (OpenAI, Gemini, Claude, LLaMA, etc.) and external Journal APIs.  
 
+### File Structure
+- For each AI agent, you should create a **separate text file** (e.g., `openai_keys.txt`, `gemini_keys.txt`, `claude_keys.txt`, `llama_keys.txt`).  
+- Each file can contain **multiple API keys**, one per line.  
+- The application will automatically **iterate over these keys** if one is rate-limited or exhausted.  
+
+**Example – `openai_keys.txt`**
 ```txt
-OPENAI_KEY=sk-xxxxxxxxxxxxxxxx
-GEMINI_KEY=ya29.xxxxxxxxxxxxxxxx
-CLAUDE_KEY=claude-xxxxxxxxxxxxx
-JOURNAL_API_KEY=abcd1234efgh5678
+sk-openai-xxxxxxxxxxxxxxxxxxxxxxxx
+sk-openai-yyyyyyyyyyyyyyyyyyyyyyyy
 ```
 
-**Tips**  
-- Keep this file private and **do not share it publicly**.  
-- If you only need one service (e.g., OpenAI), you can include just that line.  
-- Save the file as `apikeys_xxx.txt` and upload it in the Streamlit app when prompted.  
+**Example – `gemini_keys.txt`**
+```txt
+ya29.gemini-xxxxxxxxxxxxxxxx
+ya29.gemini-yyyyyyyyyyyyyyyy
+```
 
+**Example – `claude_keys.txt`**
+```txt
+claude-xxxxxxxxxxxxxxxx
+claude-yyyyyyyyyyyyyyyy
+```
+
+**Example – `llama_keys.txt`**
+```txt
+llama-xxxxxxxxxxxxxxxx
+llama-yyyyyyyyyyyyyyyy
+```
+
+**Example – `journal_api_keys.txt`**
+```txt
+journal-abc123456789
+journal-def987654321
+```
+
+---
+
+### How to Create/Get API Keys
+
+- **OpenAI**:  
+  1. Sign up at [https://platform.openai.com](https://platform.openai.com).  
+  2. Go to **View API keys**.  
+  3. Create a new secret key and copy it into `openai_keys.txt`.  
+
+- **Google Gemini (Vertex AI / Google AI Studio)**:  
+  1. Go to [Google AI Studio](https://aistudio.google.com/) or [Google Cloud Console](https://console.cloud.google.com).  
+  2. Enable Gemini API.  
+  3. Generate an API key and add it to `gemini_keys.txt`.  
+
+- **Anthropic Claude**:  
+  1. Sign up at [https://console.anthropic.com](https://console.anthropic.com).  
+  2. Generate an API key.  
+  3. Save it into `claude_keys.txt`.  
+
+- **Meta LLaMA (via third-party APIs or providers)**:  
+  1. Access may depend on your provider (e.g., Replicate, TogetherAI, or HuggingFace).  
+  2. Generate an API token from the provider’s platform.  
+  3. Save it into `llama_keys.txt`.  
+
+- **Journal API (e.g., Web of Science, Scopus, or other provider)**:  
+  1. Log in to the provider’s portal.  
+  2. Request an API token.  
+  3. Save it into `journal_api_keys.txt`.  
+
+- **Ollama**:  
+  Ollama runs **offline locally** on your machine and **does not require an API key**. You just need to have Ollama installed and running.  
+
+---
+
+👉 Keep all API key files **private** and never commit them to GitHub.  
+When running the app, simply **upload the relevant file(s)** in the Streamlit interface.  
 
 
 ## Step 8: Deactivate Virtual Environment (Optional)
