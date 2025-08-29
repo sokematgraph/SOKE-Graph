@@ -9,7 +9,7 @@ This tool can be tailored for accelerating literature analysis in any domain of 
 - [🧠 SOKE Graph: A Semantic-linked Ontological Framework](#-soke-graph-a-semantic-linked-ontological-framework-for-domain-specific-knowledge-discovery-in-scientific-literature)
 - [🚀 Features](#-features)
 - [🚀 How to Run This Python Project on Windows, macOS, and Linux](#-how-to-run-this-python-project-on-windows-macos-and-linux)
-    - [Step 1: Open the Command Line / Terminal](#step-2-open-the-command-line--terminal)
+  - [Step 1: Open the Command Line / Terminal](#step-2-open-the-command-line--terminal)
   - [Step 2: Clone the Project (Download the Code)](#step-3-clone-the-project-download-the-code)
   - [Step 3.1: Open the Project in VS Code](#step-31-open-the-project-in-vs-code)
   - [Step 3: Create a Virtual Environment](#step-4-create-a-virtual-environment-isolate-dependencies)
@@ -70,24 +70,6 @@ After cloning, navigate into the project folder:
   cd SOKEGraph
   ```
 
-## Step 3.1: Open the Project in VS Code
-
-We recommend working with **Visual Studio Code (VS Code)** for this project.  
-You can open the project in two ways:
-
-### Option 1: Open from VS Code
-- Open **VS Code**  
-- Go to **File > Open Folder...** and select the `SOKEGraph` folder  
-
-### Option 2: Open from Terminal
-If VS Code is installed and added to your PATH, you can run:
-```bash
-cd SOKEGraph
-code .
-```
-
-After opening, use the integrated terminal (View > Terminal) to activate your virtual environment (see Step 5) and start running the project.
-
 ---
 
 ## Step 3: Create a Virtual Environment (Conda Recommended)
@@ -138,6 +120,19 @@ We recommend using **VS Code** for working with this project, whether you want t
   - Use **Jupyter Notebook support** for `.ipynb` files
   - Use the integrated terminal to activate your virtual environment
 - **Tip:** You can run Jupyter notebooks inside VS Code without opening a separate browser window.
+
+### Option 1: Open from VS Code
+- Open **VS Code**  
+- Go to **File > Open Folder...** and select the `SOKEGraph` folder  
+
+### Option 2: Open from Terminal
+If VS Code is installed and added to your PATH, you can run:
+```bash
+cd SOKEGraph
+code .
+```
+
+After opening, use the integrated terminal (View > Terminal) to activate your virtual environment (see Step 5) and start running the project.
 
 ---
 
