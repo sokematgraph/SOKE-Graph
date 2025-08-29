@@ -1,45 +1,53 @@
-# 🔧 Installation Guide
 
-This document provides installation instructions for Git required by the SOKEGraph project.
+# 🛠 INSTALLATION.md
 
----
-
-## 📥 Installing Git
-
-Git is required to clone the repository. If you don’t have Git installed, follow the instructions below:
-
-### Windows
-1. Download the Git installer: [https://git-scm.com/download/win](https://git-scm.com/download/win)
-2. Run the installer and follow the setup wizard (use default options for most users).
-3. Verify installation:
-   ```bash
-   git --version
-   ```
-
-### macOS
-1. Install Git using [Homebrew](https://brew.sh/):
-   ```bash
-   brew install git
-   ```
-2. Verify installation:
-   ```bash
-   git --version
-   ```
-
-### Linux (Ubuntu/Debian)
-1. Update your package list and install Git:
-   ```bash
-   sudo apt update
-   sudo apt install git
-   ```
-2. Verify installation:
-   ```bash
-   git --version
-   ```
-
-For other distributions, install Git using your package manager.
+This file provides detailed instructions for installing required tools to run **SOKEGraph**.
 
 ---
 
-## ✅ Next Steps
-Once Git is installed, return to the [README.md](README.md) and continue with the **Clone the Project** step.
+## 1. Install Git
+Git is required to clone the repository.
+
+- **Windows:** [Download Git for Windows](https://git-scm.com/download/win) and follow the setup wizard.  
+- **macOS:** Git is preinstalled. If not, install via [Homebrew](https://brew.sh/):  
+  ```bash
+  brew install git
+  ```
+- **Linux:** Use your package manager. For example (Ubuntu/Debian):  
+  ```bash
+  sudo apt update && sudo apt install git
+  ```
+
+---
+
+## 2. Install Visual Studio Code (VS Code)
+
+VS Code is the recommended editor for working with this project.
+
+- **Download VS Code:** [https://code.visualstudio.com/Download](https://code.visualstudio.com/Download)
+- Follow the installation wizard for your operating system.
+
+### Add VS Code to PATH (Optional but Recommended)
+During installation, check the box **"Add to PATH"** so you can open projects with `code .` from the terminal.
+
+### Install Extensions
+After installing VS Code, open it and install these extensions:
+- **Python** (Microsoft)
+- **Jupyter** (Microsoft)
+
+---
+
+## 3. Install Conda (Recommended for Virtual Environment)
+We recommend [Miniconda](https://docs.conda.io/en/latest/miniconda.html) (lightweight Conda).
+
+- Download Miniconda for your OS.  
+- Install and follow on-screen instructions.  
+
+Verify installation:
+```bash
+conda --version
+```
+
+---
+
+✅ With Git, VS Code, and Conda installed, you are ready to follow the steps in the [README](README.md) to set up and run the project.

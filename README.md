@@ -70,8 +70,6 @@ After cloning, navigate into the project folder:
   cd SOKEGraph
   ```
 
----
-
 ## Step 3: Create a Virtual Environment (Conda Recommended)
 
 We recommend using **Conda** (or Miniconda/Mamba) to manage dependencies for this project.  
@@ -108,33 +106,38 @@ pip install -r requirements.txt
 
 ---
 
+
 ## Step 6: Recommended Editor – Visual Studio Code (VS Code)
 
-We recommend using **VS Code** for working with this project, whether you want to edit code, run the Streamlit app, or work in Jupyter Notebooks.
+We recommend using **Visual Studio Code (VS Code)** for working with this project, whether you want to edit code, run the Streamlit app, or work in Jupyter Notebooks.
 
-- **Download**: [https://code.visualstudio.com](https://code.visualstudio.com)
-- **Install Extensions**:
-  - Python (Microsoft)
-  - Jupyter (Microsoft)
-- **Open the project folder** in VS Code and:
-  - Use **Jupyter Notebook support** for `.ipynb` files
-  - Use the integrated terminal to activate your virtual environment
-- **Tip:** You can run Jupyter notebooks inside VS Code without opening a separate browser window.
+### Installing VS Code
+If you don’t already have VS Code installed, please see [INSTALLATION.md](INSTALLATION.md) for detailed instructions on how to download and install it.
 
-### Option 1: Open from VS Code
-- Open **VS Code**  
-- Go to **File > Open Folder...** and select the `SOKEGraph` folder  
+### Opening the Project
+You can open the `SOKEGraph` project folder in two ways:
 
-### Option 2: Open from Terminal
-If VS Code is installed and added to your PATH, you can run:
-```bash
-cd SOKEGraph
-code .
-```
+- **Option 1: From VS Code directly**  
+  - Open **VS Code**  
+  - Go to **File > Open Folder...** and select the `SOKEGraph` folder  
 
-After opening, use the integrated terminal (View > Terminal) to activate your virtual environment (see Step 5) and start running the project.
+- **Option 2: From the Terminal**  
+  If VS Code is installed and added to your PATH, you can run:  
+  ```bash
+  cd SOKEGraph
+  code .
+  ```
 
----
+After opening, use the integrated terminal (**View > Terminal**) to activate your virtual environment (see Step 4) and start running the project.
+
+### Install VS Code Extensions
+- Python (Microsoft)  
+- Jupyter (Microsoft)  
+
+These extensions make it easier to run and edit `.py` or `.ipynb` files directly inside VS Code.
+
+💡 Tip: You can run Jupyter notebooks inside VS Code without opening a separate browser window.
+
 
 ## Step 7: Run the Project
 You can choose the method that best fits your skills and setup. For most users, **Streamlit app is the easiest way** to get started.
