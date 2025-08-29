@@ -9,14 +9,13 @@ This tool can be tailored for accelerating literature analysis in any domain of 
 - [🧠 SOKE Graph: A Semantic-linked Ontological Framework](#-soke-graph-a-semantic-linked-ontological-framework-for-domain-specific-knowledge-discovery-in-scientific-literature)
 - [🚀 Features](#-features)
 - [🚀 How to Run This Python Project on Windows, macOS, and Linux](#-how-to-run-this-python-project-on-windows-macos-and-linux)
-  - [Step 1: Open the Command Line / Terminal](#step-2-open-the-command-line--terminal)
-  - [Step 2: Clone the Project (Download the Code)](#step-3-clone-the-project-download-the-code)
-  - [Step 3.1: Open the Project in VS Code](#step-31-open-the-project-in-vs-code)
-  - [Step 3: Create a Virtual Environment](#step-4-create-a-virtual-environment-isolate-dependencies)
-  - [Step 4: Activate the Virtual Environment](#step-5-activate-the-virtual-environment)
-  - [Step 5: Install Project Dependencies](#step-6-install-project-dependencies)
-  - [Step 6: Recommended Editor – VS Code](#step-7-recommended-editor--visual-studio-code-vs-code)
-  - [Step 7: Run the Project](#step-8-run-the-project)
+  - [Step 1: Open the Command Line / Terminal](#step-1-open-the-command-line--terminal)
+  - [Step 2: Clone the Project (Download the Code)](#step-2-clone-the-project-download-the-code)
+  - [Step 3: Create a Virtual Environment](#step-3-create-a-virtual-environment-conda-recommended)
+  - [Step 4: Activate the Virtual Environment](#step-4-activate-the-environment)
+  - [Step 5: Install Project Dependencies](#step-5-install-project-dependencies)
+  - [Step 6: Recommended Editor – VS Code](#step-6-recommended-editor--visual-studio-code-vs-code)
+  - [Step 7: Run the Project](#step-7-run-the-project)
     - [1️⃣ Run with Streamlit App](#1️⃣-run-with-streamlit-app--streamlit-apppy)
     - [2️⃣ Run from Jupyter Notebook – full_pipeline.ipynb](#2️⃣-run-from-jupyter-notebook--full_pipelineipynb)
     - [3️⃣ Run from Jupyter Notebook – Step-by-Step](#3️⃣-run-from-jupyter-notebook-interactive-step-by-step--full_pipeline_stepbystepipynb)
@@ -24,9 +23,8 @@ This tool can be tailored for accelerating literature analysis in any domain of 
   - [1) Ontology File](#1-ontology-file-ontologyjson)
   - [2) Query File](#2-query-file-paper_querytxt)
   - [3) Keyword File](#3-keyword-file-keyword_querytxt)
-- [Step 8: Deactivate Virtual Environment](#step-9-deactivate-virtual-environment-optional)
+- [Step 8: Deactivate Virtual Environment](#step-8-deactivate-virtual-environment-optional)
 - [Reusing the Tool](#reusing-the-tool)
-
 
 ## 🚀 Features
 
@@ -144,37 +142,58 @@ You can choose the method that best fits your skills and setup. For most users, 
 
 ---
 
+
 ### 1️⃣ Run with Streamlit App – `streamlit-app.py`
 
-A simple, user-friendly graphical interface that lets you run the whole pipeline **without writing any code**.
+The Streamlit app provides a **simple graphical interface** to run the entire pipeline without writing code.  
 
-#### How to run:
+#### How to start the app
+From your project folder, run:
 
 ```bash
 streamlit run streamlit-app.py
 ```
-- Choose your **paper source**:  
-  `Semantic Scholar`, `PDF ZIP`, or `Journal API`.
 
-- Upload or select required files:
-  - Paper queries
-  - Ontology file
-  - Keywords list
-  - API keys (AI + Journal API)
-  - Neo4j credentials (optional)
+#### What you’ll see
+The app will open in your browser. You can configure the pipeline with the following inputs:
 
-- Select an AI agent:
-  - `openAI`, `gemini`, `llama`, `ollama`, or `claude`
+- **Paper source**: Choose how to retrieve papers  
+  - `Semantic Scholar`  
+  - `Journal API`  
+  - `PDF ZIP` (upload a ZIP file of papers)  
 
-- Choose your knowledge graph backend:
-  - `neo4j` or `networkx`
+- **Number of papers**: The maximum number of papers to fetch (for Semantic Scholar or Journal API).  
 
-- Run the full pipeline:
-  - **Fetch → Enrich → Rank → Build Graph**
+- **Upload query file (`paper_query.txt`)**: A text file with one search query per line.  
 
-- View logs, ranked papers, and results directly in the UI.
+- **Upload base ontology file (`Ontology.json`)**: Defines categories, subcategories, and keywords for concept detection.  
 
----
+- **Field of interest**: Enter your research domain (e.g., *materials science, biology, medicine*).  
+
+- **AI Agent**: Select which LLM to use for ontology enrichment and paper analysis (`openAI`, `gemini`, `llama`, `ollama`, or `claude`).  
+
+- **Upload API key file (`apikeys_xxx.txt`)**: Required for accessing AI models and/or Journal APIs.  
+
+- **Upload keywords file (`keyword_query.txt`)**: A list of keywords used for ranking and filtering papers.  
+
+- **Knowledge Graph backend**: Choose the graph engine:  
+  - `networkx` (in-memory, default)  
+  - `neo4j` (requires credentials file)  
+
+- **Compute Device**:  
+  By default, the program runs with **GPU acceleration** if your system supports it (e.g., CUDA, MPS).  
+  - To force the program to run on **CPU only**, check the option **“Force CPU (ignore GPU)”** in the sidebar.  
+
+#### Running the pipeline
+Once all inputs are set, click **🚀 Run Pipeline**.  
+
+The app will:  
+1. Fetch papers from your chosen source.  
+2. Enrich the ontology with AI.  
+3. Rank the papers using queries and keywords.  
+4. Build and display the knowledge graph.  
+5. Export results (ranked papers, ontology, graph data) into the `output/` folder.  
+
 
 ### 2️⃣ Run from Jupyter Notebook – `full_pipeline.ipynb`  
 This notebook is designed for users who are comfortable modifying code directly.
