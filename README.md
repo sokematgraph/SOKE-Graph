@@ -450,27 +450,19 @@ journal-def987654321
 When running the app, simply **upload the relevant file(s)** in the Streamlit interface.  
 
 
-## Step 8: Deactivate Virtual Environment (Optional)
-When done working, you can leave the environment by running:
-```bash
-deactivate
-```
 
-Or for Conda:
+## Step 8: Deactivate Virtual Environment (Optional)
+
+When you are done working, you can leave the environment by running:
+
 ```bash
 conda deactivate
 ```
 
----
-## Reusing the Tool
-If you have cloned the repository and want to use it again:
-
-### Windows Users
-
-In Command Prompt or PowerShell, run:
+👉 Whenever you want to use the tool again, just activate the environment:
 
 ```bash
-cd SOKEGraph
-venv\Scripts\activate
-streamlit run streamlit-app.py
+conda activate sokegraph
 ```
+
+Then run the project as shown in Step 7.
