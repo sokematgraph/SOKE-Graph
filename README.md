@@ -177,12 +177,13 @@ The app will open in your browser. You can configure the pipeline with the follo
 - **Upload API key file (`apikeys_xxx.txt`)**: A text file containing the API keys required for accessing AI models and/or Journal APIs.  
 
 - **Upload keywords file (`keyword_query.txt`)**: A list of keywords used for ranking and filtering papers.  
-
-👉 **Note:** If you don’t know how to create these files (`Ontology.json`, `paper_query.txt`, `keyword_query.txt`, or `apikeys_xxx.txt`), see the section [📂 Preparing Input Files for SOKEGraph](#-preparing-input-files-for-sokegraph) below.  
+ 
 
 - **Knowledge Graph backend**: Choose the graph engine:  
   - `networkx` (in-memory, default)  
   - `neo4j` (requires credentials file)  
+
+👉 **Note:** If you don’t know how to create these files (`Ontology.json`, `paper_query.txt`, `keyword_query.txt`, `apikeys_xxx.txt`, or `neo4j_credentials.json`), see the section [📂 Preparing Input Files for SOKEGraph](#-preparing-input-files-for-sokegraph) below. 
 
 - **Compute Device**:  
   By default, the program runs with **GPU acceleration** if your system supports it (e.g., CUDA, MPS).  
@@ -192,11 +193,11 @@ The app will open in your browser. You can configure the pipeline with the follo
 Once all inputs are set, click **🚀 Run Pipeline**.  
 
 The app will:  
-1. Fetch papers from your chosen source.  
+1. Fetch papers from your chosen source using queries.  
 2. Enrich the ontology with AI.  
-3. Rank the papers using queries and keywords.  
+3. Rank the papers using keywords.  
 4. Build and display the knowledge graph.  
-5. Export results (ranked papers, ontology, graph data) into the `output/` folder.  
+5. Export results (ranked papers, ontology, graph data) into the `external/output/` folder.  
 
 
 ### 2️⃣ Run from Jupyter Notebook – `full_pipeline.ipynb`  
