@@ -306,13 +306,9 @@ It’s helpful if you want a guided, cell-by-cell execution **without writing co
   
 ---
 
-
-
----
-
 # 📂 Preparing Input Files for SOKEGraph
 
-SOKEGraph uses three input files. Place them in your project (e.g., `./inputs/`) and point the app/notebook to their paths.
+SOKEGraph uses four input files. Place them in your project (e.g., `./inputs/`) and point the app/notebook to their paths.
 
 ## 1) 🧭 Ontology File (`Ontology.json`)
 Defines **categories → subcategories → keywords/synonyms** that guide concept detection and search.
@@ -361,17 +357,6 @@ The `keyword_query.txt` file contains keywords or short phrases (e.g., *acidic H
 ```txt
 acidic HER water splitting
 ```
-
-**Recommended Layout**
-```
-inputs/
-  Ontology.json
-  paper_query.txt
-  keyword_query.txt
-```
-Point the Streamlit app / notebooks to these files when prompted.
-
-
 
 ## 4) 🔑 API Key File (`apikeys_xxx.txt`)
 
@@ -431,9 +416,9 @@ journal-def987654321
   2. Generate an API key.  
   3. Save it into `claude_keys.txt`.  
 
-- **Meta LLaMA (via third-party APIs or providers)**:  
-  1. Access may depend on your provider (e.g., Replicate, TogetherAI, or HuggingFace).  
-  2. Generate an API token from the provider’s platform.  
+- **Meta LLaMA (Together)**:  
+  1. Go to Together: [Together AI](https://www.together.ai)
+  2. Create an API key in the console. 
   3. Save it into `llama_keys.txt`.  
 
 - **Journal API (e.g., Web of Science, Scopus, or other provider)**:  
@@ -450,7 +435,17 @@ journal-def987654321
 When running the app, simply **upload the relevant file(s)** in the Streamlit interface.  
 
 
+**Recommended Layout**
+```
+inputs/
+  Ontology.json
+  paper_query.txt
+  keyword_query.txt
+  apikeys_xxx.txt
 
+```
+Point the Streamlit app / notebooks to these files when prompted.
+---
 ## Step 8: Deactivate Virtual Environment (Optional)
 
 When you are done working, you can leave the environment by running:
