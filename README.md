@@ -435,6 +435,22 @@ journal-def987654321
 When running the app, simply **upload the relevant file(s)** in the Streamlit interface.  
 
 
+
+---
+## 5) 🗝️ Neo4j Credentials File (`neo4j_credentials.json`)
+
+Provide your Neo4j connection details in a small JSON file.
+
+**Example — neo4j_credentials.json**
+```json
+{
+  "uri": "bolt://localhost:7687",
+  "username": "neo4j",
+  "password": "YOUR_PASSWORD",
+}
+```
+
+
 **Recommended Layout**
 ```
 inputs/
@@ -442,6 +458,7 @@ inputs/
   paper_query.txt
   keyword_query.txt
   apikeys_xxx.txt
+  neo4j_credentials.json
 
 ```
 Point the Streamlit app / notebooks to these files when prompted.
