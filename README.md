@@ -461,8 +461,10 @@ inputs/
   neo4j_credentials.json
 
 ```
+
 Point the Streamlit app / notebooks to these files when prompted.
 ---
+
 ## Step 8: Deactivate Virtual Environment (Optional)
 
 When you are done working, you can leave the environment by running:
