@@ -66,7 +66,7 @@ git clone https://github.com/sokematgraph/SOKE-Graph.git
 
 After cloning, navigate into the project folder:
   ```bash
-  cd SOKEGraph
+  cd SOKE-Graph
   ```
 
 ## Step 3: Create a Virtual Environment (Conda Recommended)
