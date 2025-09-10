@@ -123,7 +123,7 @@ You can open the `SOKEGraph` project folder in two ways:
 - **Option 2: From the Terminal**  
   If VS Code is installed and added to your PATH, you can run:  
   ```bash
-  cd SOKEGraph
+  cd SOKE-Graph
   code .
   ```
 
