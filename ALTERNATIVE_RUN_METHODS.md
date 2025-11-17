@@ -15,7 +15,7 @@ Before using any of the methods below, **you must first complete Steps 1–5** f
 4. Activate the environment
 5. Install dependencies
 
-See the main README for details.
+See the main [README](README.md) for details.
 
 ---
 
@@ -24,7 +24,7 @@ See the main README for details.
 VS Code is highly recommended if you want to explore the codebase, run Jupyter notebooks, or make modifications to the pipeline.
 
 ### 🔧 Install VS Code
-If you do not have VS Code installed, please follow the instructions in `INSTALLATION.md`.
+If you do not have VS Code installed, please follow the instructions in [INSTALLATION.md](INSTALLATION.md).
 
 ### 📂 Open the Project in VS Code
 
@@ -33,12 +33,11 @@ You can open the project folder using either method:
 #### **Option 1: From VS Code**
 1. Open **VS Code**
 2. Go to **File > Open Folder...**
-3. Select the `SOKEGraph` folder
+3. Select the `SOKE-Graph` folder
 
 #### **Option 2: From Terminal**
 If VS Code is added to your PATH:
 ```bash
-tcd SOKEGraph
 code .
 ```
 
@@ -59,7 +58,7 @@ These extensions provide notebook support, IntelliSense, variable explorers, and
 
 ---
 
-# 2️⃣ Run from Jupyter Notebook — `full_pipeline.ipynb`
+# 1️⃣ Run from Jupyter Notebook — `full_pipeline.ipynb`
 
 This notebook is ideal for users who prefer **script-like control** without needing a UI.
 
@@ -80,10 +79,11 @@ params = SimpleNamespace(
     pdfs_file=None,
     api_key_file="api_journal_api.txt",
     ontology_file="base_ontology.json",
+    field_of_interest="material sciences",
     AI="openAI",
     API_keys="openai_keys.json",
     keyword_query_file="keywords.txt",
-    model_knowledge_graph="neo4j",
+    model_knowledge_graph="networkx",
     credentials_for_knowledge_graph="neo4j_credentials.json",
     output_dir="output/"
 )
@@ -98,12 +98,12 @@ Depending on your workflow, use:
 - **OR** `pdfs_file` (for PDF uploads)
 
 Make sure:
-- All file paths are valid
-- Neo4j/Journals/Ollama are running if you depend on them
+- All file paths are valid.
+- Neo4j/Journals/Ollama are running if you depend on them.
 
 ---
 
-# 3️⃣ Run from Jupyter Notebook (Interactive Step-by-Step) — `full_pipeline_stepBYstep.ipynb`
+# 2️⃣ Run from Jupyter Notebook (Interactive Step-by-Step) — `full_pipeline_stepBYstep.ipynb`
 
 This notebook is ideal for users who want a **guided, form-like interface** without writing code.
 

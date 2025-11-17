@@ -87,10 +87,6 @@ class OntologyUpdater:
 
         return self.output_path
 
-    def update_base_ontology(self, user_query: str) -> None:
-        """ Update the base ontology, overwrite the file """
-        return None
-
     # ------------------------------------------------------------------ #
     # Internal helpers                                                   #
     # ------------------------------------------------------------------ #
