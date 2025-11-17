@@ -1,139 +1,127 @@
+# ⚙️ Alternative Ways to Run SOKEGraph (Without Streamlit)
+
+This guide explains how to run the SOKEGraph pipeline **without using the Streamlit app**. These methods are intended for users who want to:
+
+- Work directly with the source code
+- Use Jupyter Notebooks
+- Modify pipeline parameters manually
+- Integrate SOKEGraph into a larger workflow
+
+Before using any of the methods below, **you must first complete Steps 1–5** from the main README:
+
+1. Open Terminal
+2. Clone the project
+3. Create a virtual environment
+4. Activate the environment
+5. Install dependencies
+
+See the main README for details.
+
+---
+
 ## Step 6: Recommended Editor – Visual Studio Code (VS Code)
 
-We recommend using **Visual Studio Code (VS Code)** for working with this project, whether you want to edit code, run the Streamlit app, or work in Jupyter Notebooks.
+VS Code is highly recommended if you want to explore the codebase, run Jupyter notebooks, or make modifications to the pipeline.
 
-### Installing VS Code
-If you don’t already have VS Code installed, please see [INSTALLATION.md](INSTALLATION.md) for detailed instructions on how to download and install it.
+### 🔧 Install VS Code
+If you do not have VS Code installed, please follow the instructions in `INSTALLATION.md`.
 
-### Opening the Project
-You can open the `SOKEGraph` project folder in two ways:
+### 📂 Open the Project in VS Code
 
-- **Option 1: From VS Code directly**  
-  - Open **VS Code**  
-  - Go to **File > Open Folder...** and select the `SOKEGraph` folder  
+You can open the project folder using either method:
 
-- **Option 2: From the Terminal**  
-  If VS Code is installed and added to your PATH, you can run:  
-  ```bash
-  cd SOKEGraph
-  code .
-  ```
+#### **Option 1: From VS Code**
+1. Open **VS Code**
+2. Go to **File > Open Folder...**
+3. Select the `SOKEGraph` folder
 
-After opening, use the integrated terminal (**View > Terminal**) to activate your virtual environment (see Step 4) and start running the project.
+#### **Option 2: From Terminal**
+If VS Code is added to your PATH:
+```bash
+tcd SOKEGraph
+code .
+```
 
-### Install VS Code Extensions
-- Python (Microsoft)  
-- Jupyter (Microsoft)  
+Once opened, use **View > Terminal** to activate your virtual environment:
+```bash
+conda activate sokegraph
+```
 
-These extensions make it easier to run and edit `.py` or `.ipynb` files directly inside VS Code.
+---
 
-💡 Tip: You can run Jupyter notebooks inside VS Code without opening a separate browser window.
+## 🔌 VS Code Extensions to Install
+- **Python** (Microsoft)
+- **Jupyter** (Microsoft)
 
+These extensions provide notebook support, IntelliSense, variable explorers, and inline execution.
 
-  
+💡 **Tip:** Jupyter notebooks run directly inside VS Code — no browser required.
 
+---
 
-### 2️⃣ Run from Jupyter Notebook – `full_pipeline.ipynb`  
-This notebook is designed for users who are comfortable modifying code directly.
+# 2️⃣ Run from Jupyter Notebook — `full_pipeline.ipynb`
 
-- 🔧 You should define all parameters manually in a Python dictionary called `params`.
-- ✅ Once configured, you run the pipeline **with a single function call**.
-- 📂 Best for quick experiments or automation in notebook environments.
+This notebook is ideal for users who prefer **script-like control** without needing a UI.
 
-#### Example Usage:
+### What this notebook offers
+- Configure the entire pipeline in one place
+- Run everything with a **single function call**
+- Perfect for experiments, research workflows, and debugging
 
+### 🧪 Example Usage
 ```python
 from types import SimpleNamespace
 from sokegraph.full_pipeline import full_pipeline_main
 
 params = SimpleNamespace(
-    paper_source="Semantic Scholar",  # Options: "Semantic Scholar", "PDF Zip", "Journal API"
-    number_papers=10,                # Number of papers to fetch from Semantic Scholar
-    paper_query_file="topics.txt",   # Text file with one search query per line
-    pdfs_file=None,                  # Optional: ZIP file with PDFs (for PDF source)
-    api_key_file="api_journal_api.txt",  # API key file for Journal API source
-    ontology_file="base_ontology.json",  # Base ontology file (JSON or OWL)
-    AI="openAI",                          # Options: "openAI", "gemini", "llama", "ollama", "claude"
-    API_keys="openai_keys.json",         # API key file for AI tools
-    keyword_query_file="keywords.txt",   # Text file listing keywords
-    model_knowledge_graph="neo4j",       # Options: "neo4j", "networkx"
-    credentials_for_knowledge_graph="neo4j_credentials.json",  # Graph DB credentials
-    output_dir="output/"                 # Output directory
+    paper_source="Semantic Scholar",
+    number_papers=10,
+    paper_query_file="topics.txt",
+    pdfs_file=None,
+    api_key_file="api_journal_api.txt",
+    ontology_file="base_ontology.json",
+    AI="openAI",
+    API_keys="openai_keys.json",
+    keyword_query_file="keywords.txt",
+    model_knowledge_graph="neo4j",
+    credentials_for_knowledge_graph="neo4j_credentials.json",
+    output_dir="output/"
 )
 
 full_pipeline_main(params)
 ```
 
-⚠️ Important: You should use either:
+### ⚠️ Important Rules
+Depending on your workflow, use:
+- `number_papers` + `paper_query_file`
+- `number_papers` + `paper_query_file` + `api_key_journal_api`
+- **OR** `pdfs_file` (for PDF uploads)
 
-"number_papers" + "paper_query_file"
-
-OR
-
-"number_papers" + "paper_query_file" + "api_key_journal_api"
-
-OR
-
-"pdfs_file"
-
-depending on whether you're searching for papers or uploading PDFs.
-
-💡 Make sure that all file paths in your `params` are valid and that services like **Neo4j**, **Ollama**, or your Journal API access are available before starting the pipeline.
-
-
-### 3️⃣ Run from Jupyter Notebook (Interactive Step-by-Step) — `full_pipeline_stepBYstep.ipynb`
-
-This notebook uses **ipywidgets** to provide an **interactive form-like interface** for running the pipeline.  
-It’s helpful if you want a guided, cell-by-cell execution **without writing code manually**.
-
-#### 🧩 What it does:
-- Allows you to select how you want to retrieve papers:
-  - 📁 Upload a ZIP file of PDFs (PDF source)
-  - 🔎 Search and fetch papers from **Semantic Scholar** using a query file
-  - 🌐 Fetch papers via the **Journal API** using a query file and an API key
-
-- Provides dropdowns and file pickers to easily select files like:
-  - Ontology
-  - Keyword queries
-  - API keys
-  - Output folder
-
-- Runs each pipeline step independently, so you can see exactly what happens at every stage.
-
-#### 📋 Steps Involved:
-
-1. **📄 Paper Retrieval**
-   - Based on your selected `paper_source`:
-     - `Semantic Scholar`: Downloads papers using your `paper_query_file`
-     - `PDF Zip`: Loads and processes PDFs from the uploaded ZIP file
-     - `Journal API`: Retrieves paper metadata from the Web of Science API using query + API key
-
-2. **🧠 Ontology Enrichment**
-   - The chosen AI agent (`openAI`, `gemini`, `llama`, `ollama`, or `claude`) analyzes the papers and expands your base ontology
-   - Adds new keywords, concepts, synonyms, and relationships
-
-3. **📊 Paper Ranking**
-   - Ranks the papers using:
-     - Exact keyword matches
-     - Synonyms and expanded terms
-     - Opposite-term filtering to down-rank irrelevant papers
-
-4. **🕸 Knowledge Graph Construction**
-   - Converts enriched data into a structured graph using:
-     - `Neo4j` (with login credentials)
-     - Or `NetworkX` (in-memory option)
-   - Graph includes:
-     - Ontology categories
-     - Paper-concept links
-     - Metadata associations
-
-5. **💾 Output**
-   - Saves everything in your selected `output_dir`, including:
-     - Enriched ontology file
-     - Ranked papers (CSV/JSON)
+Make sure:
+- All file paths are valid
+- Neo4j/Journals/Ollama are running if you depend on them
 
 ---
 
-> ✅ **No need to modify code manually** – just fill out the form and click **Run** for each step.
+# 3️⃣ Run from Jupyter Notebook (Interactive Step-by-Step) — `full_pipeline_stepBYstep.ipynb`
 
-> 💡 Make sure required services like **Neo4j**, **Ollama**, or your **Journal API** credentials are ready before starting the pipeline.
+This notebook is ideal for users who want a **guided, form-like interface** without writing code.
+
+### 🧩 What this notebook provides
+- File pickers for uploading ontology, queries, API keys, and PDFs
+- Options for selecting paper sources and AI agents
+- Dropdown menus for graph backend selection
+- Buttons for running each pipeline stage interactively
+
+### 📋 Pipeline Steps (Interactive)
+1. **📄 Retrieve Papers**
+2. **🧠 Enrich Ontology using AI**
+3. **📊 Rank Papers using Keywords + Semantic Expansion**
+4. **🕸 Build Knowledge Graph (Neo4j or NetworkX)**
+5. **💾 Save Results to Output Folder**
+
+---
+
+> ✅ **No need to modify code manually** — select options, upload files, and click **Run**.
+
+> 💡 Ensure external services (Neo4j, Ollama, Journal APIs) are available before starting.
