@@ -99,54 +99,9 @@ pip install --upgrade pip
 pip install -r requirements.txt
 ```
 
-%---
 
-%> ⚡ **Note for advanced users:**  
-%> You may also use Python’s built-in `venv` if you prefer, but Conda is the recommended and %tested way for this project.
-
-%---
-
-
-## Step 6: Recommended Editor – Visual Studio Code (VS Code)
-
-We recommend using **Visual Studio Code (VS Code)** for working with this project, whether you want to edit code, run the Streamlit app, or work in Jupyter Notebooks.
-
-### Installing VS Code
-If you don’t already have VS Code installed, please see [INSTALLATION.md](INSTALLATION.md) for detailed instructions on how to download and install it.
-
-### Opening the Project
-You can open the `SOKEGraph` project folder in two ways:
-
-- **Option 1: From VS Code directly**  
-  - Open **VS Code**  
-  - Go to **File > Open Folder...** and select the `SOKEGraph` folder  
-
-- **Option 2: From the Terminal**  
-  If VS Code is installed and added to your PATH, you can run:  
-  ```bash
-  cd SOKEGraph
-  code .
-  ```
-
-After opening, use the integrated terminal (**View > Terminal**) to activate your virtual environment (see Step 4) and start running the project.
-
-### Install VS Code Extensions
-- Python (Microsoft)  
-- Jupyter (Microsoft)  
-
-These extensions make it easier to run and edit `.py` or `.ipynb` files directly inside VS Code.
-
-💡 Tip: You can run Jupyter notebooks inside VS Code without opening a separate browser window.
-
-
-## Step 7: Run the Project
-You can choose the method that best fits your skills and setup. For most users, **Streamlit app is the easiest way** to get started.
-
----
-
-
-
-### 1️⃣ Run with Streamlit App – `streamlit-app.py`
+## Step 6: Run the Project with Streamlit App – `streamlit-app.py`
+For most users, **Streamlit app is the easiest way** to get started, and you can use the full functionality of the project without needing to look at or modify the code.
 
 The Streamlit app provides a **simple graphical interface** to run the entire pipeline without writing code.  
 
@@ -198,7 +153,42 @@ The app will:
 2. Enrich the ontology with AI.  
 3. Rank the papers using keywords.  
 4. Build and display the knowledge graph.  
-5. Export results (ranked papers, ontology, graph data) into the `external/output/` folder.  
+5. Export results (ranked papers, ontology, graph data) into the `external/output/` folder.
+
+
+## Step 6: Recommended Editor – Visual Studio Code (VS Code)
+
+We recommend using **Visual Studio Code (VS Code)** for working with this project, whether you want to edit code, run the Streamlit app, or work in Jupyter Notebooks.
+
+### Installing VS Code
+If you don’t already have VS Code installed, please see [INSTALLATION.md](INSTALLATION.md) for detailed instructions on how to download and install it.
+
+### Opening the Project
+You can open the `SOKEGraph` project folder in two ways:
+
+- **Option 1: From VS Code directly**  
+  - Open **VS Code**  
+  - Go to **File > Open Folder...** and select the `SOKEGraph` folder  
+
+- **Option 2: From the Terminal**  
+  If VS Code is installed and added to your PATH, you can run:  
+  ```bash
+  cd SOKEGraph
+  code .
+  ```
+
+After opening, use the integrated terminal (**View > Terminal**) to activate your virtual environment (see Step 4) and start running the project.
+
+### Install VS Code Extensions
+- Python (Microsoft)  
+- Jupyter (Microsoft)  
+
+These extensions make it easier to run and edit `.py` or `.ipynb` files directly inside VS Code.
+
+💡 Tip: You can run Jupyter notebooks inside VS Code without opening a separate browser window.
+
+
+  
 
 
 ### 2️⃣ Run from Jupyter Notebook – `full_pipeline.ipynb`  
