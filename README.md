@@ -32,7 +32,7 @@ This tool can be tailored for accelerating literature analysis in any domain of 
 - 🔍 **Retrieve papers** from Semantic Scholar or your PDF collection
 - 🤖 **Use AI (OpenAI, Gemini, ...)** to extract ontological concepts and metadata
 - 📊 **Rank papers** based on query relevance and extracted metadata
-- 🧱 **Build knowledge graphs** (Neo4j supported) from structured paper data
+- 🧱 **Build knowledge graphs** (Neo4j and NetworkX supported) from structured paper data
 
 ---
 # 🚀 How to Run This Python Project on Windows, macOS, and Linux

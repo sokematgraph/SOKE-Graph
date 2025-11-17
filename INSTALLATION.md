@@ -7,11 +7,11 @@ This file provides detailed instructions for installing required tools to run **
 
 ## 📑 Table of Contents
 
-- [1. Install Git](#1-install-git)
-- [2. Install Visual Studio Code (VS Code)](#2-install-visual-studio-code-vs-code)
+- [Install Git](#1-install-git)
+- [Install Visual Studio Code (VS Code)](#2-install-visual-studio-code-vs-code)
   - [Add VS Code to PATH (Optional but Recommended)](#add-vs-code-to-path-optional-but-recommended)
   - [Install Extensions](#install-extensions)
-- [3. Install Conda (Recommended for Virtual Environment)](#3-install-conda-recommended-for-virtual-environment)
+- [Install Conda (Recommended for Virtual Environment)](#3-install-conda-recommended-for-virtual-environment)
 
 ---
 
