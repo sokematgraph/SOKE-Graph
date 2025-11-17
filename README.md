@@ -6,26 +6,26 @@ This tool can be tailored for accelerating literature analysis in any domain of 
 
 ## 📑 Table of Contents
 
-- [🧠 SOKE Graph: A Semantic-linked Ontological Framework](#-soke-graph-a-semantic-linked-ontological-framework-for-domain-specific-knowledge-discovery-in-scientific-literature)
+## 📑 Table of Contents
+
+- [🧠 SOKE Graph Overview](#-soke-graph-a-semantic-linked-ontological-framework-for-domain-specific-knowledge-discovery-in-scientific-literature)
 - [🚀 Features](#-features)
-- [🚀 How to Run This Python Project on Windows, macOS, and Linux](#-how-to-run-this-python-project-on-windows-macos-and-linux)
+
+- [🚀 How to Run This Python Project](#-how-to-run-this-python-project-on-windows-macos-and-linux)
   - [Step 1: Open the Command Line / Terminal](#step-1-open-the-command-line--terminal)
-  - [Step 2: Clone the Project (Download the Code)](#step-2-clone-the-project-download-the-code)
+  - [Step 2: Clone the Project](#step-2-clone-the-project-download-the-code)
   - [Step 3: Create a Virtual Environment](#step-3-create-a-virtual-environment-conda-recommended)
-  - [Step 4: Activate the Virtual Environment](#step-4-activate-the-environment)
+  - [Step 4: Activate the Environment](#step-4-activate-the-environment)
   - [Step 5: Install Project Dependencies](#step-5-install-project-dependencies)
-  - [Step 6: Recommended Editor – VS Code](#step-6-recommended-editor--visual-studio-code-vs-code)
-  - [Step 7: Run the Project](#step-7-run-the-project)
-    - [1️⃣ Run with Streamlit App](#1️⃣-run-with-streamlit-app--streamlit-apppy)
-    - [2️⃣ Run from Jupyter Notebook – full_pipeline.ipynb](#2️⃣-run-from-jupyter-notebook--full_pipelineipynb)
-    - [3️⃣ Run from Jupyter Notebook – Step-by-Step](#3️⃣-run-from-jupyter-notebook-interactive-step-by-step--full_pipeline_stepbystepipynb)
+  - [Step 6: Run the Streamlit App](#step-6-run-the-project-with-streamlit-app--streamlit-apppy)
+  - [Step 7: Deactivate the Virtual Environment](#step-7-deactivate-virtual-environment-optional)
+
 - [📂 Preparing Input Files for SOKEGraph](#-preparing-input-files-for-sokegraph)
-  - [1) Ontology File](#1-ontology-file-ontologyjson)
-  - [2) Query File](#2-query-file-paper_querytxt)
-  - [3) Keyword File](#3-keyword-file-keyword_querytxt)
-  - [4) API Key File](#4-🔑-api-key-file-apikeys_xxxtxt)
-- [Step 8: Deactivate Virtual Environment](#step-8-deactivate-virtual-environment-optional)
-- [Reusing the Tool](#reusing-the-tool)
+  - [1) Ontology File (`Ontology.json`)](#1-ontology-file-ontologyjson)
+  - [2) Query File (`paper_query.txt`)](#2-query-file-paper_querytxt)
+  - [3) Keyword File (`keyword_query.txt`)](#3-keyword-file-keyword_querytxt)
+  - [4) API Key File (`apikeys_xxxtxt`)](#4-api-key-file-apikeys_xxxtxt)
+  - [5) Neo4j Credentials File (`neo4j_credentials.json`)](#5-neo4j-credentials-file-neo4j_credentialsjson)
 
 ## 🚀 Features
 
@@ -330,6 +330,5 @@ inputs/
 ```
 
 Point the Streamlit app / notebooks to these files when prompted.
----
 
 
