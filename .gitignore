@@ -1,0 +1,19 @@
+<<<<<<< HEAD
+.DS_Store
+external/
+__pycache__/
+*.pyc
+*.csv
+*.xlsx
+*.json
+*.jsonl
+*.jsonld
+*.graphml
+*.parquet
+*.ttl
+logs/
+.ipynb_checkpoints/
+
+=======
+logs/
+>>>>>>> origin/hrishi-filtering-search
