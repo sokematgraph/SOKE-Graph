@@ -15,7 +15,7 @@ This file provides detailed instructions for installing required tools to run **
 
 ---
 
-## 1. Install Git
+## Install Git
 Git is required to clone the repository.
 
 - **Windows:** [Download Git for Windows](https://git-scm.com/download/win) and follow the setup wizard.  
@@ -30,7 +30,7 @@ Git is required to clone the repository.
 
 ---
 
-## 2. Install Visual Studio Code (VS Code)
+## Install Visual Studio Code (VS Code)
 
 VS Code is the recommended editor for working with this project.
 
@@ -49,7 +49,7 @@ These extensions make it easier to run and edit `.py` or `.ipynb` files directly
 
 ---
 
-## 3. Install Conda (Recommended for Virtual Environment)
+## Install Conda (Recommended for Virtual Environment)
 We recommend [Miniconda](https://docs.conda.io/en/latest/miniconda.html) (lightweight Conda).
 
 - Download Miniconda for your OS.  

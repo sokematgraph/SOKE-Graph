@@ -66,16 +66,17 @@ git clone https://github.com/sokematgraph/SOKE-Graph.git
 
 After cloning, navigate into the project folder:
   ```bash
-  cd SOKEGraph
+  cd SOKE-Graph/
   ```
 
 ## Step 3: Create a Virtual Environment (Conda Recommended)
 
-We recommend using **Conda** (or Miniconda/Mamba) to manage dependencies for this project.  
-Conda makes it easy to install and manage scientific packages across platforms.
+We recommend using **Conda** (or Miniconda/Mamba) to manage dependencies for this project.
+You can choose any environment name; **sokegraph** is just an example.
+Make sure to use **Python 3.9.23**.
 
 ```bash
-conda create -n sokegraph python=3.9
+conda create -n sokegraph python=3.9.23
 ```
 
 ---
@@ -98,12 +99,12 @@ pip install --upgrade pip
 pip install -r requirements.txt
 ```
 
----
+%---
 
-> ⚡ **Note for advanced users:**  
-> You may also use Python’s built-in `venv` if you prefer, but Conda is the recommended and tested way for this project.
+%> ⚡ **Note for advanced users:**  
+%> You may also use Python’s built-in `venv` if you prefer, but Conda is the recommended and %tested way for this project.
 
----
+%---
 
 
 ## Step 6: Recommended Editor – Visual Studio Code (VS Code)
