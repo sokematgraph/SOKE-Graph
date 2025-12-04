@@ -94,14 +94,14 @@ You'll be able to enter commands here.
 In the command line window you opened, type:
 
 ```bash
-git clone https://github.com/SOKEGRAPH/soke-graph.git
+git clone https://github.com/sokematgraph/SOKE-Graph.git
 ```
 
 👉 If Git is not installed on your system, please see [INSTALLATION.md](INSTALLATION.md) for details.
 
 After cloning, navigate into the project folder:
   ```bash
-  cd soke-graph
+  cd SOKE-Graph
   ```
 
 ## Step 3: Create a Virtual Environment (Conda Recommended)
@@ -149,16 +149,16 @@ We recommend using **Visual Studio Code (VS Code)** for working with this projec
 If you don’t already have VS Code installed, please see [INSTALLATION.md](INSTALLATION.md) for detailed instructions on how to download and install it.
 
 ### Opening the Project
-You can open the `soke-graph` project folder in two ways:
+You can open the `SOKE-raph` project folder in two ways:
 
 - **Option 1: From VS Code directly**  
   - Open **VS Code**  
-  - Go to **File > Open Folder...** and select the `soke-graph` folder  
+  - Go to **File > Open Folder...** and select the `SOKE-Graph` folder  
 
 - **Option 2: From the Terminal**  
   If VS Code is installed and added to your PATH, you can run:  
   ```bash
-  cd soke-graph
+  cd SOKE-Graph
   code .
   ```
 
