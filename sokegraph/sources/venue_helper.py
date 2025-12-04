@@ -430,7 +430,3 @@ if __name__ == "__main__":
     for t in titles:
         res = venue_from_title(t)
         print(f"Title: {t}\nSource: {res.get('source')}\nDOI: {res.get('doi')}\nVenue: {res.get('venue')}\nYear: {res.get('year')}\nURL: {res.get('url')}\n")
-
-    # DEMO 2: If you already have a landing-page URL
-    # url = "https://www.sciencedirect.com/science/article/pii/S092583881934592X"
-    # print(venue_from_url(url))

@@ -45,6 +45,28 @@ except Exception:  # pragma: no cover
     st = None
     Network = None
 
+# Import your abstract base (keep your original path)
+import matplotlib.pyplot as plt
+import matplotlib.patches as mpatches
+
+# Optional deps for interactive/Jupyter usage
+try:
+    import ipywidgets as widgets
+    from IPython.display import display, clear_output
+    import pandas as pd
+except Exception:  # pragma: no cover
+    widgets = None
+    display = None
+    clear_output = None
+    pd = None
+
+# Optional Streamlit visualization
+try:
+    import streamlit as st
+    from pyvis.network import Network
+except Exception:  # pragma: no cover
+    st = None
+    Network = None
 
 # Import your abstract base (keep your original path)
 from sokegraph.graph.knowledge_graph import KnowledgeGraph
@@ -173,10 +195,7 @@ class NetworkXKnowledgeGraph(KnowledgeGraph):
         if Network is None or st is None:
             raise RuntimeError("pyvis/streamlit not available in this environment.")
 
-        
-
-        net = Network(height="600px", width="100%", directed=True,
-                    bgcolor="#FAFAFA", font_color="#202124")
+        net = Network(height="600px", width="100%", directed=True)
         net.barnes_hut()
 
         for node, attrs in self.graph.nodes(data=True):
@@ -336,9 +355,6 @@ class NetworkXKnowledgeGraph(KnowledgeGraph):
 
     # ---------- Pretty subgraph drawing / interactive -------------------------
 
-    #def _color_for_kind(self, kind: str) -> str:
-    #    return self.CATEGORY_COLOR.get(kind, self.CATEGORY_COLOR["_default"])
-
     def _subgraph_attributes_df(self, H: nx.Graph):
         """Collect an attributes table for nodes shown in subgraph H."""
         rows = []
@@ -538,10 +554,7 @@ class NetworkXKnowledgeGraph(KnowledgeGraph):
         node_type : str
             One of "All", "Layer", "Category", "Keyword", "Paper", "MetaData".
         """
-        
-
-        net = Network(height="600px", width="100%", directed=False,
-                    bgcolor="#FAFAFA", font_color="#202124")
+        net = Network(height="650px", width="100%", directed=False)
         net.barnes_hut()  # layout
 
         for node_id, data in self.graph.nodes(data=True):
@@ -556,9 +569,6 @@ class NetworkXKnowledgeGraph(KnowledgeGraph):
 
     # ---------- Pretty subgraph drawing / interactive -------------------------
 
-    #def _color_for_kind(self, kind: str) -> str:
-    #    return self.CATEGORY_COLOR.get(kind, self.CATEGORY_COLOR["_default"])
-
     def _subgraph_attributes_df(self, H: nx.Graph):
         """Collect an attributes table for nodes shown in subgraph H."""
         rows = []
@@ -758,10 +768,7 @@ class NetworkXKnowledgeGraph(KnowledgeGraph):
         node_type : str
             One of "All", "Layer", "Category", "Keyword", "Paper", "MetaData".
         """
-        
-
-        net = Network(height="600px", width="100%", directed=False,
-                    bgcolor="#FAFAFA", font_color="#202124")
+        net = Network(height="650px", width="100%", directed=False)
         net.barnes_hut()  # layout
 
         for node_id, data in self.graph.nodes(data=True):
@@ -773,12 +780,3 @@ class NetworkXKnowledgeGraph(KnowledgeGraph):
                 net.add_node(node_id, label=name, color=color, title=label)
 
         return net.generate_html()
-    def get_node_attr(self, node_name: str, attr_key: str):
-        """
-        Return a specific attribute (attr_key) of a node identified by its 'name' attribute.
-        Returns None if the node or attribute is not found.
-        """
-        for node, attrs in self.graph.nodes(data=True):
-            if attrs.get("name") == node_name:
-                return attrs.get(attr_key)
-        return None

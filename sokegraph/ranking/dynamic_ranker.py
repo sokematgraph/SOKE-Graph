@@ -1,3 +1,21 @@
+"""
+dynamic_ranker.py
+
+Implements :class:`DynamicRanker`, an advanced paper ranking method using:
+
+1. Dynamic adaptive thresholds based on paper-keyword pair distributions
+2. IDF-weighted scoring for keyword importance
+3. Category-based relevance analysis
+4. Overlap detection across ranking approaches (static vs dynamic vs HRM)
+
+This ranker automatically determines quality thresholds from the data
+rather than using fixed cutoffs, making it more robust across different
+paper sets and domains.
+
+Classes:
+- DynamicRanker: Dynamic adaptive paper ranking with IDF weighting
+"""
+
 import os
 from sokegraph.ranking.base_ranking_method import BaseRankingMethod
 from sokegraph.agents.ai_agent import AIAgent
@@ -169,7 +187,6 @@ class DynamicRanker(BaseRankingMethod):
 
         # ---- Collect per-category hits and scores ----
         per_cat_hits = {}
-        #static_scores = defaultdict(float)
         dynamic_scores = defaultdict(float)
         paper_keyword_frequencies = defaultdict(lambda: defaultdict(int))
         filtered_out = {}
@@ -452,7 +469,7 @@ class DynamicRanker(BaseRankingMethod):
         
         df_merged = df_pairs.merge(
             papers_df,
-            on="paper_id",      # <-- change to "doi" if DOI is your unique key
+            on="paper_id",     
             how="left"
         )
 
@@ -563,8 +580,3 @@ class DynamicRanker(BaseRankingMethod):
         else:
             toks = toks[: self.hrm_max_seq_len]
         return toks
-
-    
-
-
-

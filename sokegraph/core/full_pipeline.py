@@ -1,3 +1,20 @@
+"""
+full_pipeline.py
+
+Main pipeline orchestrator for the SOKEGraph end-to-end workflow.
+
+This module implements the complete paper analysis pipeline:
+1. Paper Retrieval - from Semantic Scholar, PDFs, or Journal APIs
+2. Ontology Update - extract keywords and enrich ontology
+3. Paper Ranking - score papers by relevance using multiple methods
+4. Knowledge Graph - build Neo4j or NetworkX graph representation
+
+The pipeline can be configured via command-line arguments or programmatically
+and supports multiple AI providers (OpenAI, Gemini, Claude, Llama, Ollama).
+
+Functions:
+- full_pipeline_main: Execute the complete analysis pipeline
+"""
 from sokegraph.sources.base_paper_source import BasePaperSource
 from sokegraph.sources.semantic_scholar_source import SemanticScholarPaperSource
 from sokegraph.sources.pdf_paper_source import PDFPaperSource

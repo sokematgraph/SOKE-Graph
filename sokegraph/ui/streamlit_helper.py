@@ -1,3 +1,19 @@
+"""
+streamlit_helper.py
+
+UI helper functions for the SOKEGraph Streamlit application.
+
+This module provides utilities for rendering data in Streamlit, including:
+- Paginated dataframe display with dark/light theme support
+- JSON file visualization
+- Excel export with formatted columns
+- Click-to-expand text fields for long content
+
+Key Functions:
+- show_json_file: Display JSON files with theme-aware formatting
+- reduce_columns: Filter and reorder dataframe columns for display
+- _show_dataframe_papers: Render paginated table with theme detection
+"""
 import base64
 import urllib.parse
 from pathlib import Path
@@ -11,56 +27,59 @@ import pandas as pd
 import json
 
 
-def get_theme_colors():
-    """Return active Streamlit theme colors or neutral fallbacks."""
-    return {
-        "bg": st.get_option("theme.backgroundColor") or "#FFFFFF",
-        "text": st.get_option("theme.textColor") or "#000000",
-        "secondary": st.get_option("theme.secondaryBackgroundColor") or "#F5F5F5",
-        "primary": st.get_option("theme.primaryColor") or "#4E9A06"
-    }
-
-
 def show_json_file(path: str, height: int = 360):
-    """Display JSON content inside a scrollable, theme-aware box."""
-    import json
-    import streamlit as st
+    """Display JSON file content with theme-aware formatting.
+    
+    Renders JSON files in Streamlit using st.json for collapsible
+    tree view, with fallback to code block if needed.
 
+    Parameters
+    ----------
+    path : str
+        Path to JSON file to display
+    height : int, optional
+        Display height in pixels (default: 360)
+        Note: Currently unused, kept for backward compatibility
+    """
     # Load JSON file
     with open(path, "r", encoding="utf-8") as f:
         data = json.load(f)
 
-    # Pretty-print JSON string
-    json_str = json.dumps(data, indent=2, ensure_ascii=False)
-
-    # Read active Streamlit theme colors
-    bg = st.get_option("theme.secondaryBackgroundColor") or "#f9f9f9"
-    text = st.get_option("theme.textColor") or "#202124"
-    border = st.get_option("theme.primaryColor") or "#4E9A06"
-
-    # Render in styled scrollable box
-    st.markdown(f"""
-    <div style="
-        border: 1px solid rgba(120,120,120,0.3);
-        border-radius: 8px;
-        padding: 10px 12px;
-        background: {bg};
-        color: {text};
-        font-family: ui-monospace, monospace;
-        font-size: 13px;
-        white-space: pre-wrap;
-        overflow: auto;
-        max-height: {height}px;
-        line-height: 1.4;
-    ">
-    {json_str}
-    </div>
-    """, unsafe_allow_html=True)
-
+    # Use st.json for theme-aware display
+    try:
+        st.json(data, expanded=False)
+    except Exception:
+        # Fallback to code with theme-aware styling
+        json_str = json.dumps(data, indent=2, ensure_ascii=False)
+        st.code(json_str, language="json")
 
 
 
 def reduce_columns(df: pd.DataFrame, type_df) -> pd.DataFrame:
+    """Filter and reorder dataframe columns for display.
+    
+    Removes internal columns (paper_id, doi, bibtex) and reorders
+    columns for better readability in the UI.
+
+    Parameters
+    ----------
+    df : pd.DataFrame
+        Input dataframe with paper data
+    type_df : str
+        Type of dataframe: "retrieved" or "results"
+        - "retrieved": papers from source APIs
+        - "results": ranked papers with scores
+        
+    Returns
+    -------
+    pd.DataFrame
+        Dataframe with filtered and reordered columns
+        
+    Raises
+    ------
+    ValueError
+        If type_df is not "retrieved" or "results"
+    """
     df_display = df.copy()
     if type_df == "retrieved":
         columns_to_remove = [
@@ -112,7 +131,8 @@ def _show_dataframe_papers(df: pd.DataFrame, header: str, type_df:str , page_siz
 
     # Columns we expect to be long; clamp them to 2 lines (click to expand)
     long_cols = {"title", "abstract", "authors", "venue"}
-    theme = get_theme_colors()
+
+    # Detect Streamlit's theme by checking the background color of the main container
     html = f"""
 <div id="papers-wrap">
   <div id="meta" style="margin: 6px 0; font-size: 13px;"></div>
@@ -126,129 +146,172 @@ def _show_dataframe_papers(df: pd.DataFrame, header: str, type_df:str , page_siz
 </div>
 
 <style>
+  /* Default light theme styles */
+  #papers-wrap {{
+    color: #262626;
+    background-color: transparent;
+  }}
+  
   .table-container {{
     overflow-x: auto;
+    background-color: transparent;
   }}
-
+  
   #papers-table {{
-    border-collapse: collapse;
+    border-collapse: collapse; 
     width: 100%;
     table-layout: fixed;
     font-size: 14px;
-    background-color: {theme["secondary"]};
-    color: {theme["text"]};
+    background-color: #FFFFFF;
+    color: #262626;
   }}
-
+  
   #papers-table th, #papers-table td {{
-    border: 1px solid rgba(120,120,120,0.25);
     padding: 8px 10px;
     vertical-align: top;
     word-wrap: break-word;
     overflow-wrap: anywhere;
     white-space: normal;
+    border: 1px solid #D3D3D3;
+    background-color: #FFFFFF;
+    color: #262626;
   }}
-
+  
   #papers-table th {{
-    background-color: rgba(120,120,120,0.20);
-    color: {theme["text"]};
     font-weight: 600;
+    background-color: #F0F2F6 !important;
   }}
 
-  /* Gentle zebra striping for readability */
-  #papers-table tbody tr:nth-child(even) {{
-    background-color: rgba(120,120,120,0.07);
+  #papers-table tbody tr:nth-child(even) td {{
+    background: #F9F9F9 !important;
   }}
 
-  /* Hover highlight */
-  #papers-table tbody tr:hover td {{
-    background-color: rgba(120,120,120,0.15);
-  }}
+  /* Compact widths for small columns */
+  #papers-table th:nth-child(1), #papers-table td:nth-child(1) {{ width: 64px; text-align: right; }}
+  #papers-table th, #papers-table td {{ max-width: 520px; }}
 
-    /* Pagination styling */
+  /* Pagination */
   .pager {{
-    margin-top: 8px;
-    text-align: center;
+    color: #262626;
   }}
-
-  /* Pagination styling */
-  .pager {{
-    margin-top: 10px;
-    text-align: center;
-  }}
-
   .pager a, .pager span {{
-    margin: 0 6px;
-    font-size: 15px;
-    text-decoration: none;
-    padding: 3px 8px;
-    border-radius: 6px;
-    transition: all 0.2s ease-in-out;
-    color: {theme["text"]};
+    margin: 0 4px; text-decoration: none; font-size: 14px; cursor: pointer;
+    color: #262626;
   }}
-
-  /* Make all text fully opaque by default for readability */
-  .pager a, .pager span {{
-    opacity: 0.85;
-  }}
-
-  /* Hover and active states */
   .pager a:hover {{
-    background-color: rgba(120,120,120,0.15);
-    color: {theme["primary"]};
-    opacity: 1;
+    color: #0066CC;
   }}
-
-  /* Current (active) page number */
   .pager .current {{
-    font-weight: 700;
-    color: {theme["primary"]};
-    border-bottom: 3px solid {theme["primary"]};
-    border-radius: 2px;
-    padding-bottom: 2px;
-    opacity: 1;
+    font-weight: 700; border-bottom: 2px solid currentColor; cursor: default;
   }}
 
-  /* Disabled buttons (Prev/Next when unavailable) */
-  .pager span:not(.current):not([data-p]) {{
-    color: rgba(150,150,150,0.6);
-    cursor: default;
-  }}
-
-
-
-  /* Links */
-  a {{
-    color: {theme["primary"]};
-    text-decoration: none;
-  }}
-  a:hover {{
-    text-decoration: underline;
-  }}
-
-  /* Column widths remain the same */
-  #papers-table th:nth-child(1), #papers-table td:nth-child(1) {{
-    width: 64px;
-    text-align: right;
-  }}
-  #papers-table th, #papers-table td {{
-    max-width: 520px;
-  }}
-
-  /* Clamp long text to two lines */
+  /* Clamping for long-text cells; click toggles expansion */
   .clamp {{
     display: -webkit-box;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
+    cursor: pointer;
   }}
   .clamp.expand {{
     display: block;
     -webkit-line-clamp: unset;
   }}
+
+  a {{ 
+    color: #0066CC;
+    text-decoration: underline; 
+  }}
+  
+  /* Meta text (showing papers X to Y of Z) */
+  #meta {{
+    color: #262626;
+  }}
+  
+  /* Dark theme overrides - will be applied by JavaScript if dark theme detected */
+  body.dark-theme #papers-wrap,
+  .dark-theme #papers-wrap {{
+    color: #FAFAFA;
+  }}
+  
+  body.dark-theme #meta,
+  .dark-theme #meta {{
+    color: #FAFAFA;
+  }}
+  
+  body.dark-theme #papers-table,
+  .dark-theme #papers-table {{
+    background-color: #0E1117;
+    color: #FAFAFA;
+  }}
+  
+  body.dark-theme #papers-table th,
+  body.dark-theme #papers-table td,
+  .dark-theme #papers-table th,
+  .dark-theme #papers-table td {{
+    border: 1px solid #444444;
+    background-color: #0E1117;
+    color: #FAFAFA;
+  }}
+  
+  body.dark-theme #papers-table th,
+  .dark-theme #papers-table th {{
+    background-color: #262730 !important;
+  }}
+  
+  body.dark-theme #papers-table tbody tr:nth-child(even) td,
+  .dark-theme #papers-table tbody tr:nth-child(even) td {{
+    background: rgba(255,255,255,0.03) !important;
+  }}
+  
+  body.dark-theme .pager,
+  body.dark-theme .pager a,
+  body.dark-theme .pager span,
+  .dark-theme .pager,
+  .dark-theme .pager a,
+  .dark-theme .pager span {{
+    color: #FAFAFA;
+  }}
+  
+  body.dark-theme .pager a:hover,
+  .dark-theme .pager a:hover {{
+    color: #4A9EFF;
+  }}
+  
+  body.dark-theme a,
+  .dark-theme a {{
+    color: #4A9EFF;
+  }}
 </style>
 
-
 <script>
+  // Detect Streamlit theme by checking background color
+  function detectAndApplyTheme() {{
+    const stApp = window.parent.document.querySelector('.stApp');
+    if (stApp) {{
+      const bgColor = window.getComputedStyle(stApp).backgroundColor;
+      // Parse RGB values
+      const rgb = bgColor.match(/\d+/g);
+      if (rgb) {{
+        const brightness = (parseInt(rgb[0]) * 299 + parseInt(rgb[1]) * 587 + parseInt(rgb[2]) * 114) / 1000;
+        const isDark = brightness < 128;
+        
+        const wrapper = document.getElementById('papers-wrap');
+        if (wrapper) {{
+          if (isDark) {{
+            wrapper.classList.add('dark-theme');
+          }} else {{
+            wrapper.classList.remove('dark-theme');
+          }}
+        }}
+      }}
+    }}
+  }}
+  
+  // Run on load and periodically check for theme changes
+  detectAndApplyTheme();
+  setInterval(detectAndApplyTheme, 500);
+
   const ROWS = {json.dumps(data)};
   const COLS = {json.dumps(cols)};
   const PAGE_SIZE = {int(page_size)};

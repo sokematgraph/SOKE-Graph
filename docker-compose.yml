@@ -1,0 +1,63 @@
+version: '3.8'
+
+services:
+  sokegraph-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: sokegraph-streamlit
+    ports:
+      - "8501:8501" # Streamlit default port
+    volumes:
+      # Mount volumes so user can access generated files on host machine
+      - ./data/uploads:/app/data/uploads # User uploaded files
+      - ./data/outputs:/app/data/outputs # Generated outputs
+      - ./data/logs:/app/data/logs # Application logs
+      - ./external/output:/app/external/output # Pipeline outputs
+    environment:
+      # You can add API keys here or use .env file
+      - PYTHONUNBUFFERED=1
+      # Optional: Override default Streamlit settings
+      - STREAMLIT_SERVER_PORT=8501
+      - STREAMLIT_SERVER_ADDRESS=0.0.0.0
+      # Optional: Set device preference (cpu, cuda, mps)
+      - SOKEGRAPH_DEVICE=cpu
+    restart: unless-stopped
+    networks:
+      - sokegraph-network
+    # Optional: Resource limits
+    deploy:
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 4G
+        reservations:
+          cpus: '1.0'
+          memory: 2G
+
+  # Optional: Add Neo4j if you're using it for knowledge graphs
+  neo4j:
+    image: neo4j:5.13
+    container_name: sokegraph-neo4j
+    ports:
+      - "7474:7474" # Neo4j browser
+      - "7687:7687" # Bolt protocol
+    volumes:
+      - neo4j-data:/data
+      - neo4j-logs:/logs
+    environment:
+      - NEO4J_AUTH=neo4j/password123 # Change this password!
+      - NEO4J_PLUGINS=["apoc"]
+    networks:
+      - sokegraph-network
+    # Uncomment if you want Neo4j
+    # profiles:
+    #   - with-neo4j
+
+networks:
+  sokegraph-network:
+    driver: bridge
+
+volumes:
+  neo4j-data:
+  neo4j-logs:

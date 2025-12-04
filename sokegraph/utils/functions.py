@@ -1,3 +1,21 @@
+"""
+functions.py
+
+General utility functions for SOKEGraph.
+
+This module provides helper functions used across the codebase:
+- API key rotation for rate-limit management
+- Text normalization (safe titles, keyword loading)
+- DataFrame manipulation (conversion, sanitization)
+- Metadata extraction helpers
+
+Functions:
+- get_next_api_key: Cycle through multiple API keys
+- load_keyword: Load keywords from text file
+- safe_title: Normalize title strings for filenames/keys
+- create_df_from_ontology_extraction: Convert ontology to DataFrame
+"""
+
 import re
 from sokegraph.ontology import config
 from typing import Any, List, Dict

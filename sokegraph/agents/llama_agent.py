@@ -23,9 +23,6 @@ class LlamaAgent(AIAgent):
         # Load API keys from the given path using the parent method
         self.api_keys = self.load_api_keys(api_keys_path)
 
-        # Optional: Create a cycling iterator for keys if needed later
-        # self.key_cycle = cycle(self.api_keys)
-
     def ask(self, prompt: str, max_retries=3) -> str:
         """
         Send a prompt to the LLaMA model and return the generated response.
@@ -42,17 +39,11 @@ class LlamaAgent(AIAgent):
         """
         for attempt in range(max_retries):
             try:
-                # Optionally use round-robin key selection
-                # key = next(self.key_cycle)
-
                 # Get the next available API key using a custom helper
                 client = Together(api_key=get_next_api_key(self.api_keys))
 
                 # Send request to Together's LLaMA model
                 response = client.chat.completions.create(
-                    # Uncomment and adjust model name if needed
-                    # model="meta-llama/Llama-3-70b-instruct",
-                    # model = "meta-llama/Llama-2-70b-chat-hf",
                     model="meta-llama/Llama-3.3-70B-Instruct-Turbo-Free",  # Free version of LLaMA 3.3 model
                     messages=[{"role": "user", "content": prompt}],
                     temperature=0,  # Lower temperature = more deterministic output

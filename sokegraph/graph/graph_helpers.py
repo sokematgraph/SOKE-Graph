@@ -1,3 +1,19 @@
+"""
+graph_helpers.py
+
+Neo4j database connection and query helpers.
+
+This module provides utility functions for working with Neo4j knowledge graphs:
+- Database driver creation
+- Neighbor subgraph queries
+- Node lookup and visualization preparation
+
+Functions:
+- get_driver: Create Neo4j database driver connection
+- get_neighbor_subgraph: Query neighbors within N hops
+- get_node_by_name_or_id: Look up nodes by name or ID
+"""
+
 from neo4j import GraphDatabase
 
 def get_driver(creds: dict):

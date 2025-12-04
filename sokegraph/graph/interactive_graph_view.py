@@ -1,3 +1,20 @@
+"""
+interactive_graph_view.py
+
+Interactive knowledge graph visualization for Streamlit.
+
+This module provides :class:`InteractiveGraphView` for rendering
+interactive knowledge graphs using PyVis in the Streamlit UI.
+
+Features:
+- Node type and value selection
+- Neighbor exploration
+- PyVis-based interactive visualization
+- Click-to-expand graph navigation
+
+Key Classes:
+- InteractiveGraphView: Main visualization controller
+"""
 import streamlit as st
 from pyvis.network import Network
 import streamlit.components.v1 as components
@@ -21,17 +38,6 @@ class InteractiveGraphView:
         choice = st.selectbox("Value", values, key="attr_value")
 
         focus = st.session_state.get(self._FOCUS)
-
-        # # ── Get subgraph from KG
-        # if focus:
-        #     G = self.kg.neighbour_subgraph(focus)
-        #     st.markdown(f"##### Neighbours of **{focus}**")
-        # else:
-        #     G = self.kg.subgraph_for_attr(selected_label, current_val)
-        #     st.markdown(
-        #         f"##### Nodes where **{selected_label} = {current_val}** &nbsp; "
-        #         "(click a node to zoom)"
-        #     )
 
         if choice:
             data = fetch_related(driver, choice)

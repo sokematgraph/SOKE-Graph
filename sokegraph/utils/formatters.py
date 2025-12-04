@@ -1,4 +1,15 @@
-# utils/formatters.py
+"""
+formatters.py
+
+Utility functions for formatting data for display in Streamlit UI.
+
+This module provides formatters for converting data into display-friendly
+formats, particularly for creating clickable links in Markdown/HTML views.
+
+Functions:
+- make_url_link: Convert URL strings to clickable Markdown links
+- make_doi_link: Convert DOI strings to clickable Markdown links
+"""
 
 def make_url_link(url: str) -> str:
     """Return a clickable Markdown link for a URL."""

@@ -94,21 +94,6 @@ class BaseRankingMethod(ABC):
         df.to_parquet(parquet_path, index=False)
         paths["parquet"] = parquet_path
 
-        # RDF/Turtle (simple representation)
-        # rdf_path = os.path.join(output_dir, f"{basename}.ttl")
-        # g = Graph()
-        # EX = Namespace("http://example.org/")
-        # for _, row in df.iterrows():
-        #     paper_uri = URIRef(EX[row["paper_id"]])
-        #     g.add((paper_uri, RDF.type, EX.Paper))
-        #     if "title" in df.columns:
-        #         g.add((paper_uri, EX.title, Literal(row["title"])))
-        #     if "doi" in df.columns:
-        #         g.add((paper_uri, EX.doi, Literal(row["doi"])))
-        # g.serialize(destination=rdf_path, format="turtle")
-        # paths["rdf"] = rdf_path
-
-        # GraphML (Neo4j compatible)
         if "paper_id" in df.columns:
             G = nx.Graph()
             for _, row in df.iterrows():
@@ -200,10 +185,6 @@ class BaseRankingMethod(ABC):
         """
         title_map = {}
         for _, row in self.papers.iterrows():
-            # Use the title if available; otherwise fall back to paper_id
-            # Apply `safe_title()` to normalize the string into a consistent key
-            #safe_id = safe_title(paper['title'] or paper['paper_id'])
-            #safe_id = safe_title(paper['title'] or paper['paper_id'])
             safe_id = str(row.get("paper_id", ""))
             # Store the abstract (or empty string if missing) as the value
             title_map[safe_id] = row.get("title", "")
@@ -217,7 +198,6 @@ class BaseRankingMethod(ABC):
         abstract_map = {}
         for _, row in self.papers.iterrows():
             # Normalize title or use paper_id, just like in _get_title_map
-            #safe_id = safe_title(paper['title'] or paper['paper_id'])
             safe_id = str(row.get("paper_id", ""))
             # Assign abstract text (or an empty string if not available)
             abstract_map[safe_id] = row.get("abstract", "")

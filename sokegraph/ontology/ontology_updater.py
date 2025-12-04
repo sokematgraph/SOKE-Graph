@@ -74,7 +74,6 @@ class OntologyUpdater:
         """
         # Build {safe_paper_id: abstract_text} for AI extraction
         text_data = self._build_text_data()
-        # print(f"text_data :{text_data}")
         # Ask the AI agent to extract keywords & merge into ontology
         self.ontology = self.ai_tool.extract_keywords(self.ontology, text_data)
 
@@ -86,6 +85,10 @@ class OntologyUpdater:
         self._save_ontology(self.output_path)
 
         return self.output_path
+
+    def update_base_ontology(self, user_query: str) -> None:
+        """ Update the base ontology, overwrite the file """
+        return None
 
     # ------------------------------------------------------------------ #
     # Internal helpers                                                   #
@@ -116,8 +119,6 @@ class OntologyUpdater:
         text_data: Dict[str, str] = {}
         print(f"papers :{self.papers} ")
         for _, row in self.papers.iterrows():  # row is a pd.Series
-            # print(f"row: {row.to_dict()}")
-
             safe_id = str(row.get("paper_id", ""))
 
             text_data[safe_id] = row.get("abstract", "")
@@ -264,37 +265,6 @@ class OntologyUpdater:
                 examples[top] = list(slot)[:6]
 
         # ---- Prompt (require 'additions' at top-level; matches our parser) ----
-    #     prompt = prompt_overrides or f"""
-    # You are an ontology assistant. You will receive (a) SHAPE HINTS for the base ontology,
-    # (b) a few tiny EXAMPLES, and (c) user-provided keywords. Produce a SMALL JSON *patch*.
-    #
-    # RETURN **EXACTLY** THIS TOP-LEVEL SHAPE:
-    # {{
-    #   "additions": {{
-    #     // For flat sections (LIST):
-    #     //   "<TopLevel>": ["term1", "term2"]
-    #     //
-    #     // For hierarchical sections (DICT of subsections):
-    #     //   "<TopLevel>": {{
-    #     //     "<Subsection>": ["term1", "term2"]
-    #     //   }}
-    #   }}
-    # }}
-    #
-    # ROUTING RULES:
-    # - Allowed top-level sections ONLY: {base_keys}
-    # - Section shapes (list vs dict, sample subsection names):
-    #   {json.dumps(shape_hints, ensure_ascii=False)}
-    # - Use the EXAMPLES as guidance for terminology and placement (do not rewrite them):
-    #   {json.dumps(examples, ensure_ascii=False)}
-    # - Split composite phrases into atomic concepts and route EACH concept.
-    # - If unsure where to put a term, use "Keyword" -> "UserProvided".
-    # - ONLY ADD strings. Do not rename/remove anything.
-    # - Avoid duplicates. Keep strings short/plain.
-    #
-    # USER_KEYWORDS: {keywords}
-    # """.strip()
-
         prompt = prompt_overrides or f"""
         You are an ontology assistant. You will receive:
         1) SHAPE HINTS for the base ontology,

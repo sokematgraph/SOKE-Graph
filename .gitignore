@@ -1,6 +1,4 @@
-<<<<<<< HEAD
 .DS_Store
-external/
 __pycache__/
 *.pyc
 *.csv
@@ -11,9 +9,7 @@ __pycache__/
 *.graphml
 *.parquet
 *.ttl
+external/output/
 logs/
 .ipynb_checkpoints/
-
-=======
 logs/
->>>>>>> origin/hrishi-filtering-search

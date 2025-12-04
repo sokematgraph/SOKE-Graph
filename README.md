@@ -6,35 +6,70 @@ This tool can be tailored for accelerating literature analysis in any domain of 
 
 ## 📑 Table of Contents
 
-## 📑 Table of Contents
-
-- [🧠 SOKE Graph Overview](#-soke-graph-a-semantic-linked-ontological-framework-for-domain-specific-knowledge-discovery-in-scientific-literature)
-- [🚀 Features](#-features)
-
-- [🚀 How to Run This Python Project](#-how-to-run-this-python-project-on-windows-macos-and-linux)
+- [🧠 SOKE Graph: A Semantic-linked Ontological Framework for Domain-Specific Knowledge Discovery in Scientific Literature](#-soke-graph-a-semantic-linked-ontological-framework-for-domain-specific-knowledge-discovery-in-scientific-literature)
+  - [📑 Table of Contents](#-table-of-contents)
+  - [🚀 Features](#-features)
+  - [🐳 Quick Start with Docker (Easiest Option!)](#-quick-start-with-docker-easiest-option)
+- [🚀 How to Run This Python Project on Windows, macOS, and Linux](#-how-to-run-this-python-project-on-windows-macos-and-linux)
   - [Step 1: Open the Command Line / Terminal](#step-1-open-the-command-line--terminal)
-  - [Step 2: Clone the Project](#step-2-clone-the-project-download-the-code)
-  - [Step 3: Create a Virtual Environment](#step-3-create-a-virtual-environment-conda-recommended)
+  - [Step 2: Clone the Project (Download the Code)](#step-2-clone-the-project-download-the-code)
+  - [Step 3: Create a Virtual Environment (Conda Recommended)](#step-3-create-a-virtual-environment-conda-recommended)
   - [Step 4: Activate the Environment](#step-4-activate-the-environment)
   - [Step 5: Install Project Dependencies](#step-5-install-project-dependencies)
-  - [Step 6: Run the Streamlit App](#step-6-run-the-project-with-streamlit-app--streamlit-apppy)
-  - [Step 7: Deactivate the Virtual Environment](#step-7-deactivate-virtual-environment-optional)
-
+  - [Step 6: Recommended Editor – Visual Studio Code (VS Code)](#step-6-recommended-editor--visual-studio-code-vs-code)
+    - [Installing VS Code](#installing-vs-code)
+    - [Opening the Project](#opening-the-project)
+    - [Install VS Code Extensions](#install-vs-code-extensions)
+  - [Step 7: Run the Project](#step-7-run-the-project)
+    - [1️⃣ Run with Streamlit App – `streamlit-app.py`](#1️⃣-run-with-streamlit-app--streamlit-apppy)
+      - [How to start the app](#how-to-start-the-app)
+      - [What you’ll see](#what-youll-see)
+      - [Running the pipeline](#running-the-pipeline)
+    - [2️⃣ Run from Jupyter Notebook – `full_pipeline.ipynb`](#2️⃣-run-from-jupyter-notebook--full_pipelineipynb)
+      - [Example Usage:](#example-usage)
+    - [3️⃣ Run from Jupyter Notebook (Interactive Step-by-Step) — `full_pipeline_stepBYstep.ipynb`](#3️⃣-run-from-jupyter-notebook-interactive-step-by-step--full_pipeline_stepbystepipynb)
+      - [🧩 What it does:](#-what-it-does)
+      - [📋 Steps Involved:](#-steps-involved)
 - [📂 Preparing Input Files for SOKEGraph](#-preparing-input-files-for-sokegraph)
-  - [1) Ontology File (`Ontology.json`)](#1-ontology-file-ontologyjson)
-  - [2) Query File (`paper_query.txt`)](#2-query-file-paper_querytxt)
-  - [3) Keyword File (`keyword_query.txt`)](#3-keyword-file-keyword_querytxt)
-  - [4) API Key File (`apikeys_xxxtxt`)](#4-api-key-file-apikeys_xxxtxt)
-  - [5) Neo4j Credentials File (`neo4j_credentials.json`)](#5-neo4j-credentials-file-neo4j_credentialsjson)
+  - [1) 🧭 Ontology File (`Ontology.json`)](#1--ontology-file-ontologyjson)
+  - [2) 📄 Paper Query File (`paper_query.txt`)](#2--paper-query-file-paper_querytxt)
+  - [3) 🔑 Keyword Query File (`keyword_query.txt`)](#3--keyword-query-file-keyword_querytxt)
+  - [4) 🔑 LLM API Key File (`apikeys_xxx.txt`)](#4--llm-api-key-file-apikeys_xxxtxt)
+    - [File Structure](#file-structure)
+    - [How to Create/Get API Keys](#how-to-createget-api-keys)
+  - [5) 🗝️ Neo4j Credentials File (`neo4j_credentials.json`)](#5-️-neo4j-credentials-file-neo4j_credentialsjson)
+  - [Point the Streamlit app / notebooks to these files when prompted.](#point-the-streamlit-app--notebooks-to-these-files-when-prompted)
+  - [Step 8: Deactivate Virtual Environment (Optional)](#step-8-deactivate-virtual-environment-optional)
 
 ## 🚀 Features
 
 - 🔍 **Retrieve papers** from Semantic Scholar or your PDF collection
 - 🤖 **Use AI (OpenAI, Gemini, ...)** to extract ontological concepts and metadata
 - 📊 **Rank papers** based on query relevance and extracted metadata
-- 🧱 **Build knowledge graphs** (Neo4j and NetworkX supported) from structured paper data
+- 🧱 **Build knowledge graphs** (Neo4j supported) from structured paper data
 
 ---
+
+## 🐳 Quick Start with Docker (Easiest Option!)
+
+If you have Docker installed, you can run SOKEGraph without installing Python or any dependencies:
+
+```bash
+./docker-run.sh
+```
+
+Then open http://localhost:8501 in your browser.
+
+**Your files will be saved to:**
+- `./data/outputs/` - Ranked papers and results
+- `./external/output/` - Knowledge graphs and exports
+
+**To stop:** `docker-compose down`
+
+For more details, see [DOCKER_README.md](DOCKER_README.md)
+
+---
+
 # 🚀 How to Run This Python Project on Windows, macOS, and Linux
 
 This guide will walk you through running this project on your computer, regardless of your operating system or prior Python knowledge.
@@ -59,24 +94,23 @@ You'll be able to enter commands here.
 In the command line window you opened, type:
 
 ```bash
-git clone https://github.com/sokematgraph/SOKE-Graph.git
+git clone https://github.com/SOKEGRAPH/soke-graph.git
 ```
 
 👉 If Git is not installed on your system, please see [INSTALLATION.md](INSTALLATION.md) for details.
 
 After cloning, navigate into the project folder:
   ```bash
-  cd SOKE-Graph/
+  cd soke-graph
   ```
 
 ## Step 3: Create a Virtual Environment (Conda Recommended)
 
-We recommend using **Conda** (or Miniconda/Mamba) to manage dependencies for this project.
-You can choose any environment name; **sokegraph** is just an example.
-Make sure to use **Python 3.9.23**.
+We recommend using **Conda** (or Miniconda/Mamba) to manage dependencies for this project.  
+Conda makes it easy to install and manage scientific packages across platforms.
 
 ```bash
-conda create -n sokegraph python=3.9.23
+conda create -n sokegraph python=3.9
 ```
 
 ---
@@ -99,9 +133,54 @@ pip install --upgrade pip
 pip install -r requirements.txt
 ```
 
+---
 
-## Step 6: Run the Project with Streamlit App – `streamlit-app.py`
-For most users, **Streamlit app is the easiest way** to get started, and you can use the full functionality of the project without needing to look at or modify the code.
+> ⚡ **Note for advanced users:**  
+> You may also use Python’s built-in `venv` if you prefer, but Conda is the recommended and tested way for this project.
+
+---
+
+
+## Step 6: Recommended Editor – Visual Studio Code (VS Code)
+
+We recommend using **Visual Studio Code (VS Code)** for working with this project, whether you want to edit code, run the Streamlit app, or work in Jupyter Notebooks.
+
+### Installing VS Code
+If you don’t already have VS Code installed, please see [INSTALLATION.md](INSTALLATION.md) for detailed instructions on how to download and install it.
+
+### Opening the Project
+You can open the `soke-graph` project folder in two ways:
+
+- **Option 1: From VS Code directly**  
+  - Open **VS Code**  
+  - Go to **File > Open Folder...** and select the `soke-graph` folder  
+
+- **Option 2: From the Terminal**  
+  If VS Code is installed and added to your PATH, you can run:  
+  ```bash
+  cd soke-graph
+  code .
+  ```
+
+After opening, use the integrated terminal (**View > Terminal**) to activate your virtual environment (see Step 4) and start running the project.
+
+### Install VS Code Extensions
+- Python (Microsoft)  
+- Jupyter (Microsoft)  
+
+These extensions make it easier to run and edit `.py` or `.ipynb` files directly inside VS Code.
+
+💡 Tip: You can run Jupyter notebooks inside VS Code without opening a separate browser window.
+
+
+## Step 7: Run the Project
+You can choose the method that best fits your skills and setup. For most users, **Streamlit app is the easiest way** to get started.
+
+---
+
+
+
+### 1️⃣ Run with Streamlit App – `streamlit-app.py`
 
 The Streamlit app provides a **simple graphical interface** to run the entire pipeline without writing code.  
 
@@ -118,21 +197,20 @@ The app will open in your browser. You can configure the pipeline with the follo
 - **Paper source**: Choose how to retrieve papers  
   - `Semantic Scholar`  
   - `Journal API`  
-  - `PDF ZIP` (upload a ZIP file of papers)  
 
 - **Number of papers**: The maximum number of papers to fetch (for Semantic Scholar or Journal API).  
 
-- **Upload query file (`paper_query.txt`)**: A text file with one search query per line.  
+- **Upload Paper Query file (`paper_query.txt`)**: A text file with one search query per line.  
 
-- **Upload base ontology file (`Ontology.json`)**: Defines categories, subcategories, and keywords for concept detection.  
+- **Upload Base Ontology file (`Ontology.json`)**: Defines categories, subcategories, and keywords for concept detection.  
 
 - **Field of interest**: Enter your research domain (e.g., *materials science, biology, medicine*).  
 
-- **AI Agent**: Select which LLM to use for ontology enrichment and paper analysis (`openAI`, `gemini`, `llama`, `ollama`, or `claude`).  
+- **LLM**: Select which LLM to use for ontology enrichment and paper analysis (`OpenAI`, `Gemini`, `Llama`, `Ollama`, or `Claude`).  
 
-- **Upload API key file (`apikeys_xxx.txt`)**: A text file containing the API keys required for accessing AI models and/or Journal APIs.  
+- **LLM API Key (`apikeys_xxx.txt`)**: A text file containing the API keys required for accessing AI models and/or Journal APIs.  
 
-- **Upload keywords file (`keyword_query.txt`)**: A list of keywords used for ranking and filtering papers.  
+- **Keyword Query file (`keyword_query.txt`)**: A list of keywords used for ranking and filtering papers.  
  
 
 - **Knowledge Graph backend**: Choose the graph engine:  
@@ -140,6 +218,7 @@ The app will open in your browser. You can configure the pipeline with the follo
   - `neo4j` (requires credentials file)  
 
 👉 **Note:** If you don’t know how to create these files (`Ontology.json`, `paper_query.txt`, `keyword_query.txt`, `apikeys_xxx.txt`, or `neo4j_credentials.json`), see the section [📂 Preparing Input Files for SOKEGraph](#-preparing-input-files-for-sokegraph) below. 
+
 
 - **Compute Device**:  
   By default, the program runs with **GPU acceleration** if your system supports it (e.g., CUDA, MPS).  
@@ -153,25 +232,115 @@ The app will:
 2. Enrich the ontology with AI.  
 3. Rank the papers using keywords.  
 4. Build and display the knowledge graph.  
-5. Export results (ranked papers, ontology, graph data) into the `external/output/` folder.
-  
+5. Export results (ranked papers, ontology, graph data) into the `external/output/` folder.  
+
+
+### 2️⃣ Run from Jupyter Notebook – `full_pipeline.ipynb`  
+This notebook is designed for users who are comfortable modifying code directly.
+
+- 🔧 You should define all parameters manually in a Python dictionary called `params`.
+- ✅ Once configured, you run the pipeline **with a single function call**.
+- 📂 Best for quick experiments or automation in notebook environments.
+
+#### Example Usage:
+
+```python
+from types import SimpleNamespace
+from sokegraph.full_pipeline import full_pipeline_main
+
+params = SimpleNamespace(
+    paper_source="Semantic Scholar",  # Options: "Semantic Scholar", "PDF Zip", "Journal API"
+    number_papers=10,                # Number of papers to fetch from Semantic Scholar
+    paper_query_file="topics.txt",   # Text file with one search query per line
+    pdfs_file=None,                  # Optional: ZIP file with PDFs (for PDF source)
+    api_key_file="api_journal_api.txt",  # API key file for Journal API source
+    ontology_file="base_ontology.json",  # Base ontology file (JSON or OWL)
+    AI="openAI",                          # Options: "openAI", "gemini", "llama", "ollama", "claude"
+    API_keys="openai_keys.json",         # API key file for AI tools
+    keyword_query_file="keywords.txt",   # Text file listing keywords
+    model_knowledge_graph="neo4j",       # Options: "neo4j", "networkx"
+    credentials_for_knowledge_graph="neo4j_credentials.json",  # Graph DB credentials
+    output_dir="output/"                 # Output directory
+)
+
+full_pipeline_main(params)
+```
+
+⚠️ Important: You should use either:
+
+"number_papers" + "paper_query_file"
+
+OR
+
+"number_papers" + "paper_query_file" + "api_key_journal_api"
+
+OR
+
+"pdfs_file"
+
+depending on whether you're searching for papers or uploading PDFs.
+
+💡 Make sure that all file paths in your `params` are valid and that services like **Neo4j**, **Ollama**, or your Journal API access are available before starting the pipeline.
+
+
+### 3️⃣ Run from Jupyter Notebook (Interactive Step-by-Step) — `full_pipeline_stepBYstep.ipynb`
+
+This notebook uses **ipywidgets** to provide an **interactive form-like interface** for running the pipeline.  
+It’s helpful if you want a guided, cell-by-cell execution **without writing code manually**.
+
+#### 🧩 What it does:
+- Allows you to select how you want to retrieve papers:
+  - 📁 Upload a ZIP file of PDFs (PDF source)
+  - 🔎 Search and fetch papers from **Semantic Scholar** using a query file
+  - 🌐 Fetch papers via the **Journal API** using a query file and an API key
+
+- Provides dropdowns and file pickers to easily select files like:
+  - Ontology
+  - Keyword queries
+  - API keys
+  - Output folder
+
+- Runs each pipeline step independently, so you can see exactly what happens at every stage.
+
+#### 📋 Steps Involved:
+
+1. **📄 Paper Retrieval**
+   - Based on your selected `paper_source`:
+     - `Semantic Scholar`: Downloads papers using your `paper_query_file`
+     - `PDF Zip`: Loads and processes PDFs from the uploaded ZIP file
+     - `Journal API`: Retrieves paper metadata from the Web of Science API using query + API key
+
+2. **🧠 Ontology Enrichment**
+   - The chosen AI agent (`openAI`, `gemini`, `llama`, `ollama`, or `claude`) analyzes the papers and expands your base ontology
+   - Adds new keywords, concepts, synonyms, and relationships
+
+3. **📊 Paper Ranking**
+   - Ranks the papers using:
+     - Exact keyword matches
+     - Synonyms and expanded terms
+     - Opposite-term filtering to down-rank irrelevant papers
+
+4. **🕸 Knowledge Graph Construction**
+   - Converts enriched data into a structured graph using:
+     - `Neo4j` (with login credentials)
+     - Or `NetworkX` (in-memory option)
+   - Graph includes:
+     - Ontology categories
+     - Paper-concept links
+     - Metadata associations
+
+5. **💾 Output**
+   - Saves everything in your selected `output_dir`, including:
+     - Enriched ontology file
+     - Ranked papers (CSV/JSON)
+
 ---
 
-## Step 7: Deactivate Virtual Environment (Optional)
+> ✅ **No need to modify code manually** – just fill out the form and click **Run** for each step.
 
-When you are done working, you can leave the environment by running:
-
-```bash
-conda deactivate
-```
-
-👉 Whenever you want to use the tool again, just activate the environment:
-
-```bash
-conda activate sokegraph
-```
-
-Then run the project as shown in Step 7.
+> 💡 Make sure required services like **Neo4j**, **Ollama**, or your **Journal API** credentials are ready before starting the pipeline.
+  
+---
 
 # 📂 Preparing Input Files for SOKEGraph
 
@@ -207,7 +376,7 @@ Defines **categories → subcategories → keywords/synonyms** that guide concep
 - Include common variants (symbols, abbreviations, spacing: `pH<7` vs `pH < 7`).
 - Validate JSON (e.g., jsonlint). Save as `Ontology.json`.
 
-## 2) 📄 Query File (`paper_query.txt`)
+## 2) 📄 Paper Query File (`paper_query.txt`)
 Each **line** is one search query sent to Semantic Scholar / other engines.
 
 **Example**
@@ -217,7 +386,7 @@ Nickel-based electrocatalysts for OER
 Graph neural networks for chemical reaction prediction
 ```
 
-## 3) 🔑 Keyword File (`keyword_query.txt`)
+## 3) 🔑 Keyword Query File (`keyword_query.txt`)
 The `keyword_query.txt` file contains keywords or short phrases (e.g., *acidic HER water splitting*) that the system uses to **rank papers** during search.
 
 **Example**
@@ -225,7 +394,7 @@ The `keyword_query.txt` file contains keywords or short phrases (e.g., *acidic H
 acidic HER water splitting
 ```
 
-## 4) 🔑 API Key File (`apikeys_xxx.txt`)
+## 4) 🔑 LLM API Key File (`apikeys_xxx.txt`)
 
 The application requires **API keys** to access AI agents (OpenAI, Gemini, Claude, LLaMA, etc.) and external Journal APIs.  
 
@@ -330,5 +499,20 @@ inputs/
 ```
 
 Point the Streamlit app / notebooks to these files when prompted.
+---
 
+## Step 8: Deactivate Virtual Environment (Optional)
 
+When you are done working, you can leave the environment by running:
+
+```bash
+conda deactivate
+```
+
+👉 Whenever you want to use the tool again, just activate the environment:
+
+```bash
+conda activate sokegraph
+```
+
+Then run the project as shown in Step 7.

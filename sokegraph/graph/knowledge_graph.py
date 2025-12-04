@@ -107,7 +107,9 @@ class KnowledgeGraph(ABC):
             "borderWidth": 2 if is_central else 1,
         }
 
-    def _node_kind(self, node: str) -> str:
+    def _node_kind(self, node: str, row: dict) -> str:
+        if row and "kind" in row and row["kind"]:
+            return row["kind"]
         try:
             return self.get_node_attr(node, "kind")
         except Exception:
@@ -164,13 +166,21 @@ class KnowledgeGraph(ABC):
                     return key
             return None
 
+        def _style_for(node_name, row=None, is_center=False):
+            raw_kind = (row or {}).get("kind") or name_to_kind.get(str(node_name))
+            key = _normalize_kind(raw_kind) or "_default"
+            hex_color = self.CATEGORY_COLOR.get(key, "#CCCCCC")
+            return dict(
+                shape="circle",
+                font={"color": "#ffffff", "size": 16 if is_center else 14},
+                color={"background": hex_color, "border": hex_color},
+                borderWidth=2
+            )
 
         # ---------------- build PyVis ----------------
+        net = Network(height="500px", width="100%", directed=True)
 
-        net = Network(height="600px", width="100%", directed=True,
-                    bgcolor="#FAFAFA", font_color="#202124")
-
-        net.add_node(choice, label=self._display_label(choice), **self.style_for(choice, is_center=True))
+        net.add_node(choice, label=self._display_label(choice), **_style_for(choice, is_center=True))
 
         for row in data:
             n    = row["neighbour"]
@@ -178,7 +188,7 @@ class KnowledgeGraph(ABC):
             dirn = row.get("direction", "out")
 
             if n not in net.node_map:
-                net.add_node(n, label=self._display_label(n), **self.style_for(n))
+                net.add_node(n, label=self._display_label(n), **_style_for(n, row=row))
 
             if dirn == "out":
                 net.add_edge(choice, n, label=rel, title=rel, color="#888888")
@@ -227,21 +237,34 @@ class KnowledgeGraph(ABC):
         html_content = net.generate_html()
         st.components.v1.html(legend_html + html_content, height=800, scrolling=True)
 
-        # Optional debug
-        # if st.checkbox("Show resolved kinds (debug)"):
-        #     resolved = {choice: name_to_kind.get(str(choice))}
-        #     for row in data:
-        #         n = row["neighbour"]
-        #         resolved[n] = row.get("kind") or name_to_kind.get(str(n))
-        #     st.write(resolved)
-
         
 
-    def style_for(self, node_name: str, is_center: bool = False) -> dict:
-        kind = self._node_kind_from(node_name)
+
+    def _node_kind_from(self, node_name: str, row: Optional[dict] = None):
+        # 1) If fetch_related() returns kind per row, prefer that
+        if row and row.get("kind"):
+            return row["kind"]
+
+        # 2) Try your class/graph accessors if available
+        try:
+            return self.get_node_attr(node_name, "kind")
+        except Exception:
+            pass
+
+        # 3) Fallback: try the object you keep in session_state (if you use it)
+        try:
+            kg = st.session_state.get("kg_result")
+            if kg and hasattr(kg, "get_node_attr"):
+                return kg.get_node_attr(node_name, "kind")
+        except Exception:
+            pass
+
+        return None  # no kind known
+
+    def _style_for(self, node_name: str, row: Optional[dict] = None, is_center: bool = False) -> dict:
+        kind = self._node_kind_from(node_name, row=row)
         print(f"Node '{node_name}' has kind '{kind}'")
         hex_color = self.CATEGORY_COLOR.get(kind, self.CATEGORY_COLOR.get(kind))
-        print(f"Using color '{hex_color}' for kind '{kind}'")
         return dict(
             shape="circle",
             font={"color": "#ffffff", "size": 16 if is_center else 14},
@@ -294,6 +317,12 @@ class KnowledgeGraph(ABC):
         attrs.setdefault("name", self._get_attr(node_id, "name") or str(node_id))
         return json.dumps(attrs, indent=2, ensure_ascii=False)
 
+    def _color_for_kind(self, kind) -> str:
+        key = self._canonical_kind_key(kind)
+        if not key:
+            return self.CATEGORY_COLOR["_default"]
+        return self.CATEGORY_COLOR[key]
+
     def _node_style(self, *, kind, is_central: bool = False) -> dict:
         c = self._color_for_kind(kind)
         return {
@@ -304,7 +333,9 @@ class KnowledgeGraph(ABC):
             "borderWidth": 2 if is_central else 1,
         }
 
-    def _node_kind(self, node: str) -> str:
+    def _node_kind(self, node: str, row: dict) -> str:
+        if row and "kind" in row and row["kind"]:
+            return row["kind"]
         try:
             return self.get_node_attr(node, "kind")
         except Exception:
@@ -362,29 +393,36 @@ class KnowledgeGraph(ABC):
     # ------------------------------------------------------------------ #
     # Kind & styling helpers (fixed fallback)                            #
     # ------------------------------------------------------------------ #
-    def _node_kind_from(self, node_name: str):
+    def _node_kind_from(self, node_name: str, row: Optional[dict] = None):
+        # 1) If fetch_related() returns kind per row, prefer that
+        if row and row.get("kind"):
+            return row["kind"]
+
         # 2) Try your class/graph accessors if available
         try:
-            print(f"Trying to get kind from graph for node '{node_name}'")
             return self.get_node_attr(node_name, "kind")
         except Exception:
             pass
 
         # 3) Fallback: try the object you keep in session_state (if you use it)
         try:
-            print(f"Trying to get kind from session_state graph for node '{node_name}'")
             kg = st.session_state.get("kg_result")
-            print(f'kg : {kg}')
-            print(f'hasattr : {hasattr(kg, "get_node_attr")}')
             if kg and hasattr(kg, "get_node_attr"):
-                print(f'kind : {kg.get_node_attr(node_name, "kind")}')
                 return kg.get_node_attr(node_name, "kind")
         except Exception:
             pass
 
         return None  # no kind known
 
-   
+    def _style_for(self, node_name: str, row: Optional[dict] = None, is_center: bool = False) -> dict:
+        kind = self._node_kind_from(node_name, row=row)
+        hex_color = self._color_for_kind(kind)  # fixed fallback to _default
+        return dict(
+            shape="circle",
+            font={"color": "#ffffff", "size": 16 if is_center else 14},
+            color={"background": hex_color, "border": hex_color},
+            borderWidth=2
+        )
 
     def _canonical_kind_key(self, kind) -> Optional[str]:
         """ Map raw kind (any case/spelling) to a CATEGORY_COLOR key or None if unknown."""
@@ -431,12 +469,11 @@ class KnowledgeGraph(ABC):
         attrs.setdefault("name", self._get_attr(node_id, "name") or str(node_id))
         return json.dumps(attrs, indent=2, ensure_ascii=False)
 
-    def _color_for_kind(self, kind: Optional[str]) -> str:
-        """Return the hex color for a given node kind."""
-        if not kind:
-            return self.CATEGORY_COLOR.get("_default", "#CCCCCC")
-        k = str(kind).strip().title()
-        return self.CATEGORY_COLOR.get(k, self.CATEGORY_COLOR.get("_default", "#CCCCCC"))
+    def _color_for_kind(self, kind) -> str:
+        key = self._canonical_kind_key(kind)
+        if not key:
+            return self.CATEGORY_COLOR["_default"]
+        return self.CATEGORY_COLOR[key]
 
     def _node_style(self, *, kind, is_central: bool = False) -> dict:
         c = self._color_for_kind(kind)
@@ -448,7 +485,9 @@ class KnowledgeGraph(ABC):
             "borderWidth": 2 if is_central else 1,
         }
 
-    def _node_kind(self, node: str) -> str:
+    def _node_kind(self, node: str, row: dict) -> str:
+        if row and "kind" in row and row["kind"]:
+            return row["kind"]
         try:
             return self.get_node_attr(node, "kind")
         except Exception:
@@ -505,13 +544,11 @@ class KnowledgeGraph(ABC):
 
     def show_subgraph_streamlit(self, choices: list[str], option: str = "OR"):
         """
-        Visualize neighbours for multiple choices with OR/AND semantics, 
-        using category-based colors for nodes and edges.
+        Visualize neighbours for multiple choices with OR/AND semantics.
+
+        OR  -> union of neighbours (table deduped by neighbour; graph shows all edges)
+        AND -> intersection of neighbours across all choices (loose: by neighbour id)
         """
-        import pandas as pd
-        import streamlit as st
-        from pyvis.network import Network
-        
         # -------- Normalize inputs & compute mode --------
         if isinstance(choices, str):
             choices = [choices]
@@ -519,6 +556,7 @@ class KnowledgeGraph(ABC):
         if option_upper not in {"OR", "AND"}:
             option_upper = "OR"
 
+        kg = st.session_state.get("kg_result", self)
 
         # -------- Collect raw rows (with 'source' attached) --------
         data = self.fetch_related_list(choices)
@@ -530,6 +568,8 @@ class KnowledgeGraph(ABC):
             return
 
         df = pd.DataFrame(data)
+
+        # Safety: ensure columns exist
         if "source" not in df.columns:
             df["source"] = None
         if "neighbour" not in df.columns:
@@ -539,56 +579,81 @@ class KnowledgeGraph(ABC):
 
         # -------- Overlap logic (k = 1 for OR, k = len(choices) for AND) --------
         k = 1 if option_upper == "OR" else len(choices)
-        counts = df.groupby("neighbour")["source"].nunique().reset_index(name="source_count")
-        allowed_neighbours = set(counts.loc[counts["source_count"] >= k, "neighbour"].tolist())
+        # Count how many distinct sources reach each neighbour
+        counts = (
+            df.groupby("neighbour")["source"].nunique().reset_index(name="source_count")
+        )
+        allowed_neighbours = set(
+            counts.loc[counts["source_count"] >= k, "neighbour"].tolist()
+        )
+
+        # Keep only rows whose neighbour survives the overlap criterion
         df_filtered = df[df["neighbour"].isin(allowed_neighbours)].copy()
 
-        # -------- Display table --------
-        df_filtered["neighbour_label"] = df_filtered["neighbour"].apply(lambda nid: self._display_label(nid))
+        # -------- Table: one row per neighbour (dedup for readability) --------
+        # Build display label & kind (fallbacks handled by helpers)
+        df_filtered["neighbour_label"] = df_filtered["neighbour"].apply(
+            lambda nid: self._display_label(nid)
+        )
         if "kind" not in df_filtered.columns:
             df_filtered["kind"] = None
 
         def _set_agg(vals):
+            # sorted unique list; display as comma-joined
             uniq = sorted({v for v in vals if pd.notna(v)})
             return ", ".join(uniq) if uniq else ""
 
-        rel_agg = ("rel_type", _set_agg) if "rel_type" in df_filtered.columns else ("source", lambda s: "")
-        dir_agg = ("direction", _set_agg) if "direction" in df_filtered.columns else ("source", lambda s: "")
+        # Aggregate to one row per neighbour
+        if "rel_type" in df_filtered.columns:
+            rel_agg = ("rel_type", _set_agg)
+        else:
+            rel_agg = ("source", lambda s: "")
+        if "direction" in df_filtered.columns:
+            dir_agg = ("direction", _set_agg)
+        else:
+            dir_agg = ("source", lambda s: "")
 
         table = (
             df_filtered.groupby("neighbour")
-            .agg(neighbour_label=("neighbour_label", "first"), rel_types=rel_agg, directions=dir_agg)
+            .agg(
+                neighbour_label=("neighbour_label", "first"),
+                rel_types=rel_agg,
+                directions=dir_agg,
+            )
             .reset_index()
             .rename(columns={"neighbour": "neighbour_id"})
         )
+
+        # Reorder for readability
         display_cols = ["neighbour_label", "rel_types", "directions"]
         table = table[[c for c in display_cols if c in table.columns]]
-        table.index = range(1, len(table) + 1)
+        table = table.copy()
+        table.index = range(1, len(table)+1)
         table.index.name = "Serial No."
         st.dataframe(table, use_container_width=True)
 
-        # -------- Visualize Graph --------
+        # -------- Optional graph toggle (keep existing visuals) --------
         if not st.checkbox("Visualise neighbours (PyVis)"):
             return
 
-
-        net = Network(height="600px", width="100%", directed=True,
-                    bgcolor="#FAFAFA", font_color="#202124")
-        
+        # Legend: collect kinds for centers and neighbours shown
         kinds_for_legend = set()
 
-        # -------- Add center nodes --------
+        # ---------------------------- build the graph ---------------------------
+        net = Network(height="500px", width="100%", directed=True)
+
+        # Add center nodes
         for c in choices:
             knd = self._node_kind_from(c)
             kinds_for_legend.add(knd)
             net.add_node(
                 c,
                 label=self._display_label(c),
-                title=self._node_title_json(c),
-                **self.style_for(c, is_center=True)
+                title= self._node_title_json(c),
+                **self._style_for(c, is_center=True)  # keep existing circle style
             )
 
-        # -------- Add neighbour nodes --------
+        # Add neighbour nodes (only those that survived overlap)
         neighbour_ids = sorted(allowed_neighbours)
         for nid in neighbour_ids:
             knd = self._node_kind_from(nid)
@@ -598,19 +663,20 @@ class KnowledgeGraph(ABC):
                     nid,
                     label=self._short_label(nid),
                     title=self._node_title_json(nid),
-                    **self.style_for(nid)
+                    **self._style_for(nid)  # keep existing visuals
                 )
 
-        # -------- Add colored edges --------
+        # Add edges from filtered raw rows; dedupe exact duplicates
         edges_seen = set()
         for _, row in df_filtered.iterrows():
             src_choice = row.get("source")
             neigh = row.get("neighbour")
-            rel = row.get("rel_type", "")
+            rel = row.get("rel_type", "") if "rel_type" in row else ""
             direction = row.get("direction", "out")
 
             if not src_choice or not neigh:
                 continue
+
             if direction == "out":
                 u, v = src_choice, neigh
             else:
@@ -621,46 +687,68 @@ class KnowledgeGraph(ABC):
                 continue
             edges_seen.add(key)
 
-            src_kind = self._node_kind_from(src_choice)
-            edge_color = self._color_for_kind(src_kind)
+            # Ensure nodes exist (defensive)
+            if u not in net.node_map:
+                net.add_node(u, label=self._short_label(u), title=self._node_title_json(u), **self._style_for(u))
+            if v not in net.node_map:
+                net.add_node(v, label=self._short_label(v), title=self._node_title_json(v), **self._style_for(v))
 
-            net.add_edge(u, v, label=rel, title=rel, color=edge_color)
+            net.add_edge(u, v, label=rel, title=rel)
 
-        # -------- Physics & Legend --------
+        # Physics same as before
         net.repulsion(
-            node_distance=180, central_gravity=0.25,
+            node_distance=180, central_gravity=0.2,
             spring_length=200, spring_strength=0.05, damping=0.09
         )
 
+        # Legend (reuse your existing helper)
         legend_html = self._legend_html(kinds_for_legend)
         if legend_html:
             st.markdown(legend_html, unsafe_allow_html=True)
 
-        st.components.v1.html(net.generate_html(), height=800, scrolling=True)
+        html = net.generate_html()
+        st.components.v1.html(html, height=800, scrolling=True)
 
-        # Optional debug
+        # Optional quick debug to confirm kinds resolved (toggle when needed)
         if st.checkbox("Show resolved kinds (debug)"):
             resolved = {c: self._node_kind_from(c) for c in choices}
             for nid in neighbour_ids:
                 resolved[nid] = self._node_kind_from(nid)
             st.write(resolved)
 
+    # ------------------------------------------------------------------ #
+    # Kind & styling helpers (fixed fallback)                            #
+    # ------------------------------------------------------------------ #
+    def _node_kind_from(self, node_name: str, row: Optional[dict] = None):
+        # 1) If fetch_related() returns kind per row, prefer that
+        if row and row.get("kind"):
+            return row["kind"]
 
-   
+        # 2) Try your class/graph accessors if available
+        try:
+            return self.get_node_attr(node_name, "kind")
+        except Exception:
+            pass
 
-    #def _style_for(self, node_name: str, row: Optional[dict] = None, is_center: bool = False) -> dict:
-    #    kind = self._node_kind_from(node_name, row=row)
-    ##    hex_color = self._color_for_kind(kind)  # fixed fallback to _default
-    #    return dict(
-    #        shape="circle",
-    #        font={"color": "#ffffff", "size": 16 if is_center else 14},
-    #        color={"background": hex_color, "border": hex_color},
-    #        borderWidth=2
-    #    )
-    
+        # 3) Fallback: try the object you keep in session_state (if you use it)
+        try:
+            kg = st.session_state.get("kg_result")
+            if kg and hasattr(kg, "get_node_attr"):
+                return kg.get_node_attr(node_name, "kind")
+        except Exception:
+            pass
 
+        return None  # no kind known
 
-
+    def _style_for(self, node_name: str, row: Optional[dict] = None, is_center: bool = False) -> dict:
+        kind = self._node_kind_from(node_name, row=row)
+        hex_color = self._color_for_kind(kind)  # fixed fallback to _default
+        return dict(
+            shape="circle",
+            font={"color": "#ffffff", "size": 16 if is_center else 14},
+            color={"background": hex_color, "border": hex_color},
+            borderWidth=2
+        )
 
     # ------------------------------------------------------------------ #
     # Abstract API every concrete graph builder must implement           #

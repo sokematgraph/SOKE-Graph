@@ -50,10 +50,9 @@ def main():
     log = get_logger()
 
     # logging file
-    #log.info(f"Sarand initialized: output={args.output_dir}")
+    open(log_file, 'w').close()
 
     # execute main workflow
-    # print("shahlla")
     full_pipeline_main(args)
 
 

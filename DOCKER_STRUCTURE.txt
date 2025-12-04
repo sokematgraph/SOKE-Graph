@@ -1,0 +1,91 @@
+SOKEGraph-Private/
+├── 🐳 Docker Files (NEW!)
+│   ├── Dockerfile                  # Container image definition
+│   ├── docker-compose.yml          # Multi-container orchestration
+│   ├── .dockerignore              # Files to exclude from image
+│   ├── .env.example               # Template for environment variables
+│   ├── docker-run.sh              # Quick start script ⭐
+│   └── DOCKER_README.md           # Complete Docker guide
+│
+├── 📦 Application Code
+│   ├── streamlit-app.py           # Main Streamlit UI
+│   ├── sokegraph/                 # Core package
+│   │   ├── sources/               # Paper retrieval
+│   │   ├── ranking/               # Paper ranking
+│   │   ├── graph/                 # Knowledge graph
+│   │   ├── ontology/              # Ontology management
+│   │   ├── agents/                # AI agents
+│   │   └── utils/                 # Utilities
+│   ├── requirements.txt
+│   └── setup.py
+│
+└── 📂 Data Directories (Created by Docker)
+    ├── data/
+    │   ├── uploads/               # 📥 Your uploaded files
+    │   ├── outputs/               # 📤 Generated results (accessible!)
+    │   └── logs/                  # 📝 Application logs
+    └── external/
+        └── output/                # 📊 Pipeline outputs (accessible!)
+
+═══════════════════════════════════════════════════════════════
+
+🎯 TO ANSWER YOUR QUESTIONS:
+
+1️⃣ "How can I dockerize this application?"
+   ✅ DONE! I've created all necessary Docker files above.
+
+2️⃣ "Will the user be able to access created directories?"
+   ✅ YES! Through Docker volumes:
+      - Files in container → Automatically appear on your computer
+      - ./data/outputs/ → All ranking results accessible
+      - ./external/output/ → All pipeline outputs accessible
+      - Real-time sync, no need to stop container
+
+3️⃣ "Can all this be in a separate directory?"
+   ✅ YES! Volumes map container paths to YOUR chosen paths:
+      
+      In docker-compose.yml, change:
+      volumes:
+        - /your/custom/path:/app/data/outputs
+        - /another/path:/app/external/output
+      
+      Files will appear wherever YOU specify!
+
+═══════════════════════════════════════════════════════════════
+
+🚀 QUICK START (3 Steps):
+
+1. Run the script:
+   ./docker-run.sh
+
+2. Access the app:
+   http://localhost:8501
+
+3. Check your outputs:
+   ls -la data/outputs/
+   ls -la external/output/
+
+═══════════════════════════════════════════════════════════════
+
+📋 WHAT I CREATED FOR YOU:
+
+✅ Dockerfile - Optimized multi-stage build
+✅ docker-compose.yml - Easy orchestration with volume mounts
+✅ .dockerignore - Keeps image size small
+✅ .env.example - Template for API keys
+✅ docker-run.sh - One-command startup script
+✅ DOCKER_README.md - Complete documentation
+
+═══════════════════════════════════════════════════════════════
+
+🎁 BONUS FEATURES:
+
+✨ Multi-stage build → Smaller image size
+✨ Volume mounts → Access files on your computer
+✨ Health checks → Monitors app status
+✨ Resource limits → Prevents memory issues
+✨ Auto-restart → Recovers from crashes
+✨ Neo4j included → Optional graph database
+✨ GPU support → Ready for CUDA acceleration
+
+═══════════════════════════════════════════════════════════════

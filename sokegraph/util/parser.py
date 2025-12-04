@@ -1,3 +1,19 @@
+"""
+parser.py
+
+Metadata extraction and parsing utilities for scientific papers.
+
+This module provides functions to parse metadata strings from papers
+and extract numeric values with units (e.g., overpotential, Tafel slope).
+
+Functions:
+- parse_all_metadata: Extract and parse metadata from ontology extractions
+- parse_meta_data: Parse numeric values with units from metadata strings
+"""
+
+import re
+
+
 def parse_all_metadata(ontology_extractions: dict) -> None:
     for layer, cats in ontology_extractions.items():
         for cat, items in cats.items():

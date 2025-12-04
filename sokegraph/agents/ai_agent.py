@@ -52,26 +52,6 @@ class AIAgent(ABC):
 
         self.field_of_interest = field_of_interest
 
-
-    def __init__(self, field_of_interest=None):
-        """
-        Set device for GPU if available.
-        - On Mac: uses MPS (Metal)
-        - Otherwise: CUDA if available
-        - Fallback: CPU
-        """
-        if torch.backends.mps.is_available():
-            self.device = torch.device("mps")
-            LOG.info("Using MPS GPU for AI agent.")
-        elif torch.cuda.is_available():
-            self.device = torch.device("cuda")
-            LOG.info("Using CUDA GPU for AI agent.")
-        else:
-            self.device = torch.device("cpu")
-            LOG.info("Using CPU for AI agent.")
-
-        self.field_of_interest = field_of_interest
-
     # ------------------------------------------------------------------ #
     # API surface that *must* be implemented by concrete subclasses
     # ------------------------------------------------------------------ #
@@ -306,7 +286,6 @@ class AIAgent(ABC):
                 print(f"  - Layer: {layer} abstract : {abstract} categories : {categories}")
                 results = self._call_model(layer, abstract, categories)
                 print(f"results : {results} for paper_id : {paper_id}")
-                #import pdb; pdb.set_trace()
                 # Check if results is not empty
                 if len(results) > 0:
                     for res in results:
@@ -316,7 +295,6 @@ class AIAgent(ABC):
                                         cat, layer)
                             continue
                 print(f"results : {results} for paper_id : {paper_id}")
-                #import pdb; pdb.set_trace()
                 # Check if results is not empty
                 if len(results) > 0:
                     for res in results:

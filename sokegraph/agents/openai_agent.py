@@ -77,22 +77,17 @@ class OpenAIAgent(AIAgent):
             model_output = response.choices[0].message.content.strip()
             print("📄 OpenAI returned:\n", model_output[:500])  # Show preview only
             
-            #return self._parse_model_output(model_output)
             return model_output
 
         except RateLimitError:
             LOG.error("⚠️ Rate limit exceeded. Please try again later.")
-            #print(f"json format : {json.dumps({}, indent=2)}")
             return ""
         except APIStatusError as e:
             LOG.error("❌ API returned an error ({e.status_code}): {e.message}")
-            #print(f"json format : {json.dumps({}, indent=2)}")
             return ""
         except OpenAIError as e:
             LOG.error("❌ An unexpected OpenAI error occurred: {str(e)}")
-            #print(f"json format : {json.dumps({}, indent=2)}")
             return ""
         except Exception as e:
             LOG.error("❌ An unexpected system error occurred: {str(e)}")
-            #print(f"json format : {json.dumps({}, indent=2)}")
             return ""

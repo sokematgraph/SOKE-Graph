@@ -1044,15 +1044,15 @@ class PaperRanker:
         denom = rel + opp + 1.0
         return 1.0 - self.polarity_lambda * (opp / denom)
 
-    def _compute_penalty(self, opp: int, rel: int):
-        denom = float(rel) + float(opp) + 1e-9
-        penalty = self.static_lambda * (float(opp) / denom)
-        return max(0.0, 1.0-penalty)
-        # return 1.0
+    def _compute_penalty(self, opp: int, rel: int, penalize: bool = False):
+        if penalize: 
+            denom = float(rel) + float(opp) + 1e-9
+            penalty = self.static_lambda * (float(opp) / denom)
+            return max(0.0, 1.0-penalty)
+        return 1.0
 
     def _get_layer_weight(self, layer: str) -> float:
         """Get priority weight for a given ontology layer.
-        
         Returns configured weight or 1.0 (neutral) for unlisted layers.
         """
         weight = self.layer_priority_weights.get(layer, 1.0)
