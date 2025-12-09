@@ -1,6 +1,10 @@
 #!/bin/bash
 # Quick start script for running SOKEGraph in Docker
 
+echo "SCRIPT RUN FROM: $PWD"
+ls -a
+
+
 # Colors for output
 GREEN='\033[0;32m'
 BLUE='\033[0;34m'
@@ -15,9 +19,17 @@ mkdir -p data/uploads data/outputs data/logs external/output
 
 # Check if .env exists
 if [ ! -f .env ]; then
-    echo -e "${YELLOW}Creating .env file from template...${NC}"
-    cp .env.example .env
-    echo -e "${GREEN}✓${NC} Created .env file. Please edit it with your API keys if needed."
+    echo -e "${YELLOW}No .env found.${NC}"
+
+    if [ -f .env.example ]; then
+        echo -e "${YELLOW}Creating .env from .env.example...${NC}"
+        cp .env.example .env
+        echo -e "${GREEN}✓ .env created from template.${NC}"
+    else
+        echo -e "${YELLOW}⚠ No .env.example found. Creating a blank .env file...${NC}"
+        touch .env
+        echo -e "${GREEN}✓ Blank .env created.${NC}"
+    fi
 fi
 
 # Build and run
