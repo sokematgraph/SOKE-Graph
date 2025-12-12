@@ -52,9 +52,9 @@ if [ "$(docker ps -q -f name=sokegraph-streamlit)" ]; then
     echo "  - ./external/output/    (pipeline outputs)"
     echo "  - ./data/logs/          (application logs)"
     echo -e "\n${BLUE}Useful commands:${NC}"
-    echo "  View logs:    docker-compose logs -f"
-    echo "  Stop:         docker-compose down"
-    echo "  Restart:      docker-compose restart"
+    echo "  View logs:    docker compose logs -f"
+    echo "  Stop:         docker compose down"
+    echo "  Restart:      docker compose restart"
     echo "  Shell access: docker exec -it sokegraph-streamlit bash"
 else
     echo -e "\n${YELLOW}⚠ Container failed to start. Check logs:${NC}"

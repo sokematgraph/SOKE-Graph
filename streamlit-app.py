@@ -580,23 +580,12 @@ def _save_upload(uploaded_file, suffix: str) -> Path | None:
     tmp.flush()
     return Path(tmp.name)
 
-""" These methods are used to update base ontology file"""
 
 def _read_keywords_list(txt_path: Path) -> List[str]:
     """ Extract the keywords from the user query file."""
     with open(txt_path, "r", encoding="utf-8") as f:
         return [line.strip() for line in f if line.strip()]
 
-
-"""
-Next steps: 
-(Our base ontology is stored already)
-1. Read the text from the user query file. 
-2. Pass those keywords, and AI agent to ontology updater class in a method call. 
-   (Include the prompt instructions here)
-3. The method will overwrite the ontology. 
-4. The path of the ontology will remain unchanged.
-"""
 
 # ════════════════════════════════════════════════════════════════════════════
 # Streamlit UI
