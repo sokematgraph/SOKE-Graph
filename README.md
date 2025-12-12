@@ -54,7 +54,27 @@ This tool can be tailored for accelerating literature analysis in any domain of 
 
 If you have Docker installed, you can run SOKEGraph without installing Python or any dependencies:
 
+### Unix/Linux/macOS:
 ```bash
+chmod +x docker-run.sh
+./docker-run.sh
+```
+
+### Windows:
+
+**Option 1: PowerShell (Recommended)**
+```powershell
+.\docker-run.ps1
+```
+
+**Option 2: Git Bash**
+```bash
+bash docker-run.sh
+```
+
+**Option 3: WSL (Windows Subsystem for Linux)**
+```bash
+chmod +x docker-run.sh
 ./docker-run.sh
 ```
 
@@ -64,7 +84,7 @@ Then open http://localhost:8501 in your browser.
 - `./data/outputs/` - Ranked papers and results
 - `./external/output/` - Knowledge graphs and exports
 
-**To stop:** `docker-compose down`
+**To stop:** `docker compose down` (or `docker-compose down` for older Docker versions)
 
 For more details, see [DOCKER_README.md](DOCKER_README.md)
 

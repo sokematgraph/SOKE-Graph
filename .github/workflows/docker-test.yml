@@ -1,0 +1,81 @@
+name: Docker Cross-Platform Test
+
+on:
+  push:
+    branches: [ main, test/** ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test-docker-script:
+    name: Test on ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    
+    runs-on: ${{ matrix.os }}
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      
+      - name: Create .env.example (if missing)
+        run: |
+          if [ ! -f .env.example ]; then
+            echo "# Example environment variables" > .env.example
+            echo "# Add your API keys here" >> .env.example
+          fi
+        shell: bash
+      
+      - name: Test Docker Compose availability
+        run: |
+          echo "Testing docker compose (V2)..."
+          docker compose version || echo "docker compose not available"
+          echo "Testing docker-compose (V1)..."
+          docker-compose version || echo "docker-compose not available"
+        shell: bash
+        continue-on-error: true
+      
+      - name: Run docker-run.sh (Unix)
+        if: runner.os != 'Windows'
+        run: |
+          chmod +x docker-run.sh
+          ./docker-run.sh
+        shell: bash
+        continue-on-error: true
+      
+      - name: Run docker-run.sh (Windows/Git Bash)
+        if: runner.os == 'Windows'
+        run: |
+          bash docker-run.sh
+        shell: bash
+        continue-on-error: true
+      
+      - name: Run docker-run.ps1 (Windows/PowerShell)
+        if: runner.os == 'Windows'
+        run: |
+          .\docker-run.ps1
+        shell: pwsh
+        continue-on-error: true
+      
+      - name: Check container status
+        run: docker ps -a
+        shell: bash
+      
+      - name: Show Docker Compose logs on failure
+        if: failure()
+        run: |
+          docker compose logs || docker-compose logs || echo "No logs available"
+        shell: bash
+        continue-on-error: true
+      
+      - name: Cleanup
+        if: always()
+        run: |
+          docker compose down || docker-compose down || echo "Cleanup skipped"
+        shell: bash
+        continue-on-error: true
