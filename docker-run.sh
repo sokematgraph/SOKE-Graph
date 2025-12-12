@@ -34,10 +34,10 @@ fi
 
 # Build and run
 echo -e "\n${YELLOW}Building Docker image...${NC}"
-docker-compose build
+docker compose build
 
 echo -e "\n${YELLOW}Starting SOKEGraph application...${NC}"
-docker-compose up -d
+docker compose up -d
 
 # Wait for service to be ready
 echo -e "\n${YELLOW}Waiting for application to start...${NC}"
@@ -58,5 +58,5 @@ if [ "$(docker ps -q -f name=sokegraph-streamlit)" ]; then
     echo "  Shell access: docker exec -it sokegraph-streamlit bash"
 else
     echo -e "\n${YELLOW}⚠ Container failed to start. Check logs:${NC}"
-    docker-compose logs
+    docker compose logs
 fi

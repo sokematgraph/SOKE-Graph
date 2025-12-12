@@ -9,10 +9,14 @@ This tool can be tailored for accelerating literature analysis in any domain of 
 - [🧠 SOKE Graph: A Semantic-linked Ontological Framework for Domain-Specific Knowledge Discovery in Scientific Literature](#-soke-graph-a-semantic-linked-ontological-framework-for-domain-specific-knowledge-discovery-in-scientific-literature)
   - [📑 Table of Contents](#-table-of-contents)
   - [🚀 Features](#-features)
-  - [🐳 Quick Start with Docker (Easiest Option!)](#-quick-start-with-docker-easiest-option)
 - [🚀 How to Run This Python Project on Windows, macOS, and Linux](#-how-to-run-this-python-project-on-windows-macos-and-linux)
   - [Step 1: Open the Command Line / Terminal](#step-1-open-the-command-line--terminal)
   - [Step 2: Clone the Project (Download the Code)](#step-2-clone-the-project-download-the-code)
+  - [🐳 Quick Start with Docker (Easiest Option!)](#-quick-start-with-docker-easiest-option)
+    - [For macOS and Linux Users:](#for-macos-and-linux-users)
+    - [For Windows Users:](#for-windows-users)
+    - [After Running the Docker Script:](#after-running-the-docker-script)
+  - [Alternative: Manual Python Installation](#alternative-manual-python-installation)
   - [Step 3: Create a Virtual Environment (Conda Recommended)](#step-3-create-a-virtual-environment-conda-recommended)
   - [Step 4: Activate the Environment](#step-4-activate-the-environment)
   - [Step 5: Install Project Dependencies](#step-5-install-project-dependencies)
@@ -50,26 +54,6 @@ This tool can be tailored for accelerating literature analysis in any domain of 
 
 ---
 
-## 🐳 Quick Start with Docker (Easiest Option!)
-
-If you have Docker installed, you can run SOKEGraph without installing Python or any dependencies:
-
-```bash
-./docker-run.sh
-```
-
-Then open http://localhost:8501 in your browser.
-
-**Your files will be saved to:**
-- `./data/outputs/` - Ranked papers and results
-- `./external/output/` - Knowledge graphs and exports
-
-**To stop:** `docker-compose down`
-
-For more details, see [DOCKER_README.md](DOCKER_README.md)
-
----
-
 # 🚀 How to Run This Python Project on Windows, macOS, and Linux
 
 This guide will walk you through running this project on your computer, regardless of your operating system or prior Python knowledge.
@@ -103,6 +87,66 @@ After cloning, navigate into the project folder:
   ```bash
   cd SOKE-Graph
   ```
+
+---
+
+## 🐳 Quick Start with Docker (Easiest Option!)
+
+**If you have Docker installed**, you can run SOKEGraph without installing Python or any dependencies.
+
+### For macOS and Linux Users:
+
+```bash
+chmod +x docker-run.sh
+./docker-run.sh
+```
+
+### For Windows Users:
+
+**Step 1:** Make sure Docker Desktop is installed and running
+
+**Step 2:** Open PowerShell (NOT Command Prompt)
+- Press `Win + X` and select **Windows PowerShell** or **Windows Terminal**
+- Navigate to the SOKE-Graph folder if you're not already there:
+  ```powershell
+  cd SOKE-Graph
+  ```
+
+**Step 3:** Run the PowerShell script:
+```powershell
+.\docker-run.ps1
+```
+
+> 💡 **Windows Tip:** If you see an error about "execution policy", run this first:
+> ```powershell
+> Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+> ```
+
+**Alternative for Windows users with Git Bash or WSL:**
+```bash
+bash docker-run.sh
+```
+
+---
+
+### After Running the Docker Script:
+
+Open http://localhost:8501 in your browser.
+
+**Your files will be saved to:**
+- `./data/outputs/` - Ranked papers and results
+- `./external/output/` - Knowledge graphs and exports
+
+**To stop the application:**
+```bash
+docker compose down
+```
+
+For more details, see [DOCKER_README.md](DOCKER_README.md)
+
+---
+
+## Alternative: Manual Python Installation
 
 ## Step 3: Create a Virtual Environment (Conda Recommended)
 
