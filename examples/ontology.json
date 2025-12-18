@@ -1,0 +1,272 @@
+{
+  "Device": {
+    "PEMWE": [
+      "PEMWE",
+      "proton exchange membrane water electrolyzer",
+      "PEM water electrolysis",
+      "acidic water electrolysis",
+      "proton exchange membrane electrolyzer"
+    ],
+    "PEMFC": [
+      "PEMFC",
+      "proton exchange membrane fuel cell",
+      "PEM fuel cell",
+      "proton exchange membrane",
+      "fuel cell"
+    ],
+    "AEMWE": [
+      "AEMWE",
+      "anion exchange membrane water electrolyzer",
+      "alkaline water electrolysis",
+      "AEM electrolyzer"
+    ],
+    "AEMFC": [
+      "AEMFC",
+      "anion exchange membrane fuel cell",
+      "AEM fuel cell"
+    ],
+    "SOEC": [
+      "SOEC",
+      "solid oxide electrolysis cell",
+      "solid oxide electrolyzer"
+    ],
+    "SOFC": [
+      "SOFC",
+      "solid oxide fuel cell"
+    ]
+  },
+  "Environment": {
+    "Acidic": [
+      "pH < 7",
+      "pH<7",
+      "pH<",
+      "pH 1",
+      "pH=1",
+      "acidic"
+    ],
+    "Alkaline": [
+      "pH > 7",
+      "pH>7",
+      "pH>",
+      "pH=14",
+      "alkaline",
+      "basic"
+    ],
+    "Neutral": [
+      "pH 7",
+      "neutral pH"
+    ],
+    "Operating Temperature": [
+      "temperature",
+      "25°C",
+      "80°C",
+      "temperature-controlled"
+    ],
+    "Pressure": [
+      "1 atm",
+      "10 atm",
+      "high-pressure",
+      "pressure"
+    ],
+    "Gas-Phase Reactions": [
+      "gas-phase",
+      "gas reaction"
+    ],
+    "Non-aqueous Solvents": [
+      "non-aqueous",
+      "organic solvent",
+      "ethanol"
+    ]
+  },
+  "Process": {
+    "Electrochemical Energy Conversion": [
+      "electrochemical cell",
+      "redox energy",
+      "electrochemical process"
+    ],
+    "Water Electrolysis": [
+      "electrolysis of water",
+      "splitting H2O",
+      "hydrogen from water",
+      "water splitting"
+    ],
+    "Photoelectrochemical Water Splitting": [
+      "photoelectrochemical",
+      "PEC water splitting",
+      "solar water splitting"
+    ],
+    "Photocatalysis": [
+      "photocatalyst",
+      "UV-activated",
+      "light-driven catalysis"
+    ],
+    "Thermochemical Water Splitting": [
+      "high-temperature splitting",
+      "thermal decomposition of water"
+    ],
+    "Electrocatalysis": [
+      "electrocatalyst",
+      "electrocatalytic",
+      "electrode reaction enhancement",
+      "electrochemical catalysts"
+    ],
+    "Fuel Cells": [
+      "fuel cell",
+      "proton exchange membrane",
+      "PEM",
+      "electricity generation from fuel"
+    ]
+  },
+  "Reaction": {
+    "Hydrogen Evolution Reaction (HER)": [
+      "hydrogen evolution",
+      "HER",
+      "H2 generation",
+      "reduction of protons"
+    ],
+    "Oxygen Evolution Reaction (OER)": [
+      "oxygen evolution",
+      "OER",
+      "oxygen generation",
+      "water oxidation"
+    ],
+    "Proton-Coupled Electron Transfer (PCET)": [
+      "PCET",
+      "proton-electron",
+      "concerted proton electron transfer"
+    ]
+  },
+  "Elemental Composition": {
+    "Iron": [
+      "Fe",
+      "iron-based catalyst",
+      "Fe3+",
+      "Fe2+"
+    ],
+    "Nickel": [
+      "Ni",
+      "nickel foam",
+      "nickel oxide"
+    ],
+    "Cobalt": [
+      "Co",
+      "Co3O4",
+      "cobalt-doped"
+    ],
+    "Manganese": [
+      "Mn",
+      "manganese oxide"
+    ],
+    "Molybdenum": [
+      "Mo",
+      "MoS2",
+      "molybdenum disulfide"
+    ],
+    "Transition Metals": [
+      "transition metal",
+      "d-block metal",
+      "first-row metals"
+    ],
+    "Earth-Abundant Elements": [
+      "earth-abundant",
+      "non-precious",
+      "low-cost metals",
+      "earth abundant"
+    ],
+    "Metal-Free Catalysts": [
+      "carbon-based",
+      "N-doped graphene",
+      "non-metal"
+    ],
+    "Dopants": [
+      "doped with P",
+      "S-doping",
+      "boron doping"
+    ]
+  },
+  "Material": {
+    "Metal Oxides": [
+      "Fe2O3",
+      "NiO",
+      "oxide layer",
+      "metal oxide"
+    ],
+    "Metal Phosphides": [
+      "Ni2P",
+      "FeP",
+      "metal phosphide catalyst"
+    ],
+    "Sulfides, Nitrides, Carbides": [
+      "MoS2",
+      "nitrides",
+      "carbides",
+      "WS2"
+    ],
+    "Core–Shell Nanostructures": [
+      "core-shell",
+      "encapsulated nanoparticles"
+    ],
+    "2D Materials": [
+      "graphene",
+      "MoS2",
+      "nanosheets"
+    ],
+    "Porous Structures, Nanorods, Nanowires": [
+      "nanorods",
+      "nanowires",
+      "porous",
+      "mesoporous",
+      "nanoporous"
+    ]
+  },
+  "Performance & Stability": {
+    "Overpotential": [
+      "overpotential of",
+      "η = ",
+      "potential above thermodynamic"
+    ],
+    "Tafel Slope": [
+      "Tafel slope",
+      "mV dec⁻¹",
+      "Tafel plot"
+    ],
+    "Exchange Current Density": [
+      "exchange current density",
+      "j0",
+      "baseline current"
+    ],
+    "Stability": [
+      "chronoamperometry",
+      "cycling stability",
+      "durability test",
+      "long-term performance"
+    ]
+  },
+  "Application": {
+    "Green Hydrogen Economy": [
+      "green hydrogen",
+      "H2 economy",
+      "renewable hydrogen"
+    ],
+    "Hydrogen Production": [
+      "H2 production",
+      "hydrogen generation"
+    ],
+    "Renewable Energy Integration": [
+      "solar + water splitting",
+      "renewable system",
+      "wind-driven electrolysis"
+    ],
+    "PEM Electrolyzer": [
+      "proton exchange membrane",
+      "PEM electrolyzer",
+      "membrane cell"
+    ],
+    "Lithium-Ion Battery": [
+      "LIB",
+      "lithium battery",
+      "anode",
+      "cathode"
+    ]
+  }
+}
