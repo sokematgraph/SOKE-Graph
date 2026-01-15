@@ -1,7 +1,7 @@
 # PowerShell script for running SOKEGraph in Docker on Windows
 
 Write-Host ""
-Write-Host "🐳 SOKEGraph Docker Setup" -ForegroundColor Blue
+Write-Host "SOKEGraph Docker Setup" -ForegroundColor Blue
 Write-Host ""
 
 # Create necessary directories on host
@@ -15,11 +15,11 @@ if (-not (Test-Path ".env")) {
     if (Test-Path ".env.example") {
         Write-Host "Creating .env from .env.example..." -ForegroundColor Yellow
         Copy-Item ".env.example" ".env"
-        Write-Host "✓ .env created from template." -ForegroundColor Green
+        Write-Host "[OK] .env created from template." -ForegroundColor Green
     } else {
-        Write-Host "⚠ No .env.example found. Creating a blank .env file..." -ForegroundColor Yellow
+        Write-Host "[WARNING] No .env.example found. Creating a blank .env file..." -ForegroundColor Yellow
         New-Item -ItemType File -Path ".env" -Force | Out-Null
-        Write-Host "✓ Blank .env created." -ForegroundColor Green
+        Write-Host "[OK] Blank .env created." -ForegroundColor Green
     }
 }
 
@@ -44,14 +44,14 @@ if (-not $dockerComposeCmd) {
             Write-Host "Using Docker Compose V1 (docker-compose)" -ForegroundColor Cyan
         }
     } catch {
-        Write-Host "❌ Error: Neither 'docker compose' nor 'docker-compose' found." -ForegroundColor Red
+        Write-Host "[ERROR] Neither 'docker compose' nor 'docker-compose' found." -ForegroundColor Red
         Write-Host "Please install Docker Desktop or Docker Compose." -ForegroundColor Yellow
         exit 1
     }
 }
 
 if (-not $dockerComposeCmd) {
-    Write-Host "❌ Error: Neither 'docker compose' nor 'docker-compose' found." -ForegroundColor Red
+    Write-Host "[ERROR] Neither 'docker compose' nor 'docker-compose' found." -ForegroundColor Red
     Write-Host "Please install Docker Desktop or Docker Compose." -ForegroundColor Yellow
     exit 1
 }
@@ -82,7 +82,7 @@ Start-Sleep -Seconds 5
 $container = docker ps -q -f name=sokegraph-streamlit
 if ($container) {
     Write-Host ""
-    Write-Host "✓ SOKEGraph is running!" -ForegroundColor Green
+    Write-Host "[SUCCESS] SOKEGraph is running!" -ForegroundColor Green
     Write-Host ""
     Write-Host "Access the application at: " -NoNewline -ForegroundColor Blue
     Write-Host "http://localhost:8501" -ForegroundColor Cyan
@@ -104,7 +104,7 @@ if ($container) {
     Write-Host "  Shell access: docker exec -it sokegraph-streamlit bash"
 } else {
     Write-Host ""
-    Write-Host "⚠ Container failed to start. Check logs:" -ForegroundColor Yellow
+    Write-Host "[WARNING] Container failed to start. Check logs:" -ForegroundColor Yellow
     if ($dockerComposeCmd -is [array]) {
         & $dockerComposeCmd[0] $dockerComposeCmd[1] logs
     } else {
