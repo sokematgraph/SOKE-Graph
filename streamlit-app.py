@@ -276,6 +276,7 @@ def retrieve_papers_from_zip(zip_path: str, output_dir: str) -> pd.DataFrame:
                    output_dir=output_dir
                 )
     papers = paper_source.fetch_papers()
+    print(f"Retrieved papers: {papers}")
     return papers
 
 
@@ -600,22 +601,29 @@ def main():
     # ---------------- LEFT COLUMN: paper source ---------------------------
     with left:
         st.subheader("Paper Source")
-        paper_mode = st.radio("", ["Semantic Scholar", "Journal API"], key="src")
+        paper_mode = st.radio("", ["Semantic Scholar", "Journal API", "PDF ZIP"], key="src")
 
     # ---------------- RIGHT COLUMN: configuration -------------------------
     with right:
         st.subheader("⚙️ Configuration")
 
         if paper_mode == "Semantic Scholar":
-            num_papers = st.number_input("Number of papers", 1, 1000, 10) #should change upper bound
-            api_key_for_journal_api_file = None
-            
-        else:
             num_papers = st.number_input("Number of papers", 1, 200, 10) #should change upper bound
+            query_file = st.file_uploader("Upload query file (.txt)", type=["txt"])
+            api_key_for_journal_api_file = None
+            pdf_zip = None
+        elif paper_mode == "Journal API":
+            num_papers = st.number_input("Number of papers", 1, 200, 10) #should change upper bound
+            query_file = st.file_uploader("Upload query file (.txt)", type=["txt"])
             api_key_for_journal_api_file = st.file_uploader("Upload API key for journal API (.txt)", type=["txt"]) 
+            pdf_zip = None
+        else:
+            pdf_zip = st.file_uploader("Upload PDF ZIP", type=["zip"])
+            api_key_for_journal_api_file = None
+            query_file = None
+            num_papers = None 
 
-        query_file = st.file_uploader("Paper Query file (.txt)", type=["txt"])
-        pdf_zip = None
+        
 
         ontology_file = st.file_uploader("Base Ontology file (.json) (optional)", type=["json"])
         
@@ -757,7 +765,7 @@ def main():
             if paper_mode == "Semantic Scholar":
                 papers_path = retrieve_papers_semantic_scholar(str(query_path), int(num_papers), output_dir)
 
-            elif paper_mode == "PDF Zip":
+            elif paper_mode == "PDF ZIP":
                 papers_path = retrieve_papers_from_zip(str(pdf_path), output_dir)
 
             elif paper_mode == "Journal API":
@@ -782,8 +790,11 @@ def main():
             # 2️⃣ Update ontology
             status.update(label="2/4 • Updating ontology…")
             t2_start = time.perf_counter(); w2_start = datetime.now()
-            with open(query_path, "r", encoding="utf-8") as f:
-                user_keywords = [ln.strip() for ln in f if ln.strip()]
+            if query_path is not None:
+                with open(query_path, "r", encoding="utf-8") as f:
+                    user_keywords = [ln.strip() for ln in f if ln.strip()]
+            else:
+                user_keywords = []
 
             # this is updating the base ontology
             custom_prompt = None

@@ -50,8 +50,8 @@ class PDFPaperSource(BasePaperSource):
                     papers.append(info)
 
         # Step 5: Save paper metadata to Excel (inherited from BasePaperSource)
-        self.export_metadata_to_excel(papers, self.output_dir)
-        return papers
+        return self.export_metadata_to_excel(papers, self.output_dir)
+        #return papers
 
     def _unzip_pdfs(self) -> List[str]:
         """
