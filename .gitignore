@@ -4,6 +4,7 @@ __pycache__/
 *.csv
 *.xlsx
 *.json
+!examples/**/*.json
 *.jsonl
 *.jsonld
 *.graphml
