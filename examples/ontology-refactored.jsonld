@@ -1,0 +1,335 @@
+{
+  "@context": {
+    "emmo": "https://w3id.org/emmo#",
+    "emmo-electro": "https://w3id.org/emmo/domain/electrochemistry#",
+    "chebi": "http://purl.obolibrary.org/obo/CHEBI_",
+    "pato": "http://purl.obolibrary.org/obo/PATO_",
+    "skos": "http://www.w3.org/2004/02/skos/core#",
+    "Device": {
+      "@id": "emmo-electro:ElectrochemicalDevice",
+      "@type": "@id"
+    },
+    "Environment": {
+      "@id": "emmo-electro:OperatingCondition",
+      "@type": "@id"
+    },
+    "Process": {
+      "@id": "emmo-electro:ElectrochemicalProcess",
+      "@type": "@id"
+    },
+    "Reaction": {
+      "@id": "emmo-electro:ElectrochemicalReaction",
+      "@type": "@id"
+    },
+    "Element": {
+      "@id": "chebi:33250",
+      "@type": "@id"
+    },
+    "Material": {
+      "@id": "emmo:Material",
+      "@type": "@id"
+    },
+    "PerformanceMetric": {
+      "@id": "pato:0000068",
+      "@type": "@id"
+    },
+    "Application": {
+      "@id": "emmo:Application",
+      "@type": "@id"
+    }
+  },
+  "@graph": [
+    {
+      "@id": "emmo-electro:PEMWE",
+      "@type": "Device",
+      "skos:prefLabel": "Proton Exchange Membrane Water Electrolyzer",
+      "skos:altLabel": [
+        "PEMWE",
+        "PEM water electrolysis",
+        "acidic water electrolysis",
+        "proton exchange membrane electrolyzer"
+      ]
+    },
+    {
+      "@id": "emmo-electro:PEMFC",
+      "@type": "Device",
+      "skos:prefLabel": "Proton Exchange Membrane Fuel Cell",
+      "skos:altLabel": [
+        "PEMFC",
+        "PEM fuel cell",
+        "proton exchange membrane",
+        "fuel cell"
+      ]
+    },
+    {
+      "@id": "emmo-electro:AEMWE",
+      "@type": "Device",
+      "skos:prefLabel": "Anion Exchange Membrane Water Electrolyzer",
+      "skos:altLabel": [
+        "AEMWE",
+        "alkaline water electrolysis",
+        "AEM electrolyzer"
+      ]
+    },
+    {
+      "@id": "emmo-electro:AEMFC",
+      "@type": "Device",
+      "skos:prefLabel": "Anion Exchange Membrane Fuel Cell",
+      "skos:altLabel": [
+        "AEMFC",
+        "AEM fuel cell"
+      ]
+    },
+    {
+      "@id": "emmo-electro:SOEC",
+      "@type": "Device",
+      "skos:prefLabel": "Solid Oxide Electrolysis Cell",
+      "skos:altLabel": [
+        "SOEC",
+        "solid oxide electrolyzer"
+      ]
+    },
+    {
+      "@id": "emmo-electro:SOFC",
+      "@type": "Device",
+      "skos:prefLabel": "Solid Oxide Fuel Cell",
+      "skos:altLabel": [
+        "SOFC"
+      ]
+    },
+    {
+      "@id": "emmo-electro:AcidicElectrolyte",
+      "@type": "Environment",
+      "skos:prefLabel": "Acidic Environment",
+      "skos:altLabel": [
+        "pH < 7",
+        "pH<7",
+        "pH<",
+        "pH 1",
+        "pH=1",
+        "acidic"
+      ]
+    },
+    {
+      "@id": "emmo-electro:AlkalineElectrolyte",
+      "@type": "Environment",
+      "skos:prefLabel": "Alkaline Environment",
+      "skos:altLabel": [
+        "pH > 7",
+        "pH>7",
+        "pH>",
+        "pH=14",
+        "alkaline",
+        "basic"
+      ]
+    },
+    {
+      "@id": "emmo-electro:NeutralElectrolyte",
+      "@type": "Environment",
+      "skos:prefLabel": "Neutral Environment",
+      "skos:altLabel": [
+        "pH 7",
+        "neutral pH"
+      ]
+    },
+    {
+      "@id": "pato:0000146",
+      "@type": "Environment",
+      "skos:prefLabel": "Operating Temperature",
+      "skos:altLabel": [
+        "temperature",
+        "25°C",
+        "80°C",
+        "temperature-controlled"
+      ]
+    },
+    {
+      "@id": "pato:0001025",
+      "@type": "Environment",
+      "skos:prefLabel": "Operating Pressure",
+      "skos:altLabel": [
+        "1 atm",
+        "10 atm",
+        "high-pressure",
+        "pressure"
+      ]
+    },
+    {
+      "@id": "emmo-electro:ElectrochemicalEnergyConversion",
+      "@type": "Process",
+      "skos:prefLabel": "Electrochemical Energy Conversion",
+      "skos:altLabel": [
+        "electrochemical cell",
+        "redox energy",
+        "electrochemical process"
+      ]
+    },
+    {
+      "@id": "emmo-electro:WaterElectrolysis",
+      "@type": "Process",
+      "skos:prefLabel": "Water Electrolysis",
+      "skos:altLabel": [
+        "electrolysis of water",
+        "splitting H2O",
+        "hydrogen from water",
+        "water splitting"
+      ]
+    },
+    {
+      "@id": "emmo-electro:Electrocatalysis",
+      "@type": "Process",
+      "skos:prefLabel": "Electrocatalysis",
+      "skos:altLabel": [
+        "electrocatalyst",
+        "electrocatalytic",
+        "electrode reaction enhancement",
+        "electrochemical catalysts"
+      ]
+    },
+    {
+      "@id": "emmo-electro:HydrogenEvolutionReaction",
+      "@type": "Reaction",
+      "skos:prefLabel": "Hydrogen Evolution Reaction",
+      "skos:altLabel": [
+        "hydrogen evolution",
+        "HER",
+        "H2 generation",
+        "reduction of protons"
+      ]
+    },
+    {
+      "@id": "emmo-electro:OxygenEvolutionReaction",
+      "@type": "Reaction",
+      "skos:prefLabel": "Oxygen Evolution Reaction",
+      "skos:altLabel": [
+        "oxygen evolution",
+        "OER",
+        "oxygen generation",
+        "water oxidation"
+      ]
+    },
+    {
+      "@id": "emmo-electro:ProtonCoupledElectronTransfer",
+      "@type": "Reaction",
+      "skos:prefLabel": "Proton-Coupled Electron Transfer",
+      "skos:altLabel": [
+        "PCET",
+        "proton-electron",
+        "concerted proton electron transfer"
+      ]
+    },
+    {
+      "@id": "chebi:24873",
+      "@type": "Element",
+      "skos:prefLabel": "Iron",
+      "skos:altLabel": [
+        "Fe",
+        "iron-based catalyst",
+        "Fe3+",
+        "Fe2+"
+      ]
+    },
+    {
+      "@id": "chebi:28112",
+      "@type": "Element",
+      "skos:prefLabel": "Nickel",
+      "skos:altLabel": [
+        "Ni",
+        "nickel foam",
+        "nickel oxide"
+      ]
+    },
+    {
+      "@id": "chebi:27638",
+      "@type": "Element",
+      "skos:prefLabel": "Cobalt",
+      "skos:altLabel": [
+        "Co",
+        "Co3O4",
+        "cobalt-doped"
+      ]
+    },
+    {
+      "@id": "chebi:25213",
+      "@type": "Element",
+      "skos:prefLabel": "Transition Metals",
+      "skos:altLabel": [
+        "transition metal",
+        "d-block metal",
+        "first-row metals"
+      ]
+    },
+    {
+      "@id": "emmo:EarthAbundantElement",
+      "@type": "Element",
+      "skos:prefLabel": "Earth-Abundant Elements",
+      "skos:altLabel": [
+        "earth-abundant",
+        "non-precious",
+        "low-cost metals",
+        "earth abundant"
+      ]
+    },
+    {
+      "@id": "emmo:MetalOxide",
+      "@type": "Material",
+      "skos:prefLabel": "Metal Oxides",
+      "skos:altLabel": [
+        "Fe2O3",
+        "NiO",
+        "oxide layer",
+        "metal oxide"
+      ]
+    },
+    {
+      "@id": "emmo:2DMaterial",
+      "@type": "Material",
+      "skos:prefLabel": "2D Materials",
+      "skos:altLabel": [
+        "graphene",
+        "MoS2",
+        "nanosheets"
+      ]
+    },
+    {
+      "@id": "emmo-electro:Overpotential",
+      "@type": "PerformanceMetric",
+      "skos:prefLabel": "Overpotential",
+      "skos:altLabel": [
+        "overpotential of",
+        "η = ",
+        "potential above thermodynamic"
+      ]
+    },
+    {
+      "@id": "emmo-electro:TafelSlope",
+      "@type": "PerformanceMetric",
+      "skos:prefLabel": "Tafel Slope",
+      "skos:altLabel": [
+        "Tafel slope",
+        "mV dec⁻¹",
+        "Tafel plot"
+      ]
+    },
+    {
+      "@id": "emmo-electro:ExchangeCurrentDensity",
+      "@type": "PerformanceMetric",
+      "skos:prefLabel": "Exchange Current Density",
+      "skos:altLabel": [
+        "exchange current density",
+        "j0",
+        "baseline current"
+      ]
+    },
+    {
+      "@id": "emmo:GreenHydrogenEconomy",
+      "@type": "Application",
+      "skos:prefLabel": "Green Hydrogen Economy",
+      "skos:altLabel": [
+        "green hydrogen",
+        "H2 economy",
+        "renewable hydrogen"
+      ]
+    }
+  ]
+}

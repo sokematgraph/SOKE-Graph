@@ -6,7 +6,6 @@ __pycache__/
 *.json
 !examples/**/*.json
 *.jsonl
-*.jsonld
 *.graphml
 *.parquet
 *.ttl
