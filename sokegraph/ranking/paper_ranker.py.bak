@@ -31,7 +31,7 @@ from typing import List, Dict, Any, Tuple, Set, Optional
 from sokegraph.util.logger import LOG
 from sokegraph.utils.functions import load_keyword, safe_title
 from sokegraph.agents.ai_agent import AIAgent
-from sokegraph.ranking.semantic_matcher import SemanticSimilarityMatcher
+from sokegraph.ontology.semantic_retriever import OntologySemanticIndexer, TYPE_TO_LAYER
 
 import os
 import json
@@ -71,7 +71,6 @@ class PaperRanker:
         ontology_path,
         keyword_path,
         output_dir: str,
-        base_ontology_path: Optional[str] = None, # JSONLD path for Semantic Matcher
         hrm_alpha: float = 1.0,
         hrm_beta: float = 1.0,
         # -------- HRM CONFIG (adjust paths as needed) --------
@@ -92,6 +91,7 @@ class PaperRanker:
         polarity_lambda: float = 0.5,               # For simple fallback penalty calculation
         # -------- LAYER PRIORITY CONFIG --------
         layer_priority_weights: Optional[Dict[str, float]] = None,  # Layer priority multipliers
+        semantic_indexer: Optional[OntologySemanticIndexer] = None,
         semantic_similarity_threshold: float = 0.62,
     ):
         """
@@ -164,10 +164,7 @@ class PaperRanker:
             "Environment": 2.5,
             "Elemental Composition": 2.0
         }
-        
-        # Initialize semantic matcher for expanding keywords via similarity
-        base_path = base_ontology_path if base_ontology_path else self.ontology_path
-        self.semantic_matcher = SemanticSimilarityMatcher(base_path, similarity_threshold=semantic_similarity_threshold)
+        self.semantic_indexer = semantic_indexer
         self.semantic_similarity_threshold = semantic_similarity_threshold
 
         # HRM runtime
@@ -248,39 +245,10 @@ class PaperRanker:
         return len(rel_concepts_hit), len(opp_concepts_hit)
 
     def _load_ontology(self):
-        """Load ontology JSON from self.ontology_path into self.ontology.
-        If the file is a JSON-LD, convert it to the legacy layer/category structure."""
+        """Load ontology JSON from self.ontology_path into self.ontology."""
         try:
             with open(self.ontology_path, "r", encoding="utf-8") as f:
-                raw_data = json.load(f)
-                
-            # If it's a JSON-LD file with a @graph, convert it to legacy Layer -> Category -> List[Terms]
-            if isinstance(raw_data, dict) and "@graph" in raw_data:
-                legacy_ontology = defaultdict(dict)
-                for node in raw_data["@graph"]:
-                    layer = node.get("@type", "Unknown")
-                    cat = str(node.get("skos:prefLabel", node.get("@id", "Unknown")))
-                    terms = []
-                    
-                    if "skos:prefLabel" in node:
-                        lbl = node["skos:prefLabel"]
-                        if isinstance(lbl, str):
-                            terms.append(lbl)
-                        elif isinstance(lbl, list):
-                            terms.extend(lbl)
-                            
-                    if "skos:altLabel" in node:
-                        alt = node["skos:altLabel"]
-                        if isinstance(alt, str):
-                            terms.append(alt)
-                        elif isinstance(alt, list):
-                            terms.extend(alt)
-                            
-                    legacy_ontology[layer][cat] = list(set(terms))  # deduplicate
-                self.ontology = dict(legacy_ontology)
-            else:
-                self.ontology = raw_data
-                
+                self.ontology = json.load(f)
         except Exception as e:
             raise RuntimeError(f"Failed to load ontology from '{self.ontology_path}': {e}")
 
@@ -480,8 +448,8 @@ class PaperRanker:
 
         # Expand with opposites/synonyms
         query_keywords = [kw.lower() for _, _, kw in categories]
-        opposites = getattr(self.ai_tool, "get_opposites", lambda x: {})(query_keywords) or {}
-        synonyms = self.semantic_matcher.get_synonyms(query_keywords)
+        opposites = self.ai_tool.get_opposites(query_keywords)
+        synonyms = self.ai_tool.get_synonyms(query_keywords)
         expanded_keywords = {kw: [kw] + synonyms.get(kw, []) for kw in query_keywords}
         cat_to_terms = self._build_category_terms(categories, query_keywords, synonyms)
 
@@ -733,32 +701,23 @@ class PaperRanker:
     # ---------------------------
 
     def classify_query_with_fallback(self, user_query: str, kw_lookup: dict) -> list:
-        import re
         tokens = [t for t in re.findall(r"\w+", user_query.lower()) if len(t) > 1]
         categories = []
         found_set = set()
 
-        if hasattr(self, "semantic_matcher") and self.semantic_matcher is not None:
-            # We adapt semantic matcher to fetch matching terms and their categories
-            import string
-            
-            # Split the user query into manageable semantic chunks (comma, newline, or general tokens)
-            semantic_queries = [chunk.strip() for chunk in re.split(r'[,;\n]|\band\b|\bwith\b|\bfor\b|\(|\)', user_query.lower()) if len(chunk.strip()) > 2]
-            
-            # If the user inputted just a long running paragraph with no punctuation, use raw tokens as fallback chunks
-            if len(semantic_queries) <= 1 and len(tokens) > 3:
-                 semantic_queries = [tok for tok in tokens if len(tok) > 3]
-
-            matching_terms = self.semantic_matcher.get_synonyms(semantic_queries)
-            for query, terms in matching_terms.items():
-                for term in terms:
-                    # Look up layer/cat by matched ontology term in kw_lookup
-                    if term in kw_lookup:
-                        layer, cat = kw_lookup[term]
-                        kw = term
-                        if (layer, cat) not in found_set:
-                            categories.append((layer, cat, kw))
-                            found_set.add((layer, cat))
+        if self.semantic_indexer is not None:
+            matches = self.semantic_indexer.search_text(
+                text=user_query,
+                k=1,
+                similarity_threshold=self.semantic_similarity_threshold,
+            )
+            for match in matches:
+                layer = match.layer
+                cat = match.pref_label
+                kw = match.pref_label.lower()
+                if (layer, cat) not in found_set:
+                    categories.append((layer, cat, kw))
+                    found_set.add((layer, cat))
 
         for tok in tokens:
             if tok in kw_lookup:
@@ -769,7 +728,13 @@ class PaperRanker:
         return categories
 
     def _map_query_to_iris(self, query: str) -> List[str]:
-        return []
+        if self.semantic_indexer is None:
+            return []
+        return self.semantic_indexer.map_text_to_iris(
+            text=query,
+            k=1,
+            similarity_threshold=self.semantic_similarity_threshold,
+        )
 
     def calculate_score(
         self,
@@ -885,7 +850,7 @@ class PaperRanker:
 
         # query keywords + synonyms
         query_keywords = [kw.lower() for _, _, kw in categories]
-        synonyms = self.semantic_matcher.get_synonyms(query_keywords)
+        synonyms = self.ai_tool.get_synonyms(query_keywords) if hasattr(self.ai_tool, "get_synonyms") else {}
         cand_terms: Set[str] = set()
         for q in query_keywords:
             cand_terms.add(q)
@@ -1062,7 +1027,7 @@ class PaperRanker:
         if not categories:
             return [(pid, 0.0) for pid in candidate_ids]
         query_keywords = [kw.lower() for _, _, kw in categories]
-        synonyms = self.semantic_matcher.get_synonyms(query_keywords)
+        synonyms = getattr(self.ai_tool, "get_synonyms", lambda x: {})(query_keywords) or {}
         opposites = getattr(self.ai_tool, "get_opposites", lambda x: {})(query_keywords) or {}
 
         cand_terms: Set[str] = set()

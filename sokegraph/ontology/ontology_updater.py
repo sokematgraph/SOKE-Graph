@@ -16,6 +16,7 @@ from pathlib import Path
 
 from sokegraph.agents.ai_agent import AIAgent
 from sokegraph.utils.functions import parse_all_metadata, load_papers
+from sokegraph.util.logger import LOG
 
 
 class OntologyUpdater:
@@ -96,7 +97,34 @@ class OntologyUpdater:
     def _load_ontology(self) -> None:
         """Load ontology JSON from ``self.ontology_path`` into memory."""
         with open(self.ontology_path, "r", encoding="utf-8") as f:
-            self.ontology = json.load(f)
+            raw_data = json.load(f)
+            
+        if isinstance(raw_data, dict) and "@graph" in raw_data:
+            from collections import defaultdict
+            legacy_ontology = defaultdict(dict)
+            for node in raw_data["@graph"]:
+                layer = node.get("@type", "Unknown")
+                cat = str(node.get("skos:prefLabel", node.get("@id", "Unknown")))
+                terms = []
+                
+                if "skos:prefLabel" in node:
+                    lbl = node["skos:prefLabel"]
+                    if isinstance(lbl, str):
+                        terms.append(lbl)
+                    elif isinstance(lbl, list):
+                        terms.extend(lbl)
+                        
+                if "skos:altLabel" in node:
+                    alt = node["skos:altLabel"]
+                    if isinstance(alt, str):
+                        terms.append(alt)
+                    elif isinstance(alt, list):
+                        terms.extend(alt)
+                        
+                legacy_ontology[layer][cat] = list(set(terms))
+            self.ontology = dict(legacy_ontology)
+        else:
+            self.ontology = raw_data
 
     def _save_ontology(self, output_path: str) -> None:
         """Save the in‑memory ontology to disk."""
@@ -150,6 +178,12 @@ class OntologyUpdater:
 
         # Load current ontology
         root = json.loads(path.read_text(encoding="utf-8"))
+        
+        # Prevent mutating JSON-LD structures with legacy dictionary logic
+        if isinstance(root, dict) and "@graph" in root:
+            LOG.warning(f"enrich_base_with_keywords skipped: {path} is a JSON-LD file. Ignoring modifications to avoid schema corruption.")
+            return
+
         has_data_wrapper = isinstance(root, dict) and "data" in root and isinstance(root["data"], dict)
         tree: Dict[str, Any] = root["data"] if has_data_wrapper else root
 

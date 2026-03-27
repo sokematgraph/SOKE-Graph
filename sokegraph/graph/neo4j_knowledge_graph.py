@@ -83,12 +83,21 @@ class Neo4jKnowledgeGraph(KnowledgeGraph):
                     paper_id = item.get("paper_id", "unknown")
                     paper_title = (item.get("paper_title") or item.get("title") or paper_id).strip()
                     paper_titles[paper_id] = paper_title
-                    for kw in item["keywords"]:
-                        kw_key = f"{layer}|{cat}|{kw}"
+                    concept_id = item.get("concept_id")
+                    concept_label = item.get("concept_label")
+                    keyword_ids = item.get("keyword_ids", []) or ([] if concept_id is None else [concept_id])
+                    if not concept_label:
+                        concept_label = (item.get("keywords") or ["unknown"])[0]
+
+                    for kw_key in keyword_ids:
                         if kw_key in unique_keywords[(layer, cat)]:
                             continue
                         unique_keywords[(layer, cat)].add(kw_key)
-                        tx.merge(Node("Keyword", name=kw, key=kw_key), "Keyword", "key")
+                        tx.merge(
+                            Node("Keyword", name=concept_label, iri=kw_key, key=kw_key),
+                            "Keyword",
+                            "key",
+                        )
                         tx.run(
                             "MATCH (c:Category {key:$cat_key}), (k:Keyword {key:$kw_key})\n"
                             "MERGE (c)-[:HAS_KEYWORD]->(k)",

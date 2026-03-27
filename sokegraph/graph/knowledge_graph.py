@@ -82,9 +82,37 @@ class KnowledgeGraph(ABC):
         return wrap_label(human if human else str(node_key_or_name))
     
     def _load_ontology(self) -> Any:
-        """Read the ontology JSON into a Python object."""
+        """Read the ontology JSON into a Python object. Handles JSON-LD graphs."""
         with open(self.ontology_path, "r", encoding="utf-8") as f:
-            return json.load(f)
+            raw_data = json.load(f)
+            
+        # If it's a JSON-LD file with a @graph, convert it to legacy Layer -> Category -> List[Terms]
+        if isinstance(raw_data, dict) and "@graph" in raw_data:
+            from collections import defaultdict
+            legacy_ontology = defaultdict(dict)
+            for node in raw_data["@graph"]:
+                layer = node.get("@type", "Unknown")
+                cat = str(node.get("skos:prefLabel", node.get("@id", "Unknown")))
+                terms = []
+                
+                if "skos:prefLabel" in node:
+                    lbl = node["skos:prefLabel"]
+                    if isinstance(lbl, str):
+                        terms.append(lbl)
+                    elif isinstance(lbl, list):
+                        terms.extend(lbl)
+                        
+                if "skos:altLabel" in node:
+                    alt = node["skos:altLabel"]
+                    if isinstance(alt, str):
+                        terms.append(alt)
+                    elif isinstance(alt, list):
+                        terms.extend(alt)
+                        
+                legacy_ontology[layer][cat] = list(set(terms))
+            return dict(legacy_ontology)
+            
+        return raw_data
         
 
     

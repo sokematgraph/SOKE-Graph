@@ -2,18 +2,18 @@
 # -*- coding: utf-8 -*-
 
 """
-Generate a domain ontology via a local Ollama model (Mistral by default).
+Generate a domain ontology JSON-LD via a local Ollama model (Mistral by default).
 
 Features:
 - Accepts a domain string (e.g., "battery management systems").
 - Starts 'ollama serve' automatically if the service is not reachable.
 - Pulls the model automatically if it's not present.
-- Builds a strong, format-preserving prompt using your example.json (full or excerpt).
+- Builds a strong, format-preserving prompt using a JSON-LD reference (full or excerpt).
 - Calls /api/chat, validates JSON, retries once with an automatic "repair" prompt if needed.
 - Writes output to a JSON file or stdout.
 
 Usage examples:
-  python ontology_gen.py --domain "battery management systems" --out bms_ontology.json
+    python ontology_gen.py --domain "battery management systems" --out bms_ontology.jsonld
   python ontology_gen.py --domain "computer vision for retail" --model mistral --include-full-example
   python ontology_gen.py --domain "supply chain logistics" --print-prompt
 
@@ -35,7 +35,9 @@ from typing import Any, Dict, Tuple
 
 DEFAULT_HOST = os.environ.get("OLLAMA_HOST", "http://127.0.0.1:11434")
 DEFAULT_MODEL = "mistral"
-DEFAULT_EXAMPLE_PATH = os.path.join(os.path.dirname(__file__), "example.json")
+DEFAULT_EXAMPLE_PATH = os.path.abspath(
+    os.path.join(os.path.dirname(__file__), "..", "..", "examples", "ontology-refactored.jsonld")
+)
 
 
 def _http_json(method: str, url: str, payload: Dict[str, Any] = None, timeout: int = 20) -> Dict[str, Any]:
@@ -108,9 +110,9 @@ def _ensure_model(model: str) -> None:
         raise RuntimeError("Could not find 'ollama' on PATH. Please install Ollama first.")
 
 
-def _load_example(example_path: str, include_full: bool, per_category: int = 2) -> Tuple[str, Dict[str, Any]]:
+def _load_example(example_path: str, include_full: bool, per_category: int = 8) -> Tuple[str, Dict[str, Any]]:
     if not os.path.exists(example_path):
-        raise FileNotFoundError(f"example.json not found at: {example_path}")
+        raise FileNotFoundError(f"Reference ontology JSON-LD not found at: {example_path}")
 
     with open(example_path, "r", encoding="utf-8") as f:
         example = json.load(f)
@@ -118,41 +120,34 @@ def _load_example(example_path: str, include_full: bool, per_category: int = 2) 
     if include_full:
         return json.dumps(example, ensure_ascii=False, indent=2), example
 
-    # Build a small excerpt: up to `per_category` sub-items per top-level category
-    excerpt: Dict[str, Any] = {}
-    for top_key, sub in example.items():
-        if isinstance(sub, dict):
-            small = {}
-            for i, (subk, subv) in enumerate(sub.items()):
-                if i >= per_category:
-                    break
-                small[subk] = subv
-            excerpt[top_key] = small
-        else:
-            excerpt[top_key] = sub
+    # Build a small excerpt: keep context + first N graph nodes
+    excerpt: Dict[str, Any] = {
+        "@context": example.get("@context", {}),
+        "@graph": (example.get("@graph", []) or [])[:per_category],
+    }
 
     return json.dumps(excerpt, ensure_ascii=False, indent=2), example
 
 
-PROMPT_CORE = """You are an ontology expert in "{domain}". Your job is to design a compact, high-signal ontology for this domain.
+PROMPT_CORE = """You are an ontology expert in "{domain}".
 
-Use the JSON *format and style* demonstrated by the reference example (keys → subkeys → list of synonyms/aliases). 
-Do NOT copy the content—ADAPT it to the domain. If a section from the example does not make sense for the domain, omit it.
-If the domain needs new sections, introduce them following the same nesting pattern.
+Generate a STRICT JSON-LD ontology compatible with this structure:
+- Top-level keys: "@context" and "@graph"
+- Each concept in @graph must include:
+    * "@id" (IRI-like compact URI, e.g. domain:ConceptName)
+    * "@type" (one concept class)
+    * "skos:prefLabel" (canonical human label)
+    * "skos:altLabel" (list of aliases/synonyms)
 
-Constraints:
-- Output MUST be STRICTLY VALID JSON (no comments, no trailing commas, double quotes only).
-- Structure: A JSON object with 5–10 top-level sections. Each section is a JSON object whose keys are subdomains/entities and values are lists of 2–6 aliases/synonyms/phrases (domain-relevant).
-- Be precise and domain-specific; avoid generic filler.
-- Prefer concise, industry-accurate aliases.
-- If certain sections from the example are applicable (e.g., Environment, Process, Material, Performance & Stability, Application), rename/adapt them to domain-appropriate labels. Otherwise, skip them.
-- Keep naming consistent (Title Case for section names; concise subkey names).
-
-Deliver exactly and only the JSON object.
+Rules:
+- Output MUST be STRICTLY VALID JSON only.
+- Keep @context compact and consistent with generated @type values.
+- Include 25-80 concepts in @graph.
+- Use concise, domain-accurate labels and aliases.
+- Do NOT include markdown or explanatory text.
 """
 
-REPAIR_PROMPT = """Your previous output was not valid JSON. 
-Return the SAME ontology content, but as strictly valid JSON (no markdown, no prose)."""
+REPAIR_PROMPT = """Your previous output was invalid. Return strictly valid JSON-LD only with keys @context and @graph."""
 
 def _build_prompt(domain: str, ref_json_str: str) -> str:
     return (
@@ -183,32 +178,54 @@ def _ollama_chat(host: str, model: str, prompt_text: str, temperature: float = 0
         raise RuntimeError("Unexpected Ollama response shape.")
 
 
+def _validate_jsonld(obj: Any) -> bool:
+    if not isinstance(obj, dict):
+        return False
+    if "@context" not in obj or "@graph" not in obj:
+        return False
+    if not isinstance(obj["@graph"], list):
+        return False
+    for node in obj["@graph"]:
+        if not isinstance(node, dict):
+            return False
+        if not node.get("@id") or not node.get("@type") or not node.get("skos:prefLabel"):
+            return False
+        alt = node.get("skos:altLabel", [])
+        if isinstance(alt, str):
+            continue
+        if not isinstance(alt, list):
+            return False
+    return True
+
+
 def _try_parse_json(s: str) -> Tuple[bool, Any]:
     try:
-        return True, json.loads(s)
+        parsed = json.loads(s)
+        return _validate_jsonld(parsed), parsed
     except Exception:
         # Sometimes models wrap JSON in code fences or extra text; try to extract the first {...} block
         start = s.find("{")
         end = s.rfind("}")
         if start != -1 and end != -1 and end > start:
             try:
-                return True, json.loads(s[start : end + 1])
+                parsed = json.loads(s[start : end + 1])
+                return _validate_jsonld(parsed), parsed
             except Exception:
                 return False, None
         return False, None
 
 
 def main():
-    ap = argparse.ArgumentParser(description="Generate an ontology JSON for a given domain using Ollama.")
+    ap = argparse.ArgumentParser(description="Generate an ontology JSON-LD for a given domain using Ollama.")
     ap.add_argument("--domain", required=True, help='Domain, e.g. "battery management systems"')
     ap.add_argument("--model", default=DEFAULT_MODEL, help="Ollama model name (default: mistral)")
-    ap.add_argument("--example", default=DEFAULT_EXAMPLE_PATH, help="Path to example.json (format guide)")
-    ap.add_argument("--include-full-example", action="store_true", help="Include full example.json in the prompt")
+    ap.add_argument("--example", default=DEFAULT_EXAMPLE_PATH, help="Path to reference ontology JSON-LD")
+    ap.add_argument("--include-full-example", action="store_true", help="Include full reference JSON-LD in prompt")
     ap.add_argument("--host", default=DEFAULT_HOST, help="Ollama host, e.g. http://127.0.0.1:11434")
     ap.add_argument("--no-autostart", action="store_true", help="Do not auto-start 'ollama serve'")
     ap.add_argument("--no-pull", action="store_true", help="Do not auto-pull model if missing")
     ap.add_argument("--temperature", type=float, default=0.2, help="Sampling temperature (default: 0.2)")
-    ap.add_argument("--out", default="", help="Output JSON path (default: stdout)")
+    ap.add_argument("--out", default="", help="Output JSON-LD path (default: stdout)")
     ap.add_argument("--print-prompt", action="store_true", help="Print the composed prompt and exit")
 
     args = ap.parse_args()

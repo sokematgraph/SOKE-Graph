@@ -317,7 +317,6 @@ def rank_papers(
     keyword_file: str,
     ai_tool,
     output_dir,
-    base_ontology_path: str = None,
     layer_priority_weights: dict = None,
 ) -> pd.DataFrame:
     """Rank papers by relevance to user-specified keywords.
@@ -330,15 +329,13 @@ def rank_papers(
     papers_path : str
         Path to Excel file containing paper metadata
     ontology_path : str
-        Path to updated ontology JSON file
+        Path to ontology JSON file
     keyword_file : str
         Path to text file containing user query keywords
     ai_tool : AIAgent
         AI agent instance for query classification and expansion
     output_dir : str
         Directory where ranking results will be saved
-    base_ontology_path : str, optional
-        Path to base ontology JSON-LD file for embedding matching
     layer_priority_weights : dict, optional
         Dictionary mapping layer names to priority weights (default: None)
         
@@ -355,11 +352,10 @@ def rank_papers(
         ontology_path,
         keyword_file,
         output_dir,
-        base_ontology_path=base_ontology_path,
         hrm_use_neural=False,  # Disable neural HRM to use fallback
         hrm_use_simple_fallback=False,  # Use simple fallback from paper_ranker.py.txt
         polarity_lambda=0.5,  # Simple fallback penalty parameter
-        bypass_filtering=False,
+        bypass_filtering=True,
         layer_priority_weights=layer_priority_weights  # Pass custom weights
     )
     output_csv_paths, output_paths_all = ranker.rank_papers()
@@ -616,7 +612,7 @@ def main():
             query_file = st.file_uploader("Upload query file (.txt)", type=["txt"])
             api_key_for_journal_api_file = None
             pdf_zip = None
-        elif paper_mode == "Journal API":
+        # elif paper_mode == "Journal API":
             num_papers = st.number_input("Number of papers", 1, 200, 10) #should change upper bound
             query_file = st.file_uploader("Upload query file (.txt)", type=["txt"])
             api_key_for_journal_api_file = st.file_uploader("Upload API key for journal API (.txt)", type=["txt"]) 
@@ -629,7 +625,7 @@ def main():
 
         
 
-        ontology_file = st.file_uploader("Base Ontology file (.json/.jsonld) (optional)", type=["json", "jsonld"])
+        ontology_file = st.file_uploader("Base Ontology file (.json) (optional)", type=["json"])
         
         # ── LAYER PRIORITY WEIGHTS CONFIGURATION ──
         layer_weights = {}
@@ -637,10 +633,7 @@ def main():
             try:
                 # Read and parse the uploaded ontology to extract layers
                 ontology_content = json.loads(ontology_file.getvalue().decode('utf-8'))
-                if isinstance(ontology_content, dict) and "@graph" in ontology_content:
-                    detected_layers = sorted(list({str(n.get("@type", "Unknown")) for n in ontology_content.get("@graph", [])}))
-                else:
-                    detected_layers = list(ontology_content.keys())
+                detected_layers = list(ontology_content.keys())
                 
                 if detected_layers:
                     st.markdown("#### 🎚️ Layer Priority Weights")
@@ -747,10 +740,7 @@ def main():
         keywords_path= _save_upload(keywords_file, ".txt")
         # ontology_path = Path("/Users/hrishilogani/Desktop/soke-test-data/Ontology.json")
         if ontology_file:
-            suffix = ".jsonld" if ontology_file.name.lower().endswith("jsonld") else ".json"
-            ontology_path = _save_upload(ontology_file, suffix)
-        else:
-            ontology_path = Path("examples/ontology-refactored.jsonld")
+            ontology_path=_save_upload(ontology_file, ontology_file.name.split(".")[-1])
         creds_path = _save_upload(kg_credentials, ".json") if kg_credentials else None
 
         # 0. AI agent…
@@ -772,15 +762,17 @@ def main():
             # 1️⃣ Retrieve papers)
             status.update(label="1/4 • Retrieving papers…")
             t1_start = time.perf_counter(); w1_start = datetime.now()
-            # if paper_mode == "Semantic Scholar":
-            #     papers_path = retrieve_papers_semantic_scholar(str(query_path), int(num_papers), output_dir)
+            if paper_mode == "Semantic Scholar":
+                # papers_path = retrieve_papers_semantic_scholar(str(query_path), int(num_papers), output_dir)
+
             # elif paper_mode == "PDF ZIP":
-            #     papers_path = retrieve_papers_from_zip(str(pdf_path), output_dir)
+                # papers_path = retrieve_papers_from_zip(str(pdf_path), output_dir)
+
             # elif paper_mode == "Journal API":
-            #     papers_path = retrieve_papers_journal_API(str(query_path), int(num_papers), output_dir, api_key_for_journal_api_file)
-            # else:
-            #     raise ValueError(f"Unsupported paper source mode: {paper_mode}")
-            papers_path = "/Users/hrishilogani/Desktop/Workspace/Projects/papers_metadata.xlsx"
+                # papers_path = retrieve_papers_journal_API(str(query_path), int(num_papers), output_dir, api_key_for_journal_api_file)
+
+            else:
+                raise ValueError(f"Unsupported paper source mode: {paper_mode}")
 
             papers = load_papers(papers_path)
     
@@ -841,7 +833,6 @@ def main():
                 str(keywords_path), 
                 ai_tool, 
                 output_dir,
-                base_ontology_path=str(ontology_path),
                 layer_priority_weights=layer_weights if layer_weights else None
             )
             
