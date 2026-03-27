@@ -25,6 +25,53 @@ LOG = logging.getLogger(__name__)
 
 class AIAgent(ABC):
 
+    def _build_prompt(self, layer_name: str, abstract_text: str, ontology_layer: dict) -> str:
+        """Create a strict extraction prompt that demands pure JSON (no code fences), and enforces ontology constraints."""
+        return (
+            f"""
+You are a structured information extraction AI specialized in materials science.
+
+TASK: Extract information for the ontology layer: "{layer_name}".
+
+ONTOLOGY LAYER (categories → sample keywords):
+{json.dumps(ontology_layer, ensure_ascii=False, indent=2)}
+
+TEXT TO ANALYZE:
+{abstract_text}
+
+IMPORTANT ONTOLOGY CONSTRAINTS:
+- Only extract relationships (triples/edges) that are valid according to the ontology's allowed domain and range for each relation.
+- Use the canonical ontology URIs/types for all nodes and relations, as defined in the ontology.
+- If a relationship is not permitted by the ontology (e.g., the source or target type is not allowed for a given relation), SKIP IT and do not include it in the output.
+- Do NOT hallucinate or invent relationships that are not explicitly allowed by the ontology.
+
+OUTPUT FORMAT (IMPORTANT):
+- OUTPUT MUST BE PURE JSON (a JSON array). DO NOT include code fences, markdown, or any text outside the JSON.
+- EACH ITEM must follow this exact schema:
+    {{
+        "layer": "{layer_name}",
+        "matched_category": "<one of the categories exactly as shown above>",
+        "keyword": "<extracted keyword or phrase>",
+        "meta_data": "<short supporting snippet from the text>"
+    }}
+- Keep 1–25 items. Use lowercase for keywords where natural.
+- If nothing matches, return [] (empty JSON array).
+
+EXAMPLES (DO NOT ECHO; JUST FOLLOW THE FORMAT):
+Example:
+[
+    {{
+        "layer": "{layer_name}",
+        "matched_category": "<CategoryName>",
+        "keyword": "iridium oxide",
+        "meta_data": "… overpotential of 240 mV at 10 mA cm^-2 in acidic media …"
+    }}
+]
+
+NOW RETURN ONLY THE JSON ARRAY as a string. Do not include any characters such as ``` or json or any sort of code formatting.
+""".strip()
+        )
+
     """Abstract base class for any large‑language‑model agent.
 
     Sub‑classes (e.g. `OpenAIAgent`, `GeminiAgent`, `LlamaAgent`) must
@@ -78,48 +125,6 @@ class AIAgent(ABC):
             return [line.strip() for line in f if line.strip()]
 
     # 2) Prompt construction ------------------------------------------- #
-    def _build_prompt(self, layer_name: str,
-                      abstract_text: str,
-                      ontology_layer: dict) -> str:
-        """Create a strict extraction prompt that demands pure JSON (no code fences)."""
-        return (
-            f"""
-    You are a structured information extraction AI specialized in materials science.
-
-    TASK: Extract information for the ontology layer: "{layer_name}".
-
-    ONTOLOGY LAYER (categories → sample keywords):
-    {json.dumps(ontology_layer, ensure_ascii=False, indent=2)}
-
-    TEXT TO ANALYZE:
-    {abstract_text}
-
-    OUTPUT FORMAT (IMPORTANT):
-    - OUTPUT MUST BE PURE JSON (a JSON array). DO NOT include code fences, markdown, or any text outside the JSON.
-    - EACH ITEM must follow this exact schema:
-      {{
-        "layer": "{layer_name}",
-        "matched_category": "<one of the categories exactly as shown above>",
-        "keyword": "<extracted keyword or phrase>",
-        "meta_data": "<short supporting snippet from the text>"
-      }}
-    - Keep 1–25 items. Use lowercase for keywords where natural.
-    - If nothing matches, return [] (empty JSON array).
-
-    EXAMPLES (DO NOT ECHO; JUST FOLLOW THE FORMAT):
-    Example:
-    [
-      {{
-        "layer": "{layer_name}",
-        "matched_category": "<CategoryName>",
-        "keyword": "iridium oxide",
-        "meta_data": "… overpotential of 240 mV at 10 mA cm^-2 in acidic media …"
-      }}
-    ]
-
-    NOW RETURN ONLY THE JSON ARRAY as a string don't include any characters such as ``` or json or any sort of code formatting.
-    """.strip()
-        )
 
     def _strip_fences(self, s: str) -> str:
         """Remove accidental markdown fences/backticks/whitespace around JSON."""

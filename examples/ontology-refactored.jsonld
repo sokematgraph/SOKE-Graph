@@ -5,6 +5,8 @@
     "chebi": "http://purl.obolibrary.org/obo/CHEBI_",
     "pato": "http://purl.obolibrary.org/obo/PATO_",
     "skos": "http://www.w3.org/2004/02/skos/core#",
+    "owl": "http://www.w3.org/2002/07/owl#",
+    "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
     "Device": {
       "@id": "emmo-electro:ElectrochemicalDevice",
       "@type": "@id"
@@ -36,9 +38,53 @@
     "Application": {
       "@id": "emmo:Application",
       "@type": "@id"
+    },
+    "catalyzes": { 
+      "@id": "emmo-electro:catalyzes", 
+      "@type": "@id" 
+    },
+    "occursIn": { 
+      "@id": "emmo-electro:occursIn", 
+      "@type": "@id" 
+    },
+    "hasMetric": { 
+      "@id": "emmo-electro:hasMetric", 
+      "@type": "@id" 
+    },
+    "hasDopant": { 
+      "@id": "emmo-electro:hasDopant", 
+      "@type": "@id" 
     }
   },
   "@graph": [
+    {
+      "@id": "emmo-electro:catalyzes",
+      "@type": "owl:ObjectProperty",
+      "rdfs:domain": ["emmo:Material", "chebi:33250"],
+      "rdfs:range": "emmo-electro:ElectrochemicalReaction",
+      "skos:definition": "Indicates that a material or element acts as a catalyst for a specific electrochemical reaction."
+    },
+    {
+      "@id": "emmo-electro:occursIn",
+      "@type": "owl:ObjectProperty",
+      "rdfs:domain": ["emmo-electro:ElectrochemicalReaction", "emmo-electro:ElectrochemicalProcess"],
+      "rdfs:range": ["emmo-electro:OperatingCondition", "emmo-electro:ElectrochemicalDevice"],
+      "skos:definition": "Indicates the environmental conditions or device under which a reaction or process takes place."
+    },
+    {
+      "@id": "emmo-electro:hasMetric",
+      "@type": "owl:ObjectProperty",
+      "rdfs:domain": ["emmo:Material", "emmo-electro:ElectrochemicalDevice"],
+      "rdfs:range": "pato:0000068",
+      "skos:definition": "Links a material or device to a measured performance metric."
+    },
+    {
+      "@id": "emmo-electro:hasDopant",
+      "@type": "owl:ObjectProperty",
+      "rdfs:domain": "emmo:Material",
+      "rdfs:range": "chebi:33250",
+      "skos:definition": "Links a bulk material structure to a specific doping element."
+    },
     {
       "@id": "emmo-electro:PEMWE",
       "@type": "Device",

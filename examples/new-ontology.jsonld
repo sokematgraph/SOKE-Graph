@@ -1,0 +1,194 @@
+{
+  "@context": {
+    "emmo": "https://w3id.org/emmo#",
+    "emmo-electro": "https://w3id.org/emmo/domain/electrochemistry#",
+    "chebi": "http://purl.obolibrary.org/obo/CHEBI_",
+    "pato": "http://purl.obolibrary.org/obo/PATO_",
+    "skos": "http://www.w3.org/2004/02/skos/core#",
+    "owl": "http://www.w3.org/2002/07/owl#",
+    "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
+    
+    "Device": { "@id": "emmo-electro:ElectrochemicalDevice", "@type": "@id" },
+    "Environment": { "@id": "emmo-electro:OperatingCondition", "@type": "@id" },
+    "Process": { "@id": "emmo-electro:ElectrochemicalProcess", "@type": "@id" },
+    "Reaction": { "@id": "emmo-electro:ElectrochemicalReaction", "@type": "@id" },
+    "Element": { "@id": "chebi:33250", "@type": "@id" },
+    "Material": { "@id": "emmo:Material", "@type": "@id" },
+    "PerformanceMetric": { "@id": "pato:0000068", "@type": "@id" },
+    "Application": { "@id": "emmo:Application", "@type": "@id" },
+
+    "catalyzes": { "@id": "emmo-electro:catalyzes", "@type": "@id" },
+    "occursIn": { "@id": "emmo-electro:occursIn", "@type": "@id" },
+    "hasMetric": { "@id": "emmo-electro:hasMetric", "@type": "@id" },
+    "hasDopant": { "@id": "emmo-electro:hasDopant", "@type": "@id" }
+  },
+  "@graph": [
+    {
+      "@id": "emmo-electro:catalyzes",
+      "@type": "owl:ObjectProperty",
+      "rdfs:domain": ["emmo:Material", "chebi:33250"],
+      "rdfs:range": "emmo-electro:ElectrochemicalReaction",
+      "skos:definition": "Indicates that a material or element acts as a catalyst for a specific electrochemical reaction."
+    },
+    {
+      "@id": "emmo-electro:occursIn",
+      "@type": "owl:ObjectProperty",
+      "rdfs:domain": ["emmo-electro:ElectrochemicalReaction", "emmo-electro:ElectrochemicalProcess"],
+      "rdfs:range": ["emmo-electro:OperatingCondition", "emmo-electro:ElectrochemicalDevice"],
+      "skos:definition": "Indicates the environmental conditions or device under which a reaction or process takes place."
+    },
+    {
+      "@id": "emmo-electro:hasMetric",
+      "@type": "owl:ObjectProperty",
+      "rdfs:domain": ["emmo:Material", "emmo-electro:ElectrochemicalDevice"],
+      "rdfs:range": "pato:0000068",
+      "skos:definition": "Links a material or device to a measured performance metric."
+    },
+    {
+      "@id": "emmo-electro:hasDopant",
+      "@type": "owl:ObjectProperty",
+      "rdfs:domain": "emmo:Material",
+      "rdfs:range": "chebi:33250",
+      "skos:definition": "Links a bulk material structure to a specific doping element."
+    },
+
+    {
+      "@id": "emmo-electro:PEMWE",
+      "@type": "Device",
+      "skos:prefLabel": "Proton Exchange Membrane Water Electrolyzer",
+      "skos:altLabel": ["PEMWE", "PEM water electrolysis", "acidic water electrolysis", "proton exchange membrane electrolyzer"]
+    },
+    {
+      "@id": "emmo-electro:PEMFC",
+      "@type": "Device",
+      "skos:prefLabel": "Proton Exchange Membrane Fuel Cell",
+      "skos:altLabel": ["PEMFC", "PEM fuel cell", "proton exchange membrane", "fuel cell"]
+    },
+    {
+      "@id": "emmo-electro:AEMWE",
+      "@type": "Device",
+      "skos:prefLabel": "Anion Exchange Membrane Water Electrolyzer",
+      "skos:altLabel": ["AEMWE", "alkaline water electrolysis", "AEM electrolyzer"]
+    },
+    {
+      "@id": "emmo-electro:SOEC",
+      "@type": "Device",
+      "skos:prefLabel": "Solid Oxide Electrolysis Cell",
+      "skos:altLabel": ["SOEC", "solid oxide electrolyzer"]
+    },
+    {
+      "@id": "emmo-electro:AcidicElectrolyte",
+      "@type": "Environment",
+      "skos:prefLabel": "Acidic Environment",
+      "skos:altLabel": ["pH < 7", "pH<7", "pH<", "pH 1", "pH=1", "acidic"]
+    },
+    {
+      "@id": "emmo-electro:AlkalineElectrolyte",
+      "@type": "Environment",
+      "skos:prefLabel": "Alkaline Environment",
+      "skos:altLabel": ["pH > 7", "pH>7", "pH>", "pH=14", "alkaline", "basic"]
+    },
+    {
+      "@id": "emmo-electro:NeutralElectrolyte",
+      "@type": "Environment",
+      "skos:prefLabel": "Neutral Environment",
+      "skos:altLabel": ["pH 7", "neutral pH"]
+    },
+    {
+      "@id": "pato:0000146",
+      "@type": "Environment",
+      "skos:prefLabel": "Operating Temperature",
+      "skos:altLabel": ["temperature", "25°C", "80°C", "temperature-controlled"]
+    },
+    {
+      "@id": "emmo-electro:WaterElectrolysis",
+      "@type": "Process",
+      "skos:prefLabel": "Water Electrolyrolysis",
+      "skos:altLabel": ["electrolysis of water", "splitting H2O", "hydrogen from water", "water splitting"]
+    },
+    {
+      "@id": "emmo-electro:Electrocatalysis",
+      "@type": "Process",
+      "skos:prefLabel": "Electrocatalysis",
+      "skos:altLabel": ["electrocatalyst", "electrocatalytic", "electrode reaction enhancement", "electrochemical catalysts"]
+    },
+    {
+      "@id": "emmo-electro:HydrogenEvolutionReaction",
+      "@type": "Reaction",
+      "skos:prefLabel": "Hydrogen Evolution Reaction",
+      "skos:altLabel": ["hydrogen evolution", "HER", "H2 generation", "reduction of protons"]
+    },
+    {
+      "@id": "emmo-electro:OxygenEvolutionReaction",
+      "@type": "Reaction",
+      "skos:prefLabel": "Oxygen Evolution Reaction",
+      "skos:altLabel": ["oxygen evolution", "OER", "oxygen generation", "water oxidation"]
+    },
+    {
+      "@id": "chebi:24873",
+      "@type": "Element",
+      "skos:prefLabel": "Iron",
+      "skos:altLabel": ["Fe", "iron-based catalyst", "Fe3+", "Fe2+"]
+    },
+    {
+      "@id": "chebi:28112",
+      "@type": "Element",
+      "skos:prefLabel": "Nickel",
+      "skos:altLabel": ["Ni", "nickel foam", "nickel oxide", "NFF"]
+    },
+    {
+      "@id": "chebi:27638",
+      "@type": "Element",
+      "skos:prefLabel": "Cobalt",
+      "skos:altLabel": ["Co", "Co3O4", "cobalt-doped"]
+    },
+    {
+      "@id": "chebi:27266",
+      "@type": "Element",
+      "skos:prefLabel": "Vanadium",
+      "skos:altLabel": ["V", "vanadium-doped", "V-doped"]
+    },
+    {
+      "@id": "chebi:25213",
+      "@type": "Element",
+      "skos:prefLabel": "Transition Metals",
+      "skos:altLabel": ["transition metal", "d-block metal", "first-row metals"]
+    },
+    {
+      "@id": "emmo:MetalOxide",
+      "@type": "Material",
+      "skos:prefLabel": "Metal Oxides",
+      "skos:altLabel": ["Fe2O3", "NiO", "oxide layer", "metal oxide", "hydroxyl oxides"]
+    },
+    {
+      "@id": "emmo:MetalPhosphide",
+      "@type": "Material",
+      "skos:prefLabel": "Metal Phosphides",
+      "skos:altLabel": ["Ni2P", "FeP", "phosphating", "metal phosphide catalyst"]
+    },
+    {
+      "@id": "emmo:2DMaterial",
+      "@type": "Material",
+      "skos:prefLabel": "2D Materials",
+      "skos:altLabel": ["graphene", "MoS2", "nanosheets"]
+    },
+    {
+      "@id": "emmo-electro:Overpotential",
+      "@type": "PerformanceMetric",
+      "skos:prefLabel": "Overpotential",
+      "skos:altLabel": ["overpotential of", "η = ", "potential above thermodynamic", "mV overpotentials"]
+    },
+    {
+      "@id": "emmo-electro:CurrentDensity",
+      "@type": "PerformanceMetric",
+      "skos:prefLabel": "Current Density",
+      "skos:altLabel": ["mA cm-2", "current density", "operational current"]
+    },
+    {
+      "@id": "emmo-electro:Stability",
+      "@type": "PerformanceMetric",
+      "skos:prefLabel": "Stability",
+      "skos:altLabel": ["durability", "stably sustained", "long-term performance", "h in alkaline"]
+    }
+  ]
+}

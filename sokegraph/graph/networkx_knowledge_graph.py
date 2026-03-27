@@ -86,6 +86,33 @@ class NetworkXKnowledgeGraph(KnowledgeGraph):
     def __init__(self, ontology_path: str, papers_path:str):
         super().__init__(ontology_path, papers_path)
         self.graph: nx.MultiDiGraph = nx.MultiDiGraph()
+        # --- Ontology constraint rules ---
+        self.validation_rules = self._parse_object_property_rules(ontology_path)
+
+    def _parse_object_property_rules(self, ontology_path):
+        """Parse owl:ObjectProperty domain/range rules from ontology JSON-LD."""
+        rules = {}
+        try:
+            with open(ontology_path, "r", encoding="utf-8") as f:
+                data = json.load(f)
+            for node in data.get("@graph", []):
+                if node.get("@type") == "owl:ObjectProperty":
+                    rel = node.get("@id")
+                    domain = node.get("rdfs:domain", [])
+                    if isinstance(domain, str):
+                        domain = [domain]
+                    range_ = node.get("rdfs:range", [])
+                    if isinstance(range_, str):
+                        range_ = [range_]
+                    rules[rel] = {"domain": set(domain), "range": set(range_)}
+        except Exception as e:
+            print(f"[Ontology Constraint Parse Error] {e}")
+        return rules
+
+    def _get_node_type(self, node_key):
+        # Try to get ontology type from node attributes
+        node = self.graph.nodes.get(node_key, {})
+        return node.get("ontology_type") or node.get("kind")
 
     # ---------- Build ---------------------------------------------------------
 
@@ -167,7 +194,19 @@ class NetworkXKnowledgeGraph(KnowledgeGraph):
             for kw_key in kw_keys:
                 self._add_edge_once(kw_key, paper_id, "MENTIONS")
 
+        # --- Graph summary ---
         print("🎉 NetworkX knowledge graph construction complete.")
+        print(f"Nodes: {self.graph.number_of_nodes()} | Edges: {self.graph.number_of_edges()}")
+        kind_counts = {}
+        for _, d in self.graph.nodes(data=True):
+            k = d.get("kind")
+            kind_counts[k] = kind_counts.get(k, 0) + 1
+        print("Node kind counts:", kind_counts)
+        rel_counts = {}
+        for _, _, d in self.graph.edges(data=True):
+            r = d.get("rel")
+            rel_counts[r] = rel_counts.get(r, 0) + 1
+        print("Edge type counts:", rel_counts)
         return self.graph
 
 
@@ -175,7 +214,9 @@ class NetworkXKnowledgeGraph(KnowledgeGraph):
                        registry: Optional[Set[str]] = None) -> None:
         if registry is not None and key in registry:
             return
-        self.graph.add_node(key, kind=kind, **attrs)
+        # Try to infer ontology_type from attrs
+        ontology_type = attrs.get("layer") or attrs.get("category") or kind
+        self.graph.add_node(key, kind=kind, ontology_type=ontology_type, **attrs)
         if registry is not None:
             registry.add(key)
 
@@ -183,6 +224,17 @@ class NetworkXKnowledgeGraph(KnowledgeGraph):
         # avoid duplicate (src, tgt, rel)
         for _, target, data in self.graph.out_edges(src, data=True):
             if data.get("rel") == rel and target == tgt:
+                return
+        # --- Ontology constraint enforcement ---
+        rule = self.validation_rules.get(rel)
+        if rule:
+            src_type = self._get_node_type(src)
+            tgt_type = self._get_node_type(tgt)
+            if src_type and src_type not in rule["domain"]:
+                print(f"[Constraint Violation] Not adding edge: {src} ({src_type}) -[{rel}]-> {tgt} ({tgt_type}) | src_type not in domain {rule['domain']}")
+                return
+            if tgt_type and tgt_type not in rule["range"]:
+                print(f"[Constraint Violation] Not adding edge: {src} ({src_type}) -[{rel}]-> {tgt} ({tgt_type}) | tgt_type not in range {rule['range']}")
                 return
         self.graph.add_edge(src, tgt, rel=rel)
 

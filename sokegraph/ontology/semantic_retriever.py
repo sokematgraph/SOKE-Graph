@@ -42,11 +42,14 @@ class SemanticMatch:
 
 
 class OntologySemanticIndexer:
+        def debug_synonym_expansion(self, label, found_synonyms):
+            LOG.info(f"[DEBUG:{label}] Synonym expansion results: {json.dumps(found_synonyms, ensure_ascii=False)}")
+            print(f"[DEBUG:{label}] Synonym expansion results: {json.dumps(found_synonyms, ensure_ascii=False)}")
     def __init__(
         self,
         ontology_jsonld_path: str,
         index_dir: str,
-        model_name: str = "all-MiniLM-L6-v2",
+        model_name: str = "BASF-AI/ChEmbed-vanilla",
         device: str = "cpu",
         backend: str = "embedding",
     ) -> None:
@@ -70,7 +73,10 @@ class OntologySemanticIndexer:
     def _ensure_model(self) -> SentenceTransformer:
         if self.model is None:
             LOG.info("Loading semantic encoder '%s' on device=%s", self.model_name, self.device)
-            self.model = SentenceTransformer(self.model_name, device=self.device)
+            if self.model_name == "BASF-AI/ChEmbed-vanilla":
+                self.model = SentenceTransformer(self.model_name, device=self.device, trust_remote_code=True)
+            else:
+                self.model = SentenceTransformer(self.model_name, device=self.device)
         return self.model
 
     def _load_jsonld(self) -> dict:
@@ -173,6 +179,9 @@ class OntologySemanticIndexer:
         k: int = 1,
         similarity_threshold: float = 0.62,
     ) -> List[SemanticMatch]:
+
+        # --- DEBUG: Initial semantic matching phase ---
+        LOG.info(f"[DEBUG:initial-matching] User query: {text}")
         if self.backend == "lexical":
             return self._search_text_lexical(text=text, k=k, similarity_threshold=similarity_threshold)
 
@@ -278,6 +287,14 @@ class OntologySemanticIndexer:
         similarity_threshold: float = 0.62,
     ) -> List[str]:
         matches = self.search_text(text=text, k=k, similarity_threshold=similarity_threshold)
+        # --- DEBUG: Synonym expansion phase ---
+        found_synonyms = {}
+        for m in matches:
+            label = m.pref_label.lower()
+            if label not in found_synonyms:
+                found_synonyms[label] = []
+            found_synonyms[label].append(m.sentence)
+        self.debug_synonym_expansion("synonym-expansion", found_synonyms)
         uniq = []
         seen = set()
         for m in matches:

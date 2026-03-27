@@ -6,11 +6,16 @@ import requests
 # Import the base class AIAgent that this class will extend
 from sokegraph.agents.ai_agent import AIAgent
 
+
 class OllamaAgent(AIAgent):
     """
     AI Agent that interfaces with a locally running Ollama server (e.g., llama3 model).
     This class is useful for offline natural language processing using models like LLaMA.
     """
+
+    def _build_prompt(self, layer_name: str, abstract_text: str, ontology_layer: dict) -> str:
+        # Use the parent AIAgent's _build_prompt implementation
+        return super()._build_prompt(layer_name, abstract_text, ontology_layer)
 
     def __init__(self, field_of_interest, model="llama3", base_url="http://localhost:11434"):
         
